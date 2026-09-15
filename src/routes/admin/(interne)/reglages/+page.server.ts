@@ -31,7 +31,12 @@ export const actions: Actions = {
 			comments_enabled: form.get('comments_enabled') === '1' ? '1' : '0',
 			app_bandeau_actif: form.get('app_bandeau_actif') === '1' ? '1' : '0',
 			app_url_android: lienSur(form.get('app_url_android')),
-			app_url_ios: lienSur(form.get('app_url_ios'))
+			app_url_ios: lienSur(form.get('app_url_ios')),
+			apero_rythme: String(form.get('apero_rythme') ?? '').trim().slice(0, 80),
+			apero_heure: String(form.get('apero_heure') ?? '').trim().slice(0, 20),
+			apero_lieu: String(form.get('apero_lieu') ?? '').trim().slice(0, 120),
+			apero_adresse: String(form.get('apero_adresse') ?? '').trim().slice(0, 200),
+			apero_presentation: String(form.get('apero_presentation') ?? '').trim().slice(0, 1000)
 		};
 
 		for (const [cle, valeur] of Object.entries(valeurs)) {

@@ -49,7 +49,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		commentairesOuverts,
 		preModeration: preModerationEnabled(),
 		defi: commentairesOuverts ? createChallenge() : null,
-		apercu: publication.status !== 'published'
+		apercu: publication.status !== 'published',
+		// Une fiche d'apéro sans texte : le résumé n'a pas encore été écrit.
+		sansTexte: publication.body.trim().length === 0
 	};
 };
 

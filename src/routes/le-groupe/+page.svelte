@@ -78,6 +78,12 @@
 
 	<h2>Nos réunions</h2>
 	<p>
+		Le groupe se retrouve aussi régulièrement pour des <a href="/aperos">apéros thématiques</a> :
+		un sujet choisi à l'avance, une discussion ouverte à toutes et tous autour d'un verre, puis un
+		résumé des échanges publié sur le site. Dates, lieu et résumés des soirées passées sont sur la
+		page <a href="/aperos">Les apéros</a>.
+	</p>
+	<p>
 		<strong>À COMPLÉTER</strong> : indiquez ici la fréquence, le jour et le lieu habituel de vos
 		réunions, ainsi que la marche à suivre pour venir une première fois.
 	</p>

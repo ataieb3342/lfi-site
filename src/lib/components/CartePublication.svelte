@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatDate, formatDateCourte, LIBELLE_KIND, lienPublication } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateCourte, LIBELLE_KIND, lienPublication } from '$lib/format';
 	import type { PublicationVue } from '$lib/types';
 
 	let { publication, avecImage = true }: { publication: PublicationVue; avecImage?: boolean } = $props();
@@ -21,7 +21,7 @@
 
 	<div class="min-w-0 flex-1">
 		<p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-faint">
-			<span class="font-semibold tracking-wide text-brand uppercase">
+			<span class="font-semibold tracking-wide uppercase {COULEUR_KIND[publication.kind]}">
 				{LIBELLE_KIND[publication.kind]}
 			</span>
 			{#if publication.pinned}

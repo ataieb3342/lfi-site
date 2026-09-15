@@ -1,6 +1,6 @@
 import { db, now } from './db.ts';
 
-export type Kind = 'article' | 'actu';
+export type Kind = 'article' | 'actu' | 'apero';
 export type Status = 'draft' | 'published';
 
 export type Publication = {
@@ -69,6 +69,10 @@ const PUBLIC_SELECT = `
  * - « agenda » : les actions encore à venir d'abord, de la plus proche à la plus
  *   lointaine, puis tout le reste par date de publication. Sans cela, un appel à
  *   mobilisation vieux de trois mois resterait en tête de liste.
+ * - « archives » : comme « agenda » pour les rendez-vous à venir, mais les
+ *   rendez-vous passés sont classés par date de l'action et non de publication.
+ *   C'est le tri des apéros : leur fiche est publiée avant la soirée puis
+ *   complétée après, et c'est la date de la soirée qui fait sens dans l'archive.
  */
 const ORDRE = {
 	chronologique: 'order by p.pinned desc, p.published_at desc',
@@ -76,6 +80,12 @@ const ORDRE = {
 		p.pinned desc,
 		case when p.event_at is not null and p.event_at >= date('now') then 0 else 1 end,
 		case when p.event_at is not null and p.event_at >= date('now') then p.event_at end asc,
+		p.published_at desc`,
+	archives: `order by
+		p.pinned desc,
+		case when p.event_at is not null and p.event_at >= date('now') then 0 else 1 end,
+		case when p.event_at is not null and p.event_at >= date('now') then p.event_at end asc,
+		coalesce(p.event_at, substr(p.published_at, 1, 10)) desc,
 		p.published_at desc`
 } as const;
 

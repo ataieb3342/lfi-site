@@ -202,6 +202,40 @@ const MIGRATIONS: string[] = [
 	create index publications_kind on publications(kind, status, published_at desc);
 	create index publications_agenda on publications(kind, status, event_at);
 	`
+	,
+	// 003 — un troisième type de publication : l'apéro thématique
+	//
+	// Même procédure que la 002 : SQLite ne sait pas modifier une contrainte
+	// CHECK, la table est reconstruite à l'identique avec la nouvelle valeur.
+	`
+	create table publications_nouveau (
+		id integer primary key,
+		kind text not null check (kind in ('article', 'actu', 'apero')),
+		slug text not null unique,
+		title text not null,
+		summary text not null default '',
+		body text not null default '',
+		cover_media_id integer references media(id) on delete set null,
+		status text not null default 'draft' check (status in ('draft', 'published')),
+		comments_open integer not null default 1,
+		pinned integer not null default 0,
+		event_at text,
+		published_at text,
+		created_at text not null,
+		updated_at text not null,
+		author_id integer references admins(id) on delete set null,
+		author_name text not null default ''
+	);
+
+	insert into publications_nouveau select * from publications;
+
+	drop table publications;
+	alter table publications_nouveau rename to publications;
+
+	create index publications_feed on publications(status, published_at desc);
+	create index publications_kind on publications(kind, status, published_at desc);
+	create index publications_agenda on publications(kind, status, event_at);
+	`
 ];
 
 function migrer(base: DatabaseSync) {

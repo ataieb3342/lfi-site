@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatDate, LIBELLE_KIND, lienPublication } from '$lib/format';
+	import { COULEUR_KIND, formatDate, LIBELLE_KIND, lienPublication } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -23,6 +23,7 @@
 			<option value="">Tous</option>
 			<option value="article" selected={data.filtres.kind === 'article'}>Articles</option>
 			<option value="actu" selected={data.filtres.kind === 'actu'}>Actualités</option>
+			<option value="apero" selected={data.filtres.kind === 'apero'}>Apéros</option>
 		</select>
 	</div>
 	<div>
@@ -43,7 +44,7 @@
 				<div class="min-w-0 grow">
 					<a class="font-semibold text-ink hover:text-brand" href="/admin/publications/{p.id}">{p.title}</a>
 					<p class="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-ink-faint">
-						<span>{LIBELLE_KIND[p.kind]}</span>
+						<span class="font-semibold {COULEUR_KIND[p.kind]}">{LIBELLE_KIND[p.kind]}</span>
 						<span>·</span>
 						{#if p.status === 'published'}
 							<span>Publié le {formatDate(p.publishedAt)}</span>

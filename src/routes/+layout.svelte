@@ -11,6 +11,7 @@
 		{ href: '/', label: 'Accueil' },
 		{ href: '/articles', label: 'Articles' },
 		{ href: '/actualites', label: 'Actualités' },
+		{ href: '/aperos', label: 'Apéros' },
 		{ href: '/le-groupe', label: 'Le groupe' },
 		{ href: '/nous-rejoindre', label: 'Nous rejoindre' }
 	];

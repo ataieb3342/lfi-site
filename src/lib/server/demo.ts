@@ -13,8 +13,8 @@ import { currentTotp, generateTotpSecret } from './totp.ts';
  * faire tester, avant la vraie mise en production. Il s'active avec la variable
  * d'environnement MODE_DEMO=1 et fait trois choses :
  *
- *   1. si la base est vide, elle est remplie d'articles, d'actualités et de
- *      commentaires FICTIFS, et un compte administrateur de test est créé avec
+ *   1. si la base est vide, elle est remplie d'articles, d'actualités, d'apéros
+ *      et de commentaires FICTIFS, et un compte administrateur de test est créé avec
  *      la double authentification déjà activée ;
  *   2. un bandeau « site de démonstration » s'affiche sur toutes les pages ;
  *   3. la page de connexion affiche les identifiants du compte de test et le
@@ -104,6 +104,17 @@ function prochainSamedi(): number {
 	return n;
 }
 
+/**
+ * Le dernier lundi passé, en nombre de jours (toujours négatif). Les apéros
+ * ont lieu un lundi sur deux : le dernier apéro s'est tenu ce lundi-là, le
+ * prochain a lieu quatorze jours plus tard.
+ */
+function dernierLundi(): number {
+	const d = new Date();
+	const n = -((d.getUTCDay() + 6) % 7);
+	return n === 0 ? -7 : n;
+}
+
 /** Horodatage ISO décalé de n jours et de quelques heures, pour étaler les dates de publication. */
 function ilYaNJours(n: number, heure = 18): string {
 	const d = new Date();
@@ -113,13 +124,13 @@ function ilYaNJours(n: number, heure = 18): string {
 }
 
 type Fiche = {
-	kind: 'article' | 'actu';
+	kind: 'article' | 'actu' | 'apero';
 	title: string;
 	summary: string;
 	body: string;
-	/** Nombre de jours écoulés depuis la publication. */
-	publieIlYa: number;
-	/** Décalage en jours de la date de l'action (actualités seulement), ou une fonction qui le calcule. */
+	/** Nombre de jours écoulés depuis la publication, ou une fonction qui le calcule. */
+	publieIlYa: number | (() => number);
+	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
 	actionDans?: number | (() => number);
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
 };
@@ -222,6 +233,82 @@ Le lieu est indiqué dans la lettre d’information du groupe.`
 - Un cortège calme et bien organisé, sans incident.
 
 Les photos de la marche sont disponibles sur demande auprès du groupe.`
+	},
+	{
+		kind: 'apero',
+		title: 'Culture et patrimoine',
+		summary:
+			'Musées, théâtres, monuments, fêtes de quartier : à qui s’adresse la culture à Dijon, qui la finance, et que veut-on en faire ?',
+		actionDans: () => dernierLundi() + 14,
+		publieIlYa: 1,
+		body: `Le thème du prochain apéro : **la culture et le patrimoine**, à Dijon et ailleurs.
+
+Pas besoin d’avoir lu quoi que ce soit pour venir. On part de ce que chacun sait, on met en commun, et on repart avec quelques repères.
+
+## Ce dont on parlera
+
+- Qui fréquente les musées, les théâtres, les salles de concert, et qui n’y met jamais les pieds.
+- Le patrimoine classé et le patrimoine ordinaire : ce que l’on protège, ce que l’on laisse tomber.
+- Les budgets publics de la culture, et ce que changent les coupes annoncées.
+- La culture qui ne passe pas par les institutions : fêtes de quartier, radios associatives, pratiques amateurs.
+
+Le résumé des échanges sera publié sur cette page dans la semaine qui suit.`
+	},
+	{
+		kind: 'apero',
+		title: 'L’Iran : comprendre ce qui se joue',
+		summary:
+			'Une soirée pour remettre de l’ordre dans ce que l’on entend sur l’Iran : histoire récente, société, place dans la région.',
+		actionDans: dernierLundi,
+		publieIlYa: () => -dernierLundi() + 5,
+		body: `Une quinzaine de personnes autour de trois tables, dont plusieurs venues pour la première fois. Voici ce que nous retenons de la soirée.
+
+## Ce qui a été dit
+
+La discussion a commencé par un rappel des grandes dates : la révolution de 1979, la guerre avec l’Irak, les mobilisations de 2009, 2019 et 2022. Plusieurs personnes ont insisté sur un point : **l’Iran n’est pas un bloc**, et la société iranienne est très différente de l’image qu’en donnent son gouvernement comme les chaînes d’information en continu.
+
+Un long moment a été consacré aux sanctions économiques : qui elles touchent réellement, ce qu’elles changent au quotidien des habitants, et pourquoi elles pèsent d’abord sur les classes populaires.
+
+## Ce qui a fait débat
+
+- La position à tenir face à un gouvernement autoritaire sans se ranger derrière ceux qui préparent la guerre.
+- Le rôle des diasporas en Europe et la manière dont leurs voix sont relayées, ou pas.
+
+## Questions restées ouvertes
+
+Comment soutenir concrètement les mouvements sociaux iraniens depuis Dijon ? Personne n’avait de réponse toute faite ; une participante a proposé d’inviter quelqu’un de la communauté iranienne de Bourgogne à un prochain apéro.
+
+*Ce résumé est écrit par le groupe à partir des notes prises pendant la soirée. Il n’engage pas les personnes présentes.*`,
+		commentaires: [
+			{
+				auteur: 'Inès',
+				texte: 'Merci pour ce résumé, je n’avais pas pu venir. Partante pour la suite avec un invité.',
+				statut: 'approved'
+			}
+		]
+	},
+	{
+		kind: 'apero',
+		title: 'Le boycott : une arme qui marche ?',
+		summary:
+			'Premier apéro de la saison. Boycotter une marque, un pays, un événement : à quoi ça sert, quand ça a marché, et ce que ça nous coûte.',
+		actionDans: () => dernierLundi() - 14,
+		publieIlYa: () => -dernierLundi() + 19,
+		body: `Première soirée de la saison, une douzaine de personnes autour de deux tables.
+
+## Ce qui a été dit
+
+- Un rappel historique : le boycott des bus de Montgomery, celui de l’Afrique du Sud de l’apartheid, les campagnes contre certaines marques de textile. Ce qui les rapproche : une cible précise, une durée, et un mouvement organisé derrière.
+- Le boycott individuel, sans organisation collective, soulage la conscience mais pèse peu. Il devient efficace quand il est visible, chiffré et relayé.
+- Plusieurs personnes ont insisté sur le coût : boycotter suppose d’avoir le choix, ce que n’ont pas toujours les foyers les plus modestes.
+
+## Ce qui a fait débat
+
+Faut-il boycotter des événements culturels ou sportifs, au risque de pénaliser d’abord les artistes et les athlètes ? La table ne s’est pas mise d’accord, et c’est très bien ainsi.
+
+## Ce que nous en faisons
+
+Une participante a proposé de dresser la liste des campagnes de boycott en cours auxquelles le groupe pourrait se joindre, pour en discuter à une prochaine réunion.`
 	},
 	{
 		kind: 'article',
@@ -376,7 +463,8 @@ function remplirContenus(adminId: number) {
 
 		// Les dates de publication sont étalées dans le passé pour que la liste
 		// ressemble à un vrai site et non à huit publications du même instant.
-		const date = ilYaNJours(fiche.publieIlYa);
+		const publieIlYa = typeof fiche.publieIlYa === 'function' ? fiche.publieIlYa() : fiche.publieIlYa;
+		const date = ilYaNJours(publieIlYa);
 		base
 			.prepare('update publications set published_at = ?, created_at = ?, updated_at = ? where id = ?')
 			.run(date, date, date, id);
@@ -393,7 +481,7 @@ function remplirContenus(adminId: number) {
 			});
 			base
 				.prepare('update comments set created_at = ?, moderated_at = ? where id = ?')
-				.run(ilYaNJours(Math.max(0, fiche.publieIlYa - 1), 9 + i), c.statut === 'approved' ? now() : null, idCommentaire);
+				.run(ilYaNJours(Math.max(0, publieIlYa - 1), 9 + i), c.statut === 'approved' ? now() : null, idCommentaire);
 		}
 	}
 

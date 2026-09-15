@@ -21,7 +21,9 @@ export async function lirePublication(
 	const authorName = String(form.get('authorName') ?? '').trim();
 	const eventAt = String(form.get('eventAt') ?? '').trim();
 
-	if (kind !== 'article' && kind !== 'actu') throw new ErreurFormulaire('Type de publication inconnu.');
+	if (kind !== 'article' && kind !== 'actu' && kind !== 'apero') {
+		throw new ErreurFormulaire('Type de publication inconnu.');
+	}
 	if (status !== 'draft' && status !== 'published') throw new ErreurFormulaire('État inconnu.');
 	if (!title) throw new ErreurFormulaire('Le titre est obligatoire.');
 	if (title.length > 200) throw new ErreurFormulaire('Le titre est trop long (200 caractères maximum).');
@@ -29,6 +31,11 @@ export async function lirePublication(
 	if (body.length > 200_000) throw new ErreurFormulaire('Le texte est trop long.');
 	if (eventAt && !/^\d{4}-\d{2}-\d{2}$/.test(eventAt)) {
 		throw new ErreurFormulaire("La date de l'action est invalide.");
+	}
+	// Un apéro sans date n'a pas de sens : c'est elle qui le place dans la
+	// liste, avant ou après la soirée.
+	if (kind === 'apero' && !eventAt) {
+		throw new ErreurFormulaire("Un apéro a toujours une date : renseignez la date de l'action.");
 	}
 
 	// Image de couverture : suppression, remplacement, ou statu quo.

@@ -8,7 +8,7 @@
 
 export type PublicationVue = {
 	id: number;
-	kind: 'article' | 'actu';
+	kind: 'article' | 'actu' | 'apero';
 	slug: string;
 	title: string;
 	summary: string;

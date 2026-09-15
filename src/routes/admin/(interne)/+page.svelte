@@ -7,6 +7,7 @@
 	const chiffres = $derived([
 		{ label: 'Articles publiés', valeur: data.stats.articles },
 		{ label: 'Actualités publiées', valeur: data.stats.actus },
+		{ label: 'Apéros', valeur: data.stats.aperos },
 		{ label: 'Brouillons', valeur: data.stats.brouillons },
 		{ label: 'Commentaires en ligne', valeur: data.stats.commentaires }
 	]);
@@ -29,7 +30,7 @@
 	</a>
 {/if}
 
-<div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+<div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
 	{#each chiffres as chiffre (chiffre.label)}
 		<div class="carte">
 			<p class="text-3xl font-extrabold text-ink">{chiffre.valeur}</p>

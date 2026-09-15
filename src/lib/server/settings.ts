@@ -22,7 +22,17 @@ export const DEFAULTS = {
 	app_bandeau_actif: '1',
 	// Fiches officielles de l'application, éditeur « La France insoumise ».
 	app_url_android: 'https://play.google.com/store/apps/details?id=fr.actionpopulaire.twa',
-	app_url_ios: 'https://apps.apple.com/fr/app/action-populaire/id1559737444'
+	app_url_ios: 'https://apps.apple.com/fr/app/action-populaire/id1559737444',
+
+	/* Cadre des apéros thématiques, affiché en tête de la page /aperos et sur
+	   chaque fiche. Dans les réglages plutôt que dans le code : changer de bar
+	   ou d'horaire ne doit pas demander de redéploiement. */
+	apero_rythme: 'Un lundi sur deux',
+	apero_heure: '19 h 30',
+	apero_lieu: 'Café Chez Nous',
+	apero_adresse: '',
+	apero_presentation:
+		'On choisit un thème à l’avance, on en discute autour d’un verre, sans expert ni tribune : chacun vient avec ce qu’il sait et ce qu’il se demande. Quelques jours plus tard, un résumé des échanges est publié ici pour celles et ceux qui n’ont pas pu venir.'
 } satisfies Record<string, string>;
 
 export type SettingKey = keyof typeof DEFAULTS;

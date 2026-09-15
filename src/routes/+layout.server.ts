@@ -16,6 +16,14 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 			android: settings.app_url_android,
 			ios: settings.app_url_ios
 		},
+		// Cadre des apéros thématiques : rythme, heure et lieu habituels.
+		apero: {
+			rythme: settings.apero_rythme,
+			heure: settings.apero_heure,
+			lieu: settings.apero_lieu,
+			adresse: settings.apero_adresse,
+			presentation: settings.apero_presentation
+		},
 		// Vrai sur le site de démonstration : affiche le bandeau « contenus fictifs ».
 		demo: modeDemo(),
 		admin: locals.admin

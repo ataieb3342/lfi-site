@@ -131,5 +131,45 @@
 		</div>
 	</section>
 
+	<section class="carte space-y-4">
+		<h2 class="font-bold text-ink">Apéros thématiques</h2>
+		<p class="text-sm text-ink-soft">
+			Le cadre habituel des apéros, affiché en tête de la page « Les apéros » et sur chaque
+			fiche. Chaque apéro est ensuite une publication de type « Apéro thématique », avec son
+			thème en titre et la date de la soirée.
+		</p>
+
+		<div class="grid gap-4 sm:grid-cols-2">
+			<div>
+				<label class="etiquette" for="apero_rythme">Rythme</label>
+				<input id="apero_rythme" name="apero_rythme" class="champ" maxlength="80" value={r.apero_rythme} />
+				<p class="aide">Par exemple « Un lundi sur deux ».</p>
+			</div>
+			<div>
+				<label class="etiquette" for="apero_heure">Heure</label>
+				<input id="apero_heure" name="apero_heure" class="champ" maxlength="20" value={r.apero_heure} />
+			</div>
+		</div>
+
+		<div>
+			<label class="etiquette" for="apero_lieu">Lieu</label>
+			<input id="apero_lieu" name="apero_lieu" class="champ" maxlength="120" value={r.apero_lieu} />
+		</div>
+
+		<div>
+			<label class="etiquette" for="apero_adresse">Adresse</label>
+			<input id="apero_adresse" name="apero_adresse" class="champ" maxlength="200" value={r.apero_adresse} />
+			<p class="aide">Rue et numéro. Laissez vide pour n'afficher que le nom du lieu.</p>
+		</div>
+
+		<div>
+			<label class="etiquette" for="apero_presentation">Présentation</label>
+			<textarea id="apero_presentation" name="apero_presentation" class="champ" rows="3" maxlength="1000"
+				>{r.apero_presentation}</textarea
+			>
+			<p class="aide">Quelques phrases pour expliquer le principe, en tête de la page.</p>
+		</div>
+	</section>
+
 	<button class="bouton" type="submit">Enregistrer</button>
 </form>

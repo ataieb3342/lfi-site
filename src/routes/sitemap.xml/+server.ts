@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { listPublished } from '$lib/server/content';
 import { RUBRIQUE_PAR_KIND } from '$lib/rubriques';
 
-const PAGES_FIXES = ['/', '/articles', '/actualites', '/le-groupe', '/nous-rejoindre', '/mentions-legales', '/confidentialite'];
+const PAGES_FIXES = ['/', '/articles', '/actualites', '/aperos', '/le-groupe', '/nous-rejoindre', '/mentions-legales', '/confidentialite'];
 
 export const GET: RequestHandler = async ({ url }) => {
 	const base = url.origin;

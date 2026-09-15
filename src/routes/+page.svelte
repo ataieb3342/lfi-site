@@ -19,7 +19,9 @@
 	siteName={data.settings.siteName}
 	tagline={data.settings.tagline}
 	description={data.settings.description}
-	actions={data.actus.filter((a) => a.aVenir)}
+	actions={data.rendezVous}
+	apero={data.prochainApero}
+	cadreApero={data.apero}
 	app={data.app}
 />
 

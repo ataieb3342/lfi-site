@@ -75,7 +75,12 @@
 				<select id="kind" name="kind" class="champ">
 					<option value="article" selected={v.kind === 'article'}>Article</option>
 					<option value="actu" selected={v.kind === 'actu'}>Actualité</option>
+					<option value="apero" selected={v.kind === 'apero'}>Apéro thématique</option>
 				</select>
+				<p class="aide">
+					Pour un apéro : le thème en titre, la date de la soirée ci-dessous. Après la soirée,
+					rouvrez la même fiche et écrivez le résumé des échanges dans le texte.
+				</p>
 			</div>
 
 			<div>
@@ -97,8 +102,9 @@
 				<label class="etiquette" for="eventAt">Date de l'action</label>
 				<input id="eventAt" name="eventAt" type="date" class="champ" value={v.eventAt} />
 				<p class="aide">
-					Facultatif. Renseignée, la publication remonte en tête des actualités jusqu'au jour
-					dit, puis redescend automatiquement. Laissez vide pour une info sans rendez-vous.
+					Obligatoire pour un apéro, facultatif sinon. Renseignée, la publication remonte en
+					tête de sa rubrique jusqu'au jour dit, puis redescend automatiquement. Laissez vide
+					pour une info sans rendez-vous.
 				</p>
 			</div>
 

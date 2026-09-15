@@ -1,3 +1,5 @@
+import { RUBRIQUE_PAR_KIND, type Kind } from '$lib/rubriques';
+
 const MOIS = [
 	'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
 	'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
@@ -42,12 +44,32 @@ export function formatRelative(iso: string | null | undefined): string {
 
 export const LIBELLE_KIND: Record<string, string> = {
 	article: 'Article',
-	actu: 'Actualité'
+	actu: 'Actualité',
+	apero: 'Apéro thématique'
+};
+
+/**
+ * Couleur de chaque type de publication, prise aux trois couleurs du logo :
+ * violet pour les articles, rouge pour les actualités, pourpre pour les apéros.
+ * Sert aux étiquettes des listes et aux surfaces du carrousel.
+ */
+export const COULEUR_KIND: Record<string, string> = {
+	article: 'text-brand',
+	actu: 'text-accent',
+	apero: 'text-pourpre'
+};
+
+/** Surface colorée de chaque type (voir app.css), pour les diapositives. */
+export const FOND_KIND: Record<string, string> = {
+	article: 'fond-degrade',
+	actu: 'fond-actu',
+	apero: 'fond-apero'
 };
 
 /** Chemin public d'une publication. */
 export function lienPublication(kind: string, slug: string): string {
-	return kind === 'article' ? `/articles/${slug}` : `/actualites/${slug}`;
+	const rubrique = RUBRIQUE_PAR_KIND[kind as Kind] ?? 'actualites';
+	return `/${rubrique}/${slug}`;
 }
 
 /**
@@ -59,4 +81,12 @@ export function formatDateCourte(iso: string | null | undefined): string {
 	const d = new Date(`${iso}T12:00:00`);
 	if (Number.isNaN(d.getTime())) return '';
 	return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+/** « lundi 28 septembre 2026 » — la date d'un rendez-vous, jour de la semaine compris. */
+export function formatDateLongue(iso: string | null | undefined): string {
+	if (!iso) return '';
+	const d = new Date(`${iso}T12:00:00`);
+	if (Number.isNaN(d.getTime())) return '';
+	return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 }

@@ -119,6 +119,25 @@ h1, h2, h3, h4 {
 		radial-gradient(80% 100% at 0% 100%, rgba(111, 58, 173, 0.75) 0%, transparent 65%);
 	color: #fff;
 }
+/* Chaque type de publication a sa couleur, prise aux trois couleurs du logo :
+   violet pour les articles (c'est .fond-degrade), rouge pour les actualités,
+   pourpre pour les apéros. Les trois surfaces partagent la même construction,
+   un fond profond et deux lueurs, pour rester de la même famille. Texte blanc,
+   identiques en thème clair et sombre. */
+.fond-actu {
+	background-color: #521424;
+	background-image:
+		radial-gradient(70% 90% at 100% 0%, rgba(232, 62, 63, 0.7) 0%, transparent 62%),
+		radial-gradient(80% 100% at 0% 100%, rgba(154, 50, 99, 0.6) 0%, transparent 65%);
+	color: #fff;
+}
+.fond-apero {
+	background-color: #3a1032;
+	background-image:
+		radial-gradient(70% 90% at 100% 0%, rgba(154, 50, 99, 0.85) 0%, transparent 62%),
+		radial-gradient(80% 100% at 0% 100%, rgba(111, 58, 173, 0.55) 0%, transparent 65%);
+	color: #fff;
+}
 /* Surface sombre unie, pour le pied de page. */
 .fond-degrade-sombre {
 	background: #1a0f2e;

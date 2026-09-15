@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	return {
 		filtres: { kind: kind ?? '', status: status ?? '', recherche },
 		publications: listForAdmin({
-			kind: kind === 'article' || kind === 'actu' ? (kind as Kind) : undefined,
+			kind: kind === 'article' || kind === 'actu' || kind === 'apero' ? (kind as Kind) : undefined,
 			status: status === 'draft' || status === 'published' ? (status as Status) : undefined,
 			search: recherche
 		}).map(presentPublication)

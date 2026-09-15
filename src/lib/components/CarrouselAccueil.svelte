@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
-	import { formatDate } from '$lib/format';
+	import { formatDate, formatDateLongue } from '$lib/format';
 	import type { PublicationVue } from '$lib/types';
 
 	/**
@@ -21,23 +21,33 @@
 		tagline,
 		description,
 		actions = [],
+		apero = null,
+		cadreApero,
 		app
 	}: {
 		siteName: string;
 		tagline: string;
 		description: string;
 		actions?: PublicationVue[];
+		/** Le prochain apéro thématique, s'il est annoncé. */
+		apero?: PublicationVue | null;
+		/** Heure et lieu habituels des apéros (réglages). */
+		cadreApero: { heure: string; lieu: string };
 		app: { actif: boolean; android: string; ios: string };
 	} = $props();
 
 	type Diapositive =
+		| { id: string; type: 'apero'; action: PublicationVue }
 		| { id: string; type: 'identite' }
 		| { id: string; type: 'action'; action: PublicationVue }
 		| { id: string; type: 'application' };
 
-	// Une diapositive d'identité, une par action à venir (trois au plus), et
-	// celle de l'application si elle est activée.
+	// Le prochain apéro ouvre le carrousel : c'est le rendez-vous récurrent, le
+	// plus concret pour un visiteur, et il change toutes les deux semaines.
+	// Puis l'identité du groupe, les actions à venir (trois au plus), et la
+	// bulle de l'application si elle est activée.
 	const diapositives = $derived<Diapositive[]>([
+		...(apero ? [{ id: `apero-${apero.id}`, type: 'apero' as const, action: apero }] : []),
 		{ id: 'identite', type: 'identite' },
 		...actions.slice(0, 3).map((a) => ({ id: `action-${a.id}`, type: 'action' as const, action: a })),
 		...(app.actif ? [{ id: 'application', type: 'application' as const }] : [])
@@ -82,7 +92,42 @@
 				aria-roledescription="diapositive"
 				aria-label="{i + 1} sur {diapositives.length}"
 			>
-				{#if diapo.type === 'identite'}
+				{#if diapo.type === 'apero'}
+					<!-- Prochain apéro : surface bordeaux, la seule du site, pour qu'on
+					     le reconnaisse d'un coup d'œil. -->
+					<div
+						class="fond-apero relative flex h-full flex-col justify-center overflow-hidden rounded-2xl px-6 py-10 sm:px-10 sm:py-14"
+					>
+						{#if diapo.action.cover}
+							<!-- L'image de couverture en fond, teintée par la surface : elle
+							     habille sans gêner la lecture. -->
+							<img src={diapo.action.cover.url} alt="" class="absolute inset-0 h-full w-full object-cover opacity-30" aria-hidden="true" />
+						{/if}
+						<div class="relative max-w-2xl">
+							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">Prochain apéro</p>
+							<p class="mt-3 text-xl font-extrabold text-white sm:text-2xl">
+								<time datetime={diapo.action.eventAt}>{formatDateLongue(diapo.action.eventAt)}</time>
+								{#if cadreApero.heure}<span class="text-white/80"> · {cadreApero.heure}</span>{/if}
+							</p>
+							<h2 class="titre-affiche mt-1 text-2xl text-white sm:text-5xl">
+								{diapo.action.title}
+							</h2>
+							{#if diapo.action.summary}
+								<p class="mt-4 max-w-xl leading-relaxed text-white/90">{diapo.action.summary}</p>
+							{/if}
+							<div class="mt-8 flex flex-wrap items-center gap-4">
+								<a
+									href="/aperos/{diapo.action.slug}"
+									class="inline-block rounded-full bg-white px-5 py-2.5 text-sm font-bold text-pourpre transition-colors hover:bg-white/90"
+									>En savoir plus</a
+								>
+								{#if cadreApero.lieu}
+									<span class="text-sm font-semibold text-white/85">{cadreApero.lieu}</span>
+								{/if}
+							</div>
+						</div>
+					</div>
+				{:else if diapo.type === 'identite'}
 					<div class="fond-degrade relative h-full overflow-hidden rounded-2xl px-6 py-10 sm:px-10 sm:py-14">
 						<div class="relative max-w-2xl">
 							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">{siteName}</p>
@@ -106,8 +151,11 @@
 					<!-- Prochaine action : la date passe avant tout le reste, c'est ce
 					     que le visiteur doit retenir. -->
 					<div
-						class="fond-degrade relative flex h-full flex-col justify-center overflow-hidden rounded-2xl px-6 py-10 sm:px-10 sm:py-14"
+						class="fond-actu relative flex h-full flex-col justify-center overflow-hidden rounded-2xl px-6 py-10 sm:px-10 sm:py-14"
 					>
+						{#if diapo.action.cover}
+							<img src={diapo.action.cover.url} alt="" class="absolute inset-0 h-full w-full object-cover opacity-30" aria-hidden="true" />
+						{/if}
 						<div class="relative max-w-2xl">
 							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">
 								Prochaine action
@@ -124,7 +172,7 @@
 							<div class="mt-8">
 								<a
 									href="/actualites/{diapo.action.slug}"
-									class="inline-block rounded-full bg-white px-5 py-2.5 text-sm font-bold text-brand transition-colors hover:bg-white/90"
+									class="inline-block rounded-full bg-white px-5 py-2.5 text-sm font-bold text-accent-dark transition-colors hover:bg-white/90"
 									>En savoir plus</a
 								>
 							</div>

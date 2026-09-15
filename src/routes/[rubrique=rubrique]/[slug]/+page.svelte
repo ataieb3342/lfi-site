@@ -2,13 +2,17 @@
 	import { enhance } from '$app/forms';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
-	import { formatDate, formatDateTime, LIBELLE_KIND } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, LIBELLE_KIND } from '$lib/format';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const p = $derived(data.publication);
 	let envoiEnCours = $state(false);
+
+	// Cadre des apéros (heure, lieu), affiché sous le titre d'un apéro.
+	const cadre = $derived(data.apero);
+	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
 </script>
 
 <svelte:head>
@@ -26,9 +30,15 @@
 	</p>
 {/if}
 
+{#if p.kind === 'apero'}
+	<p class="mb-6 text-sm">
+		<a class="font-semibold text-brand hover:underline" href="/aperos">← Tous les apéros</a>
+	</p>
+{/if}
+
 <article>
 	<header class="border-b border-line pb-6">
-		<p class="text-xs font-semibold tracking-wide text-brand uppercase">{LIBELLE_KIND[p.kind]}</p>
+		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{LIBELLE_KIND[p.kind]}</p>
 		<h1 class="mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
 		<p class="mt-3 text-sm text-ink-faint">
 			<time datetime={p.publishedAt ?? undefined}>{formatDate(p.publishedAt)}</time>
@@ -38,7 +48,20 @@
 			<p class="mt-4 max-w-2xl text-lg text-ink-soft">{p.summary}</p>
 		{/if}
 
-		{#if p.eventAt}
+		{#if p.eventAt && p.kind === 'apero'}
+			<!-- Un apéro : la date complète, l'heure et le lieu habituels (réglages). -->
+			<p
+				class="mt-5 inline-flex flex-wrap items-center gap-x-2 rounded-lg px-4 py-2.5 text-sm font-bold
+					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
+			>
+				{#if p.aVenir}
+					<span>Rendez-vous le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time>{cadre.heure ? ` à ${cadre.heure}` : ''}</span>
+				{:else}
+					<span>Cet apéro a eu lieu le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time></span>
+				{/if}
+				{#if lieuComplet}<span aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
+			</p>
+		{:else if p.eventAt}
 			<p
 				class="mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
 					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
@@ -51,6 +74,17 @@
 			</p>
 		{/if}
 	</header>
+
+	{#if p.kind === 'apero' && data.sansTexte}
+		<!-- L'annonce a été publiée mais le résumé des échanges n'est pas encore écrit. -->
+		<p class="mx-auto mt-8 max-w-2xl rounded-lg border border-line bg-surface-alt px-4 py-3 text-sm text-ink-soft">
+			{#if p.aVenir}
+				Le résumé des échanges sera publié sur cette page après la soirée.
+			{:else}
+				Le résumé des échanges sera publié ici dans les prochains jours.
+			{/if}
+		</p>
+	{/if}
 
 	{#if p.cover}
 		<img src={p.cover.url} alt={p.cover.alt} class="mt-8 w-full rounded-lg" />

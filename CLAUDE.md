@@ -35,7 +35,8 @@ aucun service externe, aucune dépendance native.
 | `src/lib/components/Logo.svelte` | Le phi officiel, en dégradé ou en monochrome |
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
-| `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles` et `/actualites` |
+| `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites` et la fiche d'un apéro |
+| `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
 Les dépendances runtime se comptent sur une main : `markdown-it` et `qrcode`.
@@ -109,6 +110,13 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 - Les surfaces fortes (`.fond-degrade`) sont un violet profond éclairé par deux
   lueurs radiales, l'une rouge, l'autre violette — pas le dégradé diagonal du
   logo en aplat. Le dégradé pur ne sert qu'en filet fin (`.filet-degrade`).
+- **Chaque type de publication a sa couleur**, prise aux trois couleurs du
+  logo : violet pour les articles, rouge pour les actualités, pourpre pour les
+  apéros (`COULEUR_KIND` et `FOND_KIND` dans `format.ts`). Elle sert aux
+  étiquettes des listes et aux surfaces du carrousel : `.fond-degrade`,
+  `.fond-actu`, `.fond-apero`, construites pareil (fond profond, deux lueurs).
+  Quand la publication a une image de couverture, la diapositive l'affiche en
+  fond, teintée par la surface, pour qu'elle habille sans gêner la lecture.
 - `.titre-affiche` est très gras, serré, **en casse normale** : ni italique ni
   majuscules.
 - Boutons en pilule (`rounded-full`), aucun filigrane décoratif, le logo en
@@ -117,7 +125,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   mais la couleur principale des textes et liens est le violet, le rouge n'est
   qu'un accent.
 
-## Les deux types de publication
+## Les trois types de publication
 
 Une seule table `publications`, distinguée par la colonne `kind` :
 
@@ -126,6 +134,8 @@ Une seule table `publications`, distinguée par la colonne `kind` :
 - **`actu`** — actualités : annonces de rendez-vous, mobilisations, réactions à
   chaud. Elles ont une colonne `event_at` facultative (date de l'action, au
   format `AAAA-MM-JJ`).
+- **`apero`** — apéros thématiques (voir plus bas). `event_at` y est
+  obligatoire : c'est la date de la soirée.
 
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
 actions dont la date n'est pas passée remontent en tête, de la plus proche à la
@@ -135,12 +145,46 @@ sans piège de fuseau horaire.
 
 Une actualité sans `event_at` se comporte comme une simple brève d'information.
 
+## Les apéros thématiques
+
+Un lundi sur deux, le groupe se retrouve dans un bar autour d'un thème choisi à
+l'avance, puis publie un résumé des échanges. Sur le site :
+
+- **Un apéro = une seule publication** de type `apero`, le thème en titre, la
+  date de la soirée dans `event_at`. Avant la soirée, la fiche est l'annonce ;
+  après, on rouvre la même fiche et on écrit le résumé dans le corps du texte.
+  L'adresse partagée avant reste valable, pas de doublon. Tant que le corps est
+  vide, la fiche et la liste affichent « résumé à venir ».
+- **`/aperos`** (`src/routes/aperos/`) a sa propre page plutôt que de passer
+  par la route générique de rubrique : le prochain apéro est mis en avant, les
+  suivants listés, puis les précédents forment l'archive des thèmes. Cette page
+  fixe l'emporte sur `[rubrique=rubrique]` ; seule la fiche d'un apéro
+  (`/aperos/mon-theme`) passe par la route générique, dont le `match` accepte
+  `aperos`.
+- Le tri est `listPublished({ ordre: 'archives' })` : à venir d'abord par date
+  croissante, puis les passés **par date de la soirée** décroissante (et non
+  par date de publication, puisque la fiche est publiée avant et complétée
+  après).
+- **Le cadre habituel** (rythme, heure, lieu, adresse, texte de présentation)
+  est dans les réglages (`apero_*`), pas dans le code : changer de bar ne doit
+  pas demander de redéploiement. Il est exposé à toutes les pages par
+  `+layout.server.ts` sous `data.apero`.
+- Le prochain apéro ouvre le carrousel d'accueil (`prochainApero` dans
+  `src/routes/+page.server.ts`), sur la surface pourpre `.fond-apero`. Il est
+  aussi dans le flux RSS et dans le plan du site.
+- **Pas de calcul automatique des dates** tous les quinze jours : un apéro
+  sauté ou déplacé casserait la mécanique. Créer une fiche par apéro prend une
+  minute et laisse la main aux humains.
+
 ## Le carrousel d'accueil
 
-`src/lib/components/CarrouselAccueil.svelte`. Trois sortes de diapositives :
-l'identité du groupe, les prochaines actions (les actualités dont la date n'est
-pas passée, trois au plus, alimentées automatiquement), et la bulle Action
-populaire.
+`src/lib/components/CarrouselAccueil.svelte`. Quatre sortes de diapositives,
+dans cet ordre : le prochain apéro thématique (s'il est annoncé, sur la surface
+pourpre `.fond-apero`), l'identité du groupe, les prochaines actions (les
+actualités dont la date n'est pas passée, trois au plus, alimentées
+automatiquement), et la bulle Action populaire. L'apéro passe devant l'identité
+parce que c'est le rendez-vous récurrent, le plus concret pour un visiteur, et
+qu'il change toutes les deux semaines : l'accueil a toujours l'air vivant.
 
 Le défilement repose sur `scroll-snap` du navigateur, pas sur du JavaScript :
 sans script, on fait glisser au doigt et tout fonctionne. Le JavaScript n'ajoute
@@ -204,17 +248,6 @@ Les couleurs du dégradé de `app.css` sont celles, exactes, de ce fichier.
 Créer `src/routes/mon-adresse/+page.svelte`, puis ajouter le lien dans la
 navigation de `src/routes/+layout.svelte` et dans `PAGES_FIXES` de
 `src/routes/sitemap.xml/+server.ts`.
-
-## Le mode démonstration
-
-`src/lib/server/demo.ts`, activé par `MODE_DEMO=1`. Sur une base vide, il crée
-des contenus fictifs et un compte `demo` avec la 2FA déjà activée, puis la page
-de connexion affiche les identifiants et le code du moment. L'administration
-est donc ouverte à tout le monde : ce mode est réservé au site de test sur
-Render (`render.yaml`, `DEMO.md`) et ne doit jamais être activé en production.
-Les contenus fictifs sont dans le tableau `FICHES` de ce fichier ; les dates
-d'action sont relatives au jour du démarrage, pour qu'il y ait toujours des
-actions « à venir ».
 
 ## Le mode démonstration
 
