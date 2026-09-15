@@ -30,7 +30,7 @@ export const DEFAULTS = {
 	apero_rythme: 'Un lundi sur deux',
 	apero_heure: '19 h 30',
 	apero_lieu: 'Café Chez Nous',
-	apero_adresse: '',
+	apero_adresse: '6 bis rue Musette, 21000 Dijon',
 	apero_presentation:
 		'On choisit un thème à l’avance, on en discute autour d’un verre, sans expert ni tribune : chacun vient avec ce qu’il sait et ce qu’il se demande. Quelques jours plus tard, un résumé des échanges est publié ici pour celles et ceux qui n’ont pas pu venir.'
 } satisfies Record<string, string>;
