@@ -33,9 +33,11 @@ services:
         value: /app/data/site.db
       - key: UPLOADS_PATH
         value: /app/data/uploads
+      - key: BIBLIOTHEQUE_PATH
+        value: /app/data/bibliotheque
       - key: ADDRESS_HEADER
         value: X-Forwarded-For
       - key: XFF_DEPTH
         value: '1'
       - key: BODY_SIZE_LIMIT
-        value: 6M
+        value: 60M

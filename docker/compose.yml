@@ -15,7 +15,7 @@ services:
     env_file:
       - ../.env
     volumes:
-      # Tout l'état du site tient dans ce dossier : base et images.
+      # Tout l'état du site tient dans ce dossier : base, images et bibliothèque PDF.
       - ../data:/app/data
     # `expose` et non `ports` : le port 3000 reste sur le réseau interne.
     expose:

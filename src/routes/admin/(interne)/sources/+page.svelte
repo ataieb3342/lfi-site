@@ -15,8 +15,8 @@
 
 <h1 class="text-2xl font-extrabold text-ink">Sources des apéros</h1>
 <p class="mt-1 text-sm text-ink-soft">
-	Ce que les visiteurs proposent de lire, voir ou écouter avant un apéro. Ouvrez le lien avant de
-	publier : c'est lui que les gens cliqueront.
+	Ce que les visiteurs proposent de lire, voir ou écouter avant un apéro. Vérifiez le lien ou le
+	PDF et ses droits de diffusion avant de publier.
 </p>
 
 <nav class="mt-4 flex gap-1 border-b border-line" aria-label="Filtrer par état">
@@ -58,14 +58,26 @@
 						<a class="text-brand hover:underline" href={s.lien} target="_blank" rel="noopener noreferrer nofollow">{s.lien}</a>
 					</p>
 				{:else}
-					<p class="mt-1 text-xs text-ink-faint">Sans lien (un livre, par exemple).</p>
+					{#if s.pdfLien}
+						<p class="mt-1 text-sm">
+							<a class="text-brand hover:underline" href={s.pdfLien}>Télécharger le PDF à vérifier</a>
+							<span class="text-ink-faint">
+								· {s.pdfNom} · {((s.pdfOctets ?? 0) / 1024 / 1024).toFixed(1)} Mo
+							</span>
+						</p>
+						{#if s.droitsDiffusion}
+							<p class="mt-2 text-sm text-ink-soft"><strong>Droits indiqués :</strong> {s.droitsDiffusion}</p>
+						{/if}
+					{:else}
+						<p class="mt-1 text-xs text-ink-faint">Sans lien ni PDF.</p>
+					{/if}
 				{/if}
 				{#if s.note}
 					<p class="mt-2 whitespace-pre-wrap text-sm text-ink-soft">{s.note}</p>
 				{/if}
 
 				<div class="mt-4 flex flex-wrap gap-2">
-					{#if data.etat !== 'approved'}
+					{#if data.etat !== 'approved' && (s.lien || s.pdfLien)}
 						<form method="POST" action="?/approuver&etat={data.etat}">
 							<input type="hidden" name="id" value={s.id} />
 							<button class="bouton" type="submit">Publier</button>

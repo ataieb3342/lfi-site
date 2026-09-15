@@ -1,4 +1,5 @@
 import { db, now } from './db.ts';
+import { supprimerPdf } from './bibliotheque.ts';
 
 export type Kind = 'article' | 'actu' | 'apero';
 export type Status = 'draft' | 'published';
@@ -236,7 +237,13 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 }
 
 export function deletePublication(id: number) {
+	// La cascade SQLite supprime les lignes « sources », mais pas leurs fichiers
+	// sur le disque : leurs noms doivent être retenus avant la suppression.
+	const pdfs = db()
+		.prepare('select pdf_filename from sources where publication_id = ? and pdf_filename is not null')
+		.all(id) as { pdf_filename: string }[];
 	db().prepare('delete from publications where id = ?').run(id);
+	for (const pdf of pdfs) supprimerPdf(pdf.pdf_filename);
 }
 
 /* ----------------------------------------------------------- commentaires */
@@ -375,12 +382,17 @@ export type Source = {
 	created_at: string;
 	moderated_at: string | null;
 	ip_hash: string;
+	pdf_filename: string | null;
+	pdf_original_name: string;
+	pdf_bytes: number | null;
+	droits_diffusion: string;
 };
 
 export function listApprovedSources(publicationId: number): Source[] {
 	return db()
 		.prepare(
-			`select id, publication_id, title, url, note, author_name, status, created_at, moderated_at, ip_hash
+			`select id, publication_id, title, url, note, author_name, status, created_at, moderated_at, ip_hash,
+			        pdf_filename, pdf_original_name, pdf_bytes, droits_diffusion
 			 from sources where publication_id = ? and status = 'approved' order by created_at`
 		)
 		.all(publicationId) as Source[];
@@ -403,11 +415,16 @@ export function createSource(input: {
 	status: 'pending' | 'approved';
 	ipHash: string;
 	userAgent: string;
+	pdfFilename?: string | null;
+	pdfOriginalName?: string;
+	pdfBytes?: number | null;
+	droitsDiffusion?: string;
 }): number {
 	const result = db()
 		.prepare(
-			`insert into sources (publication_id, title, url, note, author_name, status, created_at, ip_hash, user_agent)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			`insert into sources (publication_id, title, url, note, author_name, status, created_at, ip_hash, user_agent,
+			 pdf_filename, pdf_original_name, pdf_bytes, droits_diffusion)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.publicationId,
@@ -418,7 +435,11 @@ export function createSource(input: {
 			input.status,
 			now(),
 			input.ipHash,
-			input.userAgent.slice(0, 200)
+			input.userAgent.slice(0, 200),
+			input.pdfFilename ?? null,
+			input.pdfOriginalName ?? '',
+			input.pdfBytes ?? null,
+			input.droitsDiffusion ?? ''
 		);
 	return Number(result.lastInsertRowid);
 }
@@ -443,6 +464,45 @@ export function listSourcesForModeration(status: 'pending' | 'approved' | 'rejec
 
 export function getSource(id: number): Source | undefined {
 	return db().prepare('select * from sources where id = ?').get(id) as Source | undefined;
+}
+
+export function getApprovedSourceByPdfFilename(filename: string): Source | undefined {
+	return db()
+		.prepare("select * from sources where pdf_filename = ? and status = 'approved'")
+		.get(filename) as Source | undefined;
+}
+
+/** Recherche sans filtre d'état, réservée à la relecture par l'administration. */
+export function getSourceByPdfFilename(filename: string): Source | undefined {
+	return db().prepare('select * from sources where pdf_filename = ?').get(filename) as Source | undefined;
+}
+
+/** Oublie le fichier après son retrait du disque tout en conservant la décision de modération. */
+export function detachPdfFromSource(id: number) {
+	db().prepare("update sources set pdf_filename = null, pdf_original_name = '', pdf_bytes = null, droits_diffusion = '' where id = ?").run(id);
+}
+
+/** Détache les PDF en attente d'une origine avant leur suppression du disque. */
+export function detachPendingPdfsFromIpHash(ipHash: string): string[] {
+	const lignes = db()
+		.prepare("select pdf_filename from sources where ip_hash = ? and status = 'pending' and pdf_filename is not null")
+		.all(ipHash) as { pdf_filename: string }[];
+	db().prepare(
+		"update sources set pdf_filename = null, pdf_original_name = '', pdf_bytes = null, droits_diffusion = '' where ip_hash = ? and status = 'pending'"
+	).run(ipHash);
+	return lignes.map((ligne) => ligne.pdf_filename);
+}
+
+/** Toutes les sources publiées, rassemblées dans la bibliothèque commune. */
+export function listBibliotheque(): SourceForModeration[] {
+	return db()
+		.prepare(
+			`select s.*, p.title as publication_title, p.slug as publication_slug, p.kind as publication_kind
+			 from sources s join publications p on p.id = s.publication_id
+			 where s.status = 'approved' and (s.url != '' or s.pdf_filename is not null)
+			 order by s.created_at desc limit 500`
+		)
+		.all() as SourceForModeration[];
 }
 
 export function moderateSource(id: number, status: 'approved' | 'rejected', adminId: number) {

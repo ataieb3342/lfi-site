@@ -9,12 +9,12 @@ import {
 	listApprovedSources
 } from '$lib/server/content';
 import { presentComment, presentPublication, presentSource } from '$lib/server/present';
-import { audit } from '$lib/server/auth';
 import { renderMarkdown, toPlainText } from '$lib/server/markdown';
 import { createChallenge, verifySolution } from '$lib/server/captcha';
 import { rateLimit, rateLimitPeek } from '$lib/server/ratelimit';
 import { commentsGloballyOpen, preModerationEnabled } from '$lib/server/settings';
 import { KIND_PAR_RUBRIQUE, type Rubrique } from '$lib/rubriques';
+import { MAX_PDF_BYTES, stockerPdf, supprimerPdf } from '$lib/server/bibliotheque';
 
 const CORPS_MIN = 2;
 const CORPS_MAX = 3000;
@@ -28,7 +28,7 @@ const SOURCE_TITRE_MAX = 120;
 const SOURCE_LIEN_MAX = 500;
 const SOURCE_NOTE_MAX = 300;
 /** Formulaire de source remis à zéro après un envoi accepté. */
-const SOURCE_VIDE = { formulaire: 'source' as const, titre: '', lien: '', note: '', pseudoSource: '', erreurSource: '' };
+const SOURCE_VIDE = { formulaire: 'source' as const, titre: '', lien: '', note: '', pseudoSource: '', droitsDiffusion: '', erreurSource: '' };
 
 // Quotas d'envoi par personne (identifiée par l'empreinte de son IP).
 const QUOTA_COURT = { limite: 3, fenetreMs: 10 * 60_000 };
@@ -65,8 +65,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		// Le dossier partagé n'existe que pour les apéros.
 		sources: publication.kind === 'apero' ? listApprovedSources(publication.id).map(presentSource) : [],
 		defiSource: publication.kind === 'apero' && publication.status === 'published' ? createChallenge() : null,
-		// Un administrateur connecté publie ses sources sans relecture.
-		sourceDirecte: !!locals.admin
+		// Les propositions passent toutes par la modération, y compris en session admin.
+		sourceSansPreuve: !!locals.admin
 	};
 };
 
@@ -193,12 +193,14 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const titre = String(form.get('titre') ?? '').trim();
 		const lienBrut = String(form.get('lien') ?? '').trim();
+		const fichier = form.get('pdf');
 		const note = String(form.get('note') ?? '').trim();
 		const pseudoSource = String(form.get('pseudoSource') ?? '').trim();
+		const droitsDiffusion = String(form.get('droitsDiffusion') ?? '').trim();
 		const preuve = String(form.get('preuve') ?? '');
 		const piege = String(form.get('site') ?? '');
 
-		const renvoi = { formulaire: 'source' as const, titre, lien: lienBrut, note, pseudoSource, erreurSource: '' };
+		const renvoi = { formulaire: 'source' as const, titre, lien: lienBrut, note, pseudoSource, droitsDiffusion, erreurSource: '' };
 
 		if (piege) return { ...SOURCE_VIDE, succesSource: true, enAttenteSource: true };
 		if (isIpBlocked(locals.ipHash)) {
@@ -218,6 +220,19 @@ export const actions: Actions = {
 		if (lien === null) {
 			return fail(400, { ...renvoi, erreurSource: 'Le lien ne ressemble pas à une adresse web (elle commence par https://).' });
 		}
+		const pdf = fichier instanceof File && fichier.size > 0 ? fichier : null;
+		if ((!lien && !pdf) || (lien && pdf)) {
+			return fail(400, { ...renvoi, erreurSource: 'Choisissez soit un lien, soit un fichier PDF.' });
+		}
+		if (pdf && pdf.size > MAX_PDF_BYTES) {
+			return fail(413, { ...renvoi, erreurSource: 'PDF trop lourd (maximum 50 Mo).' });
+		}
+		if (pdf && droitsDiffusion.length < 3) {
+			return fail(400, { ...renvoi, erreurSource: 'Pour un PDF, indiquez sa licence ou l’autorisation qui permet de le republier.' });
+		}
+		if (droitsDiffusion.length > 300) {
+			return fail(400, { ...renvoi, erreurSource: 'L’indication sur les droits est trop longue (maximum 300 caractères).' });
+		}
 		if (note.length > SOURCE_NOTE_MAX) {
 			return fail(400, { ...renvoi, erreurSource: `Le mot d’accompagnement est trop long (maximum ${SOURCE_NOTE_MAX} caractères).` });
 		}
@@ -228,23 +243,7 @@ export const actions: Actions = {
 			return fail(400, { ...renvoi, erreurSource: 'Mettez le lien dans le champ prévu, pas dans le mot d’accompagnement.' });
 		}
 
-		// Un administrateur connecté publie directement, et l'action est tracée.
-		if (locals.admin) {
-			createSource({
-				publicationId: publication.id,
-				title: titre,
-				url: lien,
-				note,
-				authorName: pseudoSource || locals.admin.displayName,
-				status: 'approved',
-				ipHash: locals.ipHash,
-				userAgent: request.headers.get('user-agent') ?? ''
-			});
-			audit(locals.admin, 'source.publication', publication.title, titre, locals.ipHash);
-			return { ...SOURCE_VIDE, succesSource: true, enAttenteSource: false };
-		}
-
-		const preuveValide = preuve ? verifySolution(preuve) : false;
+		const preuveValide = locals.admin || (preuve ? verifySolution(preuve) : false);
 		const quotas = preuveValide
 			? [
 					{ ...QUOTA_COURT, bucket: `source:court:${locals.ipHash}` },
@@ -266,16 +265,28 @@ export const actions: Actions = {
 		}
 		for (const quota of quotas) rateLimit(quota.bucket, quota.limite, quota.fenetreMs);
 
-		createSource({
-			publicationId: publication.id,
-			title: titre,
-			url: lien,
-			note,
-			authorName: pseudoSource,
-			status: 'pending',
-			ipHash: locals.ipHash,
-			userAgent: request.headers.get('user-agent') ?? ''
-		});
+		let pdfStocke: Awaited<ReturnType<typeof stockerPdf>> | null = null;
+		try {
+			if (pdf) pdfStocke = await stockerPdf(pdf);
+			createSource({
+				publicationId: publication.id,
+				title: titre,
+				url: lien,
+				note,
+				authorName: pseudoSource || locals.admin?.displayName || '',
+				status: 'pending',
+				ipHash: locals.ipHash,
+				userAgent: request.headers.get('user-agent') ?? '',
+				pdfFilename: pdfStocke?.filename,
+				pdfOriginalName: pdfStocke?.originalName,
+				pdfBytes: pdfStocke?.bytes,
+				droitsDiffusion: pdf ? droitsDiffusion : ''
+			});
+		} catch (err) {
+			supprimerPdf(pdfStocke?.filename);
+			const message = err instanceof Error ? err.message : 'Impossible d’enregistrer le PDF.';
+			return fail(400, { ...renvoi, erreurSource: message });
+		}
 
 		return { ...SOURCE_VIDE, succesSource: true, enAttenteSource: true };
 	}

@@ -57,7 +57,15 @@ export function presentSource(row: Source): SourceVue {
 		site: nomDuSite(row.url),
 		note: row.note,
 		authorName: row.author_name,
-		createdAt: row.created_at
+		createdAt: row.created_at,
+		droitsDiffusion: row.droits_diffusion,
+		pdf: row.pdf_filename
+			? {
+					url: `/bibliotheque/fichiers/${row.pdf_filename}`,
+					nom: row.pdf_original_name,
+					octets: row.pdf_bytes ?? 0
+				}
+			: null
 	};
 }
 

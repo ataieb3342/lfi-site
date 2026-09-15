@@ -64,9 +64,10 @@ ADMIN_EMAIL=contact@votre-domaine.fr
 
 DATABASE_PATH=/app/data/site.db
 UPLOADS_PATH=/app/data/uploads
+BIBLIOTHEQUE_PATH=/app/data/bibliotheque
 ADDRESS_HEADER=X-Forwarded-For
 XFF_DEPTH=1
-BODY_SIZE_LIMIT=6M
+BODY_SIZE_LIMIT=60M
 PORT=3000
 NODE_ENV=production
 ```

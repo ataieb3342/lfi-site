@@ -21,6 +21,7 @@ JOURS_CONSERVES="${JOURS_CONSERVES:-30}"
 HORODATAGE="$(date +%Y-%m-%d_%Hh%M)"
 
 mkdir -p "$DESTINATION"
+mkdir -p "$RACINE/data/uploads" "$RACINE/data/bibliotheque"
 
 echo "→ Instantané cohérent de la base…"
 $COMPOSE exec -T site node -e "
@@ -32,11 +33,11 @@ $COMPOSE exec -T site node -e "
   base.close();
 "
 
-echo "→ Archivage de la base et des images…"
+echo "→ Archivage de la base, des images et des PDF…"
 tar -czf "$DESTINATION/site-$HORODATAGE.tar.gz" \
 	-C "$RACINE/data" \
 	--transform 's|^\.instantane\.db$|site.db|' \
-	.instantane.db uploads
+	.instantane.db uploads bibliotheque
 
 rm -f "$RACINE/data/.instantane.db"
 chmod 600 "$DESTINATION/site-$HORODATAGE.tar.gz"
