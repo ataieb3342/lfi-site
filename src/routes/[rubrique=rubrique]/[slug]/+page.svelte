@@ -32,6 +32,10 @@
 	{#if p.cover}<meta property="og:image" content={p.cover.url} />{/if}
 </svelte:head>
 
+<!-- Toute la fiche partage la même colonne de lecture : en-tête, image,
+     texte, dossier partagé et commentaires ont ainsi le même bord gauche. -->
+<div class="mx-auto max-w-2xl">
+
 {#if data.apercu}
 	<p class="mb-6 rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
 		Aperçu d'un brouillon : cette page n'est pas visible du public.
@@ -59,7 +63,7 @@
 		{#if p.eventAt && p.kind === 'apero'}
 			<!-- Un apéro : la date complète, l'heure et le lieu habituels (réglages). -->
 			<p
-				class="mt-5 inline-flex flex-wrap items-center gap-x-2 rounded-lg px-4 py-2.5 text-sm font-bold
+				class="mt-5 flex flex-col gap-y-1 rounded-lg px-4 py-2.5 text-sm font-bold sm:inline-flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2
 					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
 			>
 				{#if p.aVenir}
@@ -67,7 +71,7 @@
 				{:else}
 					<span>Cet apéro a eu lieu le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time></span>
 				{/if}
-				{#if lieuComplet}<span aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
+				{#if lieuComplet}<span class="hidden sm:inline" aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
 			</p>
 		{:else if p.eventAt}
 			<p
@@ -160,7 +164,7 @@
 
 		{#if data.defiSource}
 			<details class="mt-6" bind:open={partageOuvert}>
-				<summary class="inline-block cursor-pointer list-none rounded-full bg-pourpre px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90">
+				<summary class="inline-block cursor-pointer list-none rounded-full bg-pourpre px-5 py-2.5 text-sm font-bold text-sur-brand transition-opacity hover:opacity-90">
 					Partager une source
 				</summary>
 
@@ -194,7 +198,7 @@
 							required
 							maxlength="120"
 							value={form?.formulaire === 'source' ? (form.titre ?? '') : ''}
-							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 						/>
 					</div>
 
@@ -211,7 +215,7 @@
 							maxlength="500"
 							placeholder="https://"
 							value={form?.formulaire === 'source' ? (form.lien ?? '') : ''}
-							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 						/>
 					</div>
 
@@ -224,7 +228,7 @@
 							name="note"
 							rows="2"
 							maxlength="300"
-							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 							>{form?.formulaire === 'source' ? (form.note ?? '') : ''}</textarea
 						>
 					</div>
@@ -240,7 +244,7 @@
 							maxlength="60"
 							autocomplete="off"
 							value={form?.formulaire === 'source' ? (form.pseudoSource ?? '') : ''}
-							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 						/>
 					</div>
 
@@ -259,7 +263,7 @@
 						<button
 							type="submit"
 							disabled={envoiSourceEnCours}
-							class="rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+							class="rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-sur-brand transition-colors hover:bg-brand-dark disabled:opacity-60"
 							>{envoiSourceEnCours ? 'Envoi…' : 'Ajouter au dossier'}</button
 						>
 						<p class="text-xs text-ink-faint">
@@ -278,8 +282,12 @@
 
 <section id="commentaires" class="mx-auto mt-16 max-w-2xl border-t border-line pt-10">
 	<h2 class="text-xl font-extrabold text-ink">
-		{data.commentaires.length}
-		{data.commentaires.length > 1 ? 'commentaires' : 'commentaire'}
+		{#if data.commentaires.length === 0}
+			Commentaires
+		{:else}
+			{data.commentaires.length}
+			{data.commentaires.length > 1 ? 'commentaires' : 'commentaire'}
+		{/if}
 	</h2>
 
 	{#if data.commentaires.length}
@@ -343,7 +351,7 @@
 					maxlength="60"
 					autocomplete="off"
 					value={form?.pseudo ?? ''}
-					class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+					class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 				/>
 			</div>
 
@@ -355,7 +363,7 @@
 					rows="5"
 					required
 					maxlength="3000"
-					class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+					class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
 					>{form?.corps ?? ''}</textarea
 				>
 			</div>
@@ -374,7 +382,7 @@
 				<button
 					type="submit"
 					disabled={envoiEnCours}
-					class="rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+					class="rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-sur-brand transition-colors hover:bg-brand-dark disabled:opacity-60"
 					>{envoiEnCours ? 'Envoi…' : 'Envoyer'}</button
 				>
 				<p class="text-xs text-ink-faint">
@@ -389,6 +397,8 @@
 		</p>
 	{/if}
 </section>
+
+</div>
 
 {#if p.kind === 'actu'}
 	<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />

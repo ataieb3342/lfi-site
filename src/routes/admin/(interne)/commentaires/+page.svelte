@@ -27,7 +27,7 @@
 		>
 			{onglet.label}
 			{#if onglet.etat === 'pending' && data.commentairesEnAttente}
-				<span class="ml-1 rounded-full bg-brand px-1.5 text-xs text-white">{data.commentairesEnAttente}</span>
+				<span class="ml-1 rounded-full bg-brand px-1.5 text-xs text-sur-brand">{data.commentairesEnAttente}</span>
 			{/if}
 		</a>
 	{/each}

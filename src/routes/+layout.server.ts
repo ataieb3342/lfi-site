@@ -26,6 +26,8 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		},
 		// Vrai sur le site de démonstration : affiche le bandeau « contenus fictifs ».
 		demo: modeDemo(),
+		// Affichage choisi : 'clair', 'sombre' ou 'auto'. Sert à marquer le bouton actif.
+		theme: locals.theme,
 		admin: locals.admin
 			? { id: locals.admin.id, displayName: locals.admin.displayName, role: locals.admin.role }
 			: null

@@ -45,7 +45,7 @@
 	{#each etapes as etape, i (etape.titre)}
 		<li class="flex flex-col rounded-2xl border border-line bg-surface p-6">
 			<span
-				class="grid h-9 w-9 place-items-center rounded-full bg-brand text-sm font-extrabold text-white"
+				class="grid h-9 w-9 place-items-center rounded-full bg-brand text-sm font-extrabold text-sur-brand"
 				aria-hidden="true">{i + 1}</span
 			>
 			<h2 class="mt-4 text-lg font-extrabold tracking-tight text-ink">{etape.titre}</h2>

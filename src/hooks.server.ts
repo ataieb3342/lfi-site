@@ -5,6 +5,7 @@ import { SESSION_COOKIE, resolveSession } from '$lib/server/auth';
 import { hmac } from '$lib/server/crypto';
 import { annoncerInstallationSiNecessaire } from '$lib/server/installation';
 import { modeDemo, preparerDemoSiNecessaire } from '$lib/server/demo';
+import { THEME_COOKIE, lireTheme } from '$lib/server/theme';
 
 /** Chemins de l'administration accessibles sans être connecté. */
 const PUBLIC_ADMIN_PATHS = ['/admin/connexion', '/admin/installation'];
@@ -35,7 +36,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const response = await resolve(event);
+	// Affichage clair ou sombre choisi par le visiteur (pied de page). Le thème
+	// est écrit sur la balise <html> par le serveur : aucun script en ligne,
+	// donc rien à assouplir dans la politique de sécurité, et pas de page qui
+	// s'affiche d'abord en clair puis bascule.
+	event.locals.theme = lireTheme(event.cookies.get(THEME_COOKIE));
+
+	const response = await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('%sveltekit.theme%', event.locals.theme)
+	});
 
 	// En-têtes de sécurité. La CSP elle-même est configurée dans vite.config.ts.
 	response.headers.set('X-Content-Type-Options', 'nosniff');

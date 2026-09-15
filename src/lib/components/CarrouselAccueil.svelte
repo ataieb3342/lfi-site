@@ -55,6 +55,10 @@
 
 	let piste = $state<HTMLDivElement | null>(null);
 	let courante = $state(0);
+	// Vrai une fois le script chargé. Les diapositives hors champ ne sont
+	// rendues inertes qu'à partir de là : sans script, `courante` resterait à
+	// zéro et les liens des autres diapositives seraient inutilisables.
+	let scriptActif = $state(false);
 
 	function allerA(i: number) {
 		if (!piste) return;
@@ -67,6 +71,7 @@
 
 	$effect(() => {
 		if (piste) piste.scrollLeft = 0;
+		scriptActif = true;
 	});
 
 	function surDefilement() {
@@ -74,6 +79,11 @@
 		courante = Math.round(piste.scrollLeft / piste.clientWidth);
 	}
 </script>
+
+<!-- Le titre principal de la page est ici, hors du carrousel : dans une
+     diapositive, il pouvait arriver après d'autres titres et perturbait
+     l'ordre de lecture des lecteurs d'écran. -->
+<h1 class="sr-only">{siteName}</h1>
 
 <section
 	class="relative"
@@ -87,10 +97,13 @@
 			[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 	>
 		{#each diapositives as diapo, i (diapo.id)}
+			<!-- Une diapositive hors champ est inerte : la touche Tab ne peut plus
+			     atteindre ses boutons, ce qui faisait sauter le carrousel. -->
 			<div
 				class="w-full shrink-0 snap-start"
 				aria-roledescription="diapositive"
 				aria-label="{i + 1} sur {diapositives.length}"
+				inert={scriptActif && i !== courante}
 			>
 				{#if diapo.type === 'apero'}
 					<!-- Prochain apéro : surface bordeaux, la seule du site, pour qu'on
@@ -105,11 +118,11 @@
 						{/if}
 						<div class="relative max-w-2xl">
 							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">Prochain apéro</p>
-							<p class="mt-3 text-xl font-extrabold text-white sm:text-2xl">
+							<p class="mt-3 text-lg font-extrabold text-white sm:text-2xl">
 								<time datetime={diapo.action.eventAt}>{formatDateLongue(diapo.action.eventAt)}</time>
-								{#if cadreApero.heure}<span class="text-white/80"> · {cadreApero.heure}</span>{/if}
+								{#if cadreApero.heure}<span class="whitespace-nowrap text-white/80"> · {cadreApero.heure}</span>{/if}
 							</p>
-							<h2 class="titre-affiche mt-1 text-2xl text-white sm:text-5xl">
+							<h2 class="titre-affiche mt-2 text-3xl text-white sm:text-5xl">
 								{diapo.action.title}
 							</h2>
 							{#if diapo.action.summary}
@@ -131,7 +144,7 @@
 					<div class="fond-degrade relative h-full overflow-hidden rounded-2xl px-6 py-10 sm:px-10 sm:py-14">
 						<div class="relative max-w-2xl">
 							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">{siteName}</p>
-							<h1 class="titre-affiche mt-3 text-3xl text-white sm:text-6xl">{tagline}</h1>
+							<h2 class="titre-affiche mt-3 text-3xl text-white sm:text-6xl">{tagline}</h2>
 							<p class="mt-5 max-w-xl text-lg leading-relaxed text-white/90">{description}</p>
 							<div class="mt-8 flex flex-wrap gap-3">
 								<a
@@ -160,10 +173,10 @@
 							<p class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">
 								Prochaine action
 							</p>
-							<p class="mt-3 text-2xl font-extrabold text-white">
+							<p class="mt-3 text-lg font-extrabold text-white sm:text-2xl">
 								<time datetime={diapo.action.eventAt}>{formatDate(diapo.action.eventAt)}</time>
 							</p>
-							<h2 class="titre-affiche mt-1 text-2xl text-white sm:text-5xl">
+							<h2 class="titre-affiche mt-2 text-3xl text-white sm:text-5xl">
 								{diapo.action.title}
 							</h2>
 							{#if diapo.action.summary}
@@ -194,7 +207,7 @@
 		<div class="mt-4 flex items-center justify-center gap-3">
 			<button
 				type="button"
-				class="rounded-full border border-line p-2 text-ink-soft transition-colors hover:bg-surface-alt"
+				class="rounded-full border border-line-forte p-2 text-ink-soft transition-colors hover:bg-surface-alt"
 				aria-label="Diapositive précédente"
 				onclick={() => allerA(Math.max(0, courante - 1))}
 			>
@@ -209,7 +222,7 @@
 					<button
 						type="button"
 						class="h-2.5 rounded-full transition-all
-							{i === courante ? 'w-6 bg-brand' : 'w-2.5 bg-line hover:bg-ink-faint'}"
+							{i === courante ? 'w-6 bg-brand' : 'w-2.5 bg-line-forte hover:bg-ink-faint'}"
 						aria-label="Aller à la diapositive {i + 1}"
 						aria-current={i === courante ? 'true' : undefined}
 						onclick={() => allerA(i)}
@@ -219,7 +232,7 @@
 
 			<button
 				type="button"
-				class="rounded-full border border-line p-2 text-ink-soft transition-colors hover:bg-surface-alt"
+				class="rounded-full border border-line-forte p-2 text-ink-soft transition-colors hover:bg-surface-alt"
 				aria-label="Diapositive suivante"
 				onclick={() => allerA(Math.min(diapositives.length - 1, courante + 1))}
 			>

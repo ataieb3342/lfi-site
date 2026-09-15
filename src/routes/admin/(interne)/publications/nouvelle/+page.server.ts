@@ -1,11 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { createPublication } from '$lib/server/content';
-import { ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
+import { apercuPublication, ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
 import { audit } from '$lib/server/auth';
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	creer: async ({ request, locals }) => {
 		const admin = locals.admin!;
 		const form = await request.formData();
 
@@ -22,5 +22,7 @@ export const actions: Actions = {
 		}
 
 		redirect(303, `/admin/publications/${id}?enregistre=1`);
-	}
+	},
+
+	apercu: async ({ request }) => apercuPublication(await request.formData())
 };

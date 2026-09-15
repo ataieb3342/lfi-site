@@ -34,11 +34,11 @@
 		<div class="max-w-2xl">
 			<p id="prochain" class="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">Prochain apéro</p>
 			{#if prochain}
-				<p class="mt-3 text-xl font-extrabold text-white sm:text-2xl">
+				<p class="mt-3 text-lg font-extrabold text-white sm:text-2xl">
 					<time datetime={prochain.eventAt}>{formatDateLongue(prochain.eventAt)}</time>
-					{#if cadre.heure}<span class="text-white/80"> · {cadre.heure}</span>{/if}
+					{#if cadre.heure}<span class="whitespace-nowrap text-white/80"> · {cadre.heure}</span>{/if}
 				</p>
-				<h2 class="titre-affiche mt-1 text-2xl text-white sm:text-5xl">{prochain.title}</h2>
+				<h2 class="titre-affiche mt-2 text-3xl text-white sm:text-5xl">{prochain.title}</h2>
 				{#if prochain.summary}
 					<p class="mt-4 max-w-xl leading-relaxed text-white/90">{prochain.summary}</p>
 				{/if}

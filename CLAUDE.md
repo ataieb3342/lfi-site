@@ -121,6 +121,20 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   majuscules.
 - Boutons en pilule (`rounded-full`), aucun filigrane décoratif, le logo en
   couleur sur fond blanc dans l'en-tête.
+- **Le fond clair n'est pas un blanc pur** (`--color-surface`) et le texte
+  n'est pas un noir pur : le contraste reste très large mais la page
+  n'éblouit pas. `--color-line` est le filet décoratif ; `--color-line-forte`
+  sert aux contours qu'on manipule (champs, boutons secondaires, pastilles),
+  pour tenir le contraste de 3 pour 1 exigé sur les commandes.
+- **Le texte posé sur un fond violet passe par `text-sur-brand`**, jamais
+  `text-white` : en thème sombre le violet devient un lavande clair et le
+  texte doit devenir sombre. La classe `.bouton` le fait déjà.
+- **Le visiteur choisit son affichage** (clair, sombre, automatique) dans le
+  pied de page. C'est un formulaire ordinaire vers `/theme`, qui pose un
+  cookie ; `hooks.server.ts` écrit ensuite `data-theme` sur `<html>`. Aucun
+  script en ligne, donc rien à assouplir dans la CSP, et pas de page qui
+  s'affiche en clair avant de basculer. Les jetons sombres d'`app.css` sont
+  écrits deux fois, pour le cas « automatique » et pour le cas « choisi ».
 - Les couleurs du logo officiel restent la référence de la palette (`app.css`),
   mais la couleur principale des textes et liens est le violet, le rouge n'est
   qu'un accent.
@@ -266,6 +280,18 @@ par un carré, sinon il est inutilement rétréci.
 Le fichier d'origine récupéré sur Wikimedia pesait 61 Ko dont 52 Ko d'aperçu PNG
 masqué et un tracé en `display:none`, restes du recadrage. Ils ont été retirés.
 Les couleurs du dégradé de `app.css` sont celles, exactes, de ce fichier.
+
+## Le formulaire de publication
+
+`src/lib/components/FormulairePublication.svelte` offre une barre d'outils
+(gras, titre, lien, image…) qui insère la syntaxe Markdown dans le texte, et
+un bouton « Aperçu du texte ». L'aperçu est rendu **par le serveur** (action
+`apercu` des pages nouvelle et modification, via `apercuPublication` dans
+`formulaires.ts`) avec exactement le code des pages publiques : pas de second
+moteur Markdown côté navigateur, donc pas d'écart entre l'aperçu et le site,
+et `html: false` s'applique aussi à l'aperçu. Le formulaire est envoyé sans
+rechargement (`use:enhance`, `reset: false`) pour que l'image choisie et le
+texte tapé restent en place.
 
 ## Ajouter une page fixe
 

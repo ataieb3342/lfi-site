@@ -14,24 +14,48 @@
 	--color-brand-dark: #43206c;
 	--color-brand-soft: #f1ebf8;
 
-	--color-accent: #c43850; /* rouge officiel, assombri juste ce qu'il faut
-	                            pour rester lisible sur fond blanc */
+	--color-accent: #b8334a; /* rouge officiel, assombri juste ce qu'il faut
+	                            pour rester lisible sur le fond clair */
 	--color-accent-dark: #9c1e33;
 	--color-accent-soft: #fbeaee;
 
 	--color-pourpre: #9a3263; /* teinte intermédiaire du dégradé */
 
-	--color-ink: #1c1426; /* noir légèrement violacé */
+	/*
+	 * Texte et fond. Le fond n'est pas un blanc pur mais un blanc cassé à peine
+	 * violacé, et le texte un noir adouci : le contraste reste très large
+	 * (au-delà de 14 pour 1, la norme demande 4,5) mais la page n'éblouit plus.
+	 */
+	--color-ink: #2a1f36;
 	--color-ink-soft: #4d4459;
-	--color-ink-faint: #776e82;
+	--color-ink-faint: #6f6679;
 
-	--color-surface: #ffffff;
-	--color-surface-alt: #f7f4fa;
-	--color-line: #e4dfea;
+	--color-surface: #faf8fc;
+	--color-surface-alt: #f2eef7;
+	/* Filet décoratif : séparateurs, bordures de cartes. Volontairement discret. */
+	--color-line: #e1dbe8;
+	/* Contour des éléments qu'on manipule : champs, boutons secondaires,
+	   pastilles. Plus soutenu, pour atteindre le contraste de 3 pour 1 que
+	   demande la norme sur les contours de commande. */
+	--color-line-forte: #918799;
+	/* Couleur du texte posé sur un fond violet (boutons, pastilles). Blanc en
+	   thème clair ; en thème sombre le violet devient un lavande clair, et le
+	   texte doit passer au sombre pour rester lisible. */
+	--color-sur-brand: #ffffff;
 
 	--font-sans:
 		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 	--font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+	/*
+	 * Les deux plus petites tailles de texte sont relevées pour tout le site :
+	 * 14 px au lieu de 12 pour les dates, aides et étiquettes, 15 px au lieu
+	 * de 14 pour les chapôs des listes. Le public est de tous âges.
+	 */
+	--text-xs: 0.875rem;
+	--text-xs--line-height: 1.45;
+	--text-sm: 0.9375rem;
+	--text-sm--line-height: 1.5;
 }
 
 /*
@@ -47,9 +71,17 @@
 	--filet-degrade: linear-gradient(90deg, #e83e3f 0%, #9a3263 45%, #4f2680 100%);
 }
 
-/* Mode sombre automatique, suivant le réglage du système du visiteur. */
+/*
+ * Thème sombre.
+ *
+ * Il s'applique dans deux cas : quand le visiteur a choisi « Sombre » dans le
+ * pied de page (le serveur écrit alors data-theme="sombre" sur <html>, d'après
+ * un cookie), ou quand son système est en sombre et qu'il n'a rien choisi.
+ * Les jetons sont écrits deux fois, une par cas : le CSS ne permet pas de
+ * combiner une requête média et un sélecteur dans une même règle.
+ */
 @media (prefers-color-scheme: dark) {
-	:root {
+	:root:not([data-theme='clair']) {
 		--color-brand: #c1a0ef;
 		--color-brand-dark: #d8c2f7;
 		--color-brand-soft: #2a1d3d;
@@ -62,18 +94,45 @@
 
 		--color-ink: #f3eff8;
 		--color-ink-soft: #bbb2c8;
-		--color-ink-faint: #8f8699;
+		--color-ink-faint: #9a92a6;
 
 		--color-surface: #130f1a;
 		--color-surface-alt: #1c1626;
 		--color-line: #2f2740;
+		--color-line-forte: #6d6280;
+		--color-sur-brand: #1a0f2e;
 	}
+}
+:root[data-theme='sombre'] {
+	--color-brand: #c1a0ef;
+	--color-brand-dark: #d8c2f7;
+	--color-brand-soft: #2a1d3d;
+
+	--color-accent: #ff6d80;
+	--color-accent-dark: #ff9aa7;
+	--color-accent-soft: #3a1820;
+
+	--color-pourpre: #d67bb0;
+
+	--color-ink: #f3eff8;
+	--color-ink-soft: #bbb2c8;
+	--color-ink-faint: #9a92a6;
+
+	--color-surface: #130f1a;
+	--color-surface-alt: #1c1626;
+	--color-line: #2f2740;
+	--color-line-forte: #6d6280;
+	--color-sur-brand: #1a0f2e;
 }
 
 html {
+	/* Par défaut, formulaires et barres de défilement suivent le système ;
+	   un choix explicite du visiteur les force dans un sens ou l'autre. */
 	color-scheme: light dark;
 	scroll-behavior: smooth;
 }
+html[data-theme='clair'] { color-scheme: light; }
+html[data-theme='sombre'] { color-scheme: dark; }
 
 body {
 	background: var(--color-surface);
@@ -103,7 +162,7 @@ h1, h2, h3, h4 {
 	z-index: 100;
 	padding: 0.75rem 1rem;
 	background: var(--color-brand);
-	color: #fff;
+	color: var(--color-sur-brand);
 	font-weight: 600;
 }
 .skip-link:focus {
@@ -229,7 +288,7 @@ h1, h2, h3, h4 {
  */
 .champ {
 	width: 100%;
-	border: 1px solid var(--color-line);
+	border: 1px solid var(--color-line-forte);
 	background: var(--color-surface);
 	color: var(--color-ink);
 	border-radius: 0.375rem;
@@ -239,12 +298,12 @@ h1, h2, h3, h4 {
 .champ:disabled { opacity: 0.6; }
 .etiquette {
 	display: block;
-	font-size: 0.8125rem;
+	font-size: 0.875rem;
 	font-weight: 600;
 	color: var(--color-ink);
 	margin-bottom: 0.25rem;
 }
-.aide { font-size: 0.75rem; color: var(--color-ink-faint); margin-top: 0.25rem; }
+.aide { font-size: 0.875rem; color: var(--color-ink-faint); margin-top: 0.25rem; }
 
 .bouton {
 	display: inline-flex;
@@ -252,7 +311,7 @@ h1, h2, h3, h4 {
 	gap: 0.5rem;
 	border-radius: 9999px;
 	background: var(--color-brand);
-	color: #fff;
+	color: var(--color-sur-brand);
 	padding: 0.55rem 1.1rem;
 	font-size: 0.875rem;
 	font-weight: 700;
@@ -270,7 +329,7 @@ h1, h2, h3, h4 {
 	border-radius: 9999px;
 	background: var(--color-surface);
 	color: var(--color-ink);
-	border: 1px solid var(--color-line);
+	border: 1px solid var(--color-line-forte);
 	padding: 0.55rem 1.1rem;
 	font-size: 0.875rem;
 	font-weight: 600;
@@ -287,7 +346,7 @@ h1, h2, h3, h4 {
 	color: var(--color-accent);
 	border: 1px solid var(--color-accent);
 	padding: 0.4rem 0.9rem;
-	font-size: 0.8125rem;
+	font-size: 0.875rem;
 	font-weight: 700;
 	cursor: pointer;
 }

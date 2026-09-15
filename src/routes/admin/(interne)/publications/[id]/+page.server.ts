@@ -2,7 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { deletePublication, getById, updatePublication } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
-import { ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
+import { apercuPublication, ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
 import { audit } from '$lib/server/auth';
 
 function charger(id: string) {
@@ -41,6 +41,8 @@ export const actions: Actions = {
 
 		redirect(303, `/admin/publications/${publication.id}?enregistre=1`);
 	},
+
+	apercu: async ({ request }) => apercuPublication(await request.formData()),
 
 	supprimer: async ({ params, locals }) => {
 		const admin = locals.admin!;

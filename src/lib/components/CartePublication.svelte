@@ -51,10 +51,15 @@
 			<p class="mt-1.5 line-clamp-3 text-sm text-ink-soft">{publication.summary}</p>
 		{/if}
 
-		<p class="mt-2 text-xs text-ink-faint">
-			{#if publication.authorName}{publication.authorName} ·{/if}
-			{publication.commentCount}
-			{publication.commentCount > 1 ? 'commentaires' : 'commentaire'}
-		</p>
+		{#if publication.authorName || publication.commentCount > 0}
+			<p class="mt-2 text-xs text-ink-faint">
+				{#if publication.authorName}{publication.authorName}{/if}
+				{#if publication.authorName && publication.commentCount > 0} · {/if}
+				{#if publication.commentCount > 0}
+					{publication.commentCount}
+					{publication.commentCount > 1 ? 'commentaires' : 'commentaire'}
+				{/if}
+			</p>
+		{/if}
 	</div>
 </article>

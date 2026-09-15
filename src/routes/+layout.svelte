@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/state';
+	import { afterNavigate } from '$app/navigation';
 	import Logo from '$lib/components/Logo.svelte';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
@@ -21,6 +22,20 @@
 	}
 
 	const annee = new Date().getFullYear();
+
+	// Le menu mobile est un <details> : il reste ouvert tant qu'on ne le ferme
+	// pas. Comme le site navigue sans recharger la page, on le referme nous-mêmes
+	// une fois arrivé sur la page choisie.
+	let menu = $state<HTMLDetailsElement | null>(null);
+	afterNavigate(() => {
+		if (menu) menu.open = false;
+	});
+
+	const affichages = [
+		{ valeur: 'auto', label: 'Automatique' },
+		{ valeur: 'clair', label: 'Clair' },
+		{ valeur: 'sombre', label: 'Sombre' }
+	] as const;
 </script>
 
 <a class="skip-link" href="#contenu-principal">Aller au contenu</a>
@@ -58,7 +73,9 @@
 			<Logo class="h-10 w-auto shrink-0" />
 			<span class="leading-tight">
 				<span class="block text-lg font-extrabold tracking-tight text-ink">{data.settings.siteName}</span>
-				<span class="mt-0.5 block text-xs font-medium text-ink-faint">{data.settings.tagline}</span>
+				<!-- Le sous-titre est masqué sur mobile : à côté du logo et du bouton
+				     de menu, il se coupait sur deux lignes serrées. -->
+				<span class="mt-0.5 hidden text-xs font-medium text-ink-faint sm:block">{data.settings.tagline}</span>
 			</span>
 		</a>
 
@@ -81,10 +98,10 @@
 		</nav>
 
 		<!-- Navigation mobile : un <details>, donc aucun JavaScript nécessaire -->
-		<details class="relative ml-auto md:hidden">
+		<details class="relative ml-auto md:hidden" bind:this={menu}>
 			<summary
-				class="cursor-pointer list-none rounded border border-line px-3 py-2 text-sm font-semibold text-ink"
-				aria-label="Ouvrir le menu">Menu</summary
+				class="cursor-pointer list-none rounded border border-line-forte px-3 py-2 text-sm font-semibold text-ink"
+				>Menu</summary
 			>
 			<nav
 				class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-line bg-surface p-2 shadow-lg"
@@ -138,6 +155,26 @@
 				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>
 				<li><a class="hover:text-white hover:underline" href="/admin">Administration</a></li>
 			</ul>
+
+			<!-- Choix d'affichage. Un formulaire ordinaire : le serveur pose un
+			     cookie et renvoie sur la même page, sans JavaScript. -->
+			<form method="POST" action="/theme" class="mt-6">
+				<p id="affichage-titre" class="text-sm font-semibold text-white/80">Affichage</p>
+				<div class="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="affichage-titre">
+					{#each affichages as a (a.valeur)}
+						<button
+							type="submit"
+							name="theme"
+							value={a.valeur}
+							aria-pressed={data.theme === a.valeur}
+							class="rounded-full border px-3 py-1 text-sm font-semibold transition-colors
+								{data.theme === a.valeur
+								? 'border-white bg-white text-[#1a0f2e]'
+								: 'border-white/40 text-white/85 hover:border-white hover:text-white'}">{a.label}</button
+						>
+					{/each}
+				</div>
+			</form>
 		</nav>
 	</div>
 	<div class="border-t border-white/15">

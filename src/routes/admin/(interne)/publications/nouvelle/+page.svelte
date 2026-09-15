@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import FormulairePublication from '$lib/components/FormulairePublication.svelte';
 	import type { ActionData } from './$types';
 
@@ -12,10 +13,25 @@
 	<h1 class="mt-1 text-2xl font-extrabold text-ink">Nouvelle publication</h1>
 </header>
 
-<form method="POST" enctype="multipart/form-data">
+<form
+	method="POST"
+	action="?/creer"
+	enctype="multipart/form-data"
+	use:enhance={({ action, formData }) => {
+		// L'aperçu n'a pas besoin de l'image de couverture : on ne l'envoie pas.
+		if (action.search === '?/apercu') formData.delete('cover');
+		return async ({ update }) => {
+			// reset: false : les champs gardent ce qu'on vient de taper, et le
+			// fichier choisi reste sélectionné.
+			await update({ reset: false });
+			if (action.search === '?/apercu') document.getElementById('apercu')?.scrollIntoView();
+		};
+	}}
+>
 	<FormulairePublication
 		valeurs={form ?? {}}
 		erreur={form?.erreur ?? ''}
+		apercu={form?.apercu ?? ''}
 		libelleValider="Créer la publication"
 	/>
 </form>

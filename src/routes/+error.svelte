@@ -10,7 +10,7 @@
 	<p class="mt-3 text-ink-soft">La page demandée n'existe pas ou n'est plus disponible.</p>
 	<a
 		href="/"
-		class="mt-8 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-dark"
+		class="mt-8 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-sur-brand hover:bg-brand-dark"
 		>Retour à l'accueil</a
 	>
 </div>

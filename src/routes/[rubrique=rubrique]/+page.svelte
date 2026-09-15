@@ -30,7 +30,7 @@
 		<nav class="mt-10 flex items-center justify-between" aria-label="Pagination">
 			{#if data.page > 1}
 				<a
-					class="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
+					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
 					href="?page={data.page - 1}">← Page précédente</a
 				>
 			{:else}
@@ -39,7 +39,7 @@
 			<span class="text-sm text-ink-faint">Page {data.page} sur {data.pages}</span>
 			{#if data.page < data.pages}
 				<a
-					class="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
+					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
 					href="?page={data.page + 1}">Page suivante →</a
 				>
 			{:else}

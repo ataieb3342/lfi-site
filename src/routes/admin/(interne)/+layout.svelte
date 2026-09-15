@@ -35,7 +35,7 @@
 					>
 						{lien.label}
 						{#if lien.badge}
-							<span class="rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-white">{lien.badge}</span>
+							<span class="rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-sur-brand">{lien.badge}</span>
 						{/if}
 					</a>
 				</li>

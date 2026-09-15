@@ -1,5 +1,6 @@
 import type { PublicationInput, Kind, Status } from './content.ts';
 import { storeUpload } from './media.ts';
+import { renderMarkdown } from './markdown.ts';
 
 /**
  * Lecture et validation du formulaire de publication, partagée entre la
@@ -64,6 +65,15 @@ export async function lirePublication(
 		coverMediaId,
 		eventAt: eventAt || null
 	};
+}
+
+/**
+ * Aperçu du texte : les valeurs saisies, renvoyées telles quelles, plus le
+ * texte rendu en HTML par le même code que les pages publiques. Rien n'est
+ * enregistré.
+ */
+export function apercuPublication(form: FormData) {
+	return { ...valeursSaisies(form), apercu: renderMarkdown(String(form.get('body') ?? '')) };
 }
 
 /** Valeurs à renvoyer au formulaire après une erreur, pour ne rien perdre. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import FormulairePublication from '$lib/components/FormulairePublication.svelte';
 	import { formatDateTime, lienPublication } from '$lib/format';
 	import type { ActionData, PageData } from './$types';
@@ -32,11 +33,26 @@
 	<p class="alerte alerte-succes mb-6">Modifications enregistrées.</p>
 {/if}
 
-<form method="POST" action="?/enregistrer" enctype="multipart/form-data">
+<form
+	method="POST"
+	action="?/enregistrer"
+	enctype="multipart/form-data"
+	use:enhance={({ action, formData }) => {
+		// L'aperçu n'a pas besoin de l'image de couverture : on ne l'envoie pas.
+		if (action.search === '?/apercu') formData.delete('cover');
+		return async ({ update }) => {
+			// reset: false : les champs gardent ce qu'on vient de taper, et le
+			// fichier choisi reste sélectionné.
+			await update({ reset: false });
+			if (action.search === '?/apercu') document.getElementById('apercu')?.scrollIntoView();
+		};
+	}}
+>
 	<FormulairePublication
 		publication={data.publication}
 		{valeurs}
 		erreur={form?.erreur ?? ''}
+		apercu={form?.apercu ?? ''}
 		libelleValider="Enregistrer"
 	/>
 
