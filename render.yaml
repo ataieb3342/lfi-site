@@ -1,0 +1,42 @@
+# Site de démonstration sur Render (offre gratuite).
+#
+# Ce fichier décrit le service à Render : il le lit depuis le dépôt Git au
+# moment de créer le « Blueprint ». Voir DEMO.md pour la marche à suivre.
+#
+# Ce n'est PAS la configuration du vrai site : le disque de Render est effacé à
+# chaque redémarrage et MODE_DEMO ouvre l'administration à tout le monde. La
+# mise en production reste celle décrite dans DEPLOIEMENT.md.
+
+services:
+  - type: web
+    name: lfi-dijon-demo
+    runtime: docker
+    plan: free
+    # Francfort est la seule région européenne proposée par Render.
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    # ORIGIN doit être l'adresse publique exacte, sinon SvelteKit refuse les
+    # formulaires (protection anti-CSRF). Render la fournit dans
+    # RENDER_EXTERNAL_URL, quel que soit le nom finalement attribué au service.
+    dockerCommand: sh -c 'export ORIGIN="${ORIGIN:-$RENDER_EXTERNAL_URL}"; exec node build/index.js'
+    envVars:
+      - key: MODE_DEMO
+        value: '1'
+      - key: SECRET_KEY
+        # Render génère une valeur aléatoire à la création du service.
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: '10000'
+      - key: DATABASE_PATH
+        value: /app/data/site.db
+      - key: UPLOADS_PATH
+        value: /app/data/uploads
+      - key: ADDRESS_HEADER
+        value: X-Forwarded-For
+      - key: XFF_DEPTH
+        value: '1'
+      - key: BODY_SIZE_LIMIT
+        value: 6M

@@ -1,0 +1,54 @@
+# Lancement :  docker compose -f docker/compose.yml up -d --build
+#
+# Deux conteneurs seulement :
+#   - « site »  : l'application. Elle n'est PAS exposée sur Internet, seul
+#                 Caddy peut l'atteindre.
+#   - « caddy » : le serveur en façade. Il obtient et renouvelle tout seul le
+#                 certificat HTTPS auprès de Let's Encrypt.
+
+services:
+  site:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    volumes:
+      # Tout l'état du site tient dans ce dossier : base et images.
+      - ../data:/app/data
+    # `expose` et non `ports` : le port 3000 reste sur le réseau interne.
+    expose:
+      - '3000'
+    networks:
+      - interne
+    security_opt:
+      - no-new-privileges:true
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    # Caddy lit SITE_DOMAIN et ADMIN_EMAIL depuis le même .env que le site.
+    env_file:
+      - ../.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - site
+    networks:
+      - interne
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  interne:
+
+volumes:
+  caddy_data:
+  caddy_config:

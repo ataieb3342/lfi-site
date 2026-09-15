@@ -1,0 +1,29 @@
+{
+	email {$ADMIN_EMAIL}
+	# Caddy obtient et renouvelle le certificat HTTPS automatiquement.
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Le nom et la version du serveur ne sont pas annoncés : inutile de
+	# renseigner un attaquant sur ce qui tourne en face.
+	header -Server
+
+	# Les fichiers compilés portent un nom unique par version : on peut les
+	# mettre en cache très longtemps.
+	@statiques path /_app/immutable/*
+	header @statiques Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy site:3000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output file /data/acces.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}

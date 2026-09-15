@@ -1,0 +1,297 @@
+@import 'tailwindcss';
+
+/*
+ * Jetons de couleur du site. Tout passe par des variables : changer l'identité
+ * visuelle se fait ici, en un seul endroit, sans toucher aux composants.
+ */
+@theme {
+	/*
+	 * Couleurs reprises telles quelles du logo officiel 2024 : le dégradé va du
+	 * rouge (à gauche) au violet (à droite), avec le phi et le texte en blanc.
+	 * Le violet sert de couleur principale, le rouge d'accent.
+	 */
+	--color-brand: #58277e; /* violet officiel */
+	--color-brand-dark: #43206c;
+	--color-brand-soft: #f1ebf8;
+
+	--color-accent: #c43850; /* rouge officiel, assombri juste ce qu'il faut
+	                            pour rester lisible sur fond blanc */
+	--color-accent-dark: #9c1e33;
+	--color-accent-soft: #fbeaee;
+
+	--color-pourpre: #9a3263; /* teinte intermédiaire du dégradé */
+
+	--color-ink: #1c1426; /* noir légèrement violacé */
+	--color-ink-soft: #4d4459;
+	--color-ink-faint: #776e82;
+
+	--color-surface: #ffffff;
+	--color-surface-alt: #f7f4fa;
+	--color-line: #e4dfea;
+
+	--font-sans:
+		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	--font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+}
+
+/*
+ * Surfaces de marque.
+ *
+ * Le dégradé diagonal du logo, appliqué tel quel en fond de bloc, fait très
+ * « affiche de campagne ». Les surfaces fortes du site sont donc un violet
+ * profond éclairé par deux lueurs douces, l'une rouge, l'autre violette : les
+ * couleurs officielles restent là, mais en lumière plutôt qu'en aplat. Le
+ * dégradé pur ne sert plus qu'en filet fin.
+ */
+:root {
+	--filet-degrade: linear-gradient(90deg, #e83e3f 0%, #9a3263 45%, #4f2680 100%);
+}
+
+/* Mode sombre automatique, suivant le réglage du système du visiteur. */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-brand: #c1a0ef;
+		--color-brand-dark: #d8c2f7;
+		--color-brand-soft: #2a1d3d;
+
+		--color-accent: #ff6d80;
+		--color-accent-dark: #ff9aa7;
+		--color-accent-soft: #3a1820;
+
+		--color-pourpre: #d67bb0;
+
+		--color-ink: #f3eff8;
+		--color-ink-soft: #bbb2c8;
+		--color-ink-faint: #8f8699;
+
+		--color-surface: #130f1a;
+		--color-surface-alt: #1c1626;
+		--color-line: #2f2740;
+	}
+}
+
+html {
+	color-scheme: light dark;
+	scroll-behavior: smooth;
+}
+
+body {
+	background: var(--color-surface);
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+	text-wrap: pretty;
+}
+
+h1, h2, h3, h4 {
+	text-wrap: balance;
+	letter-spacing: -0.02em;
+}
+
+/* Anneau de focus visible partout : accessibilité au clavier. */
+:focus-visible {
+	outline: 3px solid var(--color-brand);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* Lien d'évitement pour les lecteurs d'écran et la navigation au clavier. */
+.skip-link {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	z-index: 100;
+	padding: 0.75rem 1rem;
+	background: var(--color-brand);
+	color: #fff;
+	font-weight: 600;
+}
+.skip-link:focus {
+	left: 0;
+}
+
+/* Surface forte : violet profond, lueur rouge en haut à droite, lueur violette
+   en bas à gauche. Texte blanc. Identique en thème clair et sombre. */
+.fond-degrade {
+	background-color: #24123f;
+	background-image:
+		radial-gradient(70% 90% at 100% 0%, rgba(232, 62, 63, 0.55) 0%, transparent 62%),
+		radial-gradient(80% 100% at 0% 100%, rgba(111, 58, 173, 0.75) 0%, transparent 65%);
+	color: #fff;
+}
+/* Surface sombre unie, pour le pied de page. */
+.fond-degrade-sombre {
+	background: #1a0f2e;
+	color: #fff;
+}
+/* Filet aux couleurs du logo. */
+.filet-degrade {
+	background: var(--filet-degrade);
+}
+/* Titre d'affichage : très gras, serré, en casse normale. */
+.titre-affiche {
+	font-weight: 800;
+	letter-spacing: -0.035em;
+	line-height: 1.02;
+}
+
+/*
+ * Mise en forme du Markdown des articles. Écrit à la main plutôt que via un
+ * plugin : une quarantaine de lignes, aucune dépendance à mettre à jour.
+ */
+.contenu {
+	line-height: 1.75;
+	font-size: 1.0625rem;
+	color: var(--color-ink);
+}
+.contenu > * + * { margin-top: 1.15em; }
+.contenu h2 {
+	margin-top: 2.25em;
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+.contenu h3 {
+	margin-top: 1.75em;
+	font-size: 1.2rem;
+	font-weight: 700;
+}
+.contenu a {
+	color: var(--color-brand);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1.5px;
+}
+.contenu a:hover { color: var(--color-brand-dark); }
+.contenu ul, .contenu ol { padding-left: 1.5rem; }
+.contenu ul { list-style: disc; }
+.contenu ol { list-style: decimal; }
+.contenu li + li { margin-top: 0.4em; }
+.contenu li::marker { color: var(--color-brand); }
+.contenu blockquote {
+	border-left: 3px solid var(--color-brand);
+	padding: 0.25rem 0 0.25rem 1.15rem;
+	color: var(--color-ink-soft);
+	font-style: italic;
+}
+.contenu img {
+	border-radius: 0.5rem;
+	max-width: 100%;
+	height: auto;
+}
+.contenu code {
+	background: var(--color-surface-alt);
+	border: 1px solid var(--color-line);
+	border-radius: 0.25rem;
+	padding: 0.1em 0.35em;
+	font-size: 0.9em;
+}
+.contenu pre {
+	background: var(--color-surface-alt);
+	border: 1px solid var(--color-line);
+	border-radius: 0.5rem;
+	padding: 1rem;
+	overflow-x: auto;
+}
+.contenu pre code { background: none; border: 0; padding: 0; }
+.contenu hr { border: 0; border-top: 1px solid var(--color-line); margin: 2.5em 0; }
+.contenu table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+.contenu th, .contenu td { border: 1px solid var(--color-line); padding: 0.5rem 0.75rem; text-align: left; }
+
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+	*, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/*
+ * Classes partagées de l'interface d'administration. Les regrouper ici évite
+ * de répéter dix classes utilitaires sur chaque champ et rend un changement de
+ * style immédiat sur tout le back-office.
+ */
+.champ {
+	width: 100%;
+	border: 1px solid var(--color-line);
+	background: var(--color-surface);
+	color: var(--color-ink);
+	border-radius: 0.375rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.9375rem;
+}
+.champ:disabled { opacity: 0.6; }
+.etiquette {
+	display: block;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: var(--color-ink);
+	margin-bottom: 0.25rem;
+}
+.aide { font-size: 0.75rem; color: var(--color-ink-faint); margin-top: 0.25rem; }
+
+.bouton {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border-radius: 9999px;
+	background: var(--color-brand);
+	color: #fff;
+	padding: 0.55rem 1.1rem;
+	font-size: 0.875rem;
+	font-weight: 700;
+	border: 1px solid transparent;
+	cursor: pointer;
+	transition: filter 0.15s;
+}
+.bouton:hover { background: var(--color-brand-dark); filter: brightness(1.08); }
+.bouton:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.bouton-secondaire {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border-radius: 9999px;
+	background: var(--color-surface);
+	color: var(--color-ink);
+	border: 1px solid var(--color-line);
+	padding: 0.55rem 1.1rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+.bouton-secondaire:hover { background: var(--color-surface-alt); }
+
+.bouton-danger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border-radius: 0.375rem;
+	background: transparent;
+	color: var(--color-accent);
+	border: 1px solid var(--color-accent);
+	padding: 0.4rem 0.9rem;
+	font-size: 0.8125rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+.bouton-danger:hover { background: var(--color-accent-soft); }
+
+.carte {
+	border: 1px solid var(--color-line);
+	border-radius: 0.625rem;
+	background: var(--color-surface);
+	padding: 1.25rem;
+}
+
+.alerte {
+	border-radius: 0.375rem;
+	padding: 0.75rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	border: 1px solid var(--color-accent);
+	background: var(--color-accent-soft);
+	color: var(--color-accent);
+}
+.alerte-succes {
+	border-color: var(--color-line);
+	background: var(--color-surface-alt);
+	color: var(--color-ink);
+}
