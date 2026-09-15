@@ -10,6 +10,14 @@
 	const p = $derived(data.publication);
 	let envoiEnCours = $state(false);
 
+	// Le formulaire de partage d'une source est replié par défaut ; il se
+	// rouvre de lui-même si l'envoi a échoué, pour montrer l'erreur.
+	let partageOuvert = $state(false);
+	$effect(() => {
+		if (form?.formulaire === 'source' && form?.erreurSource) partageOuvert = true;
+	});
+	let envoiSourceEnCours = $state(false);
+
 	// Cadre des apéros (heure, lieu), affiché sous le titre d'un apéro.
 	const cadre = $derived(data.apero);
 	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
@@ -97,6 +105,176 @@
 		{@html data.corpsHtml}
 	</div>
 </article>
+
+{#if p.kind === 'apero'}
+	<!-- Le dossier partagé : ce que les uns et les autres proposent de lire,
+	     voir ou écouter avant la soirée. Volontairement peu formel : un titre,
+	     un lien si on en a un, un mot pour dire pourquoi. -->
+	<section id="sources" class="mx-auto mt-16 max-w-2xl rounded-2xl border border-line bg-surface-alt px-5 py-6 sm:px-8 sm:py-8">
+		<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Pour préparer la soirée</p>
+		<h2 class="mt-1 text-xl font-extrabold text-ink">Le dossier partagé</h2>
+		<p class="mt-2 text-sm text-ink-soft">
+			Un livre, une vidéo, un podcast, un article, un site : ce que chacun a trouvé utile sur le sujet.
+			Rien d'obligatoire, rien d'exhaustif — on vient aussi sans avoir rien lu.
+		</p>
+
+		{#if data.sources.length}
+			<ul class="mt-6 space-y-4">
+				{#each data.sources as source (source.id)}
+					<li class="rounded-lg border border-line bg-surface px-4 py-3">
+						<p class="font-semibold text-ink">
+							{#if source.url}
+								<a
+									href={source.url}
+									target="_blank"
+									rel="noopener noreferrer nofollow"
+									class="text-brand underline-offset-4 hover:underline">{source.title}</a
+								>
+								<span class="ml-2 rounded bg-surface-alt px-1.5 py-0.5 text-xs font-medium text-ink-faint">{source.site}</span>
+							{:else}
+								{source.title}
+							{/if}
+						</p>
+						{#if source.note}
+							<p class="mt-1 text-sm text-ink-soft">{source.note}</p>
+						{/if}
+						{#if source.authorName}
+							<p class="mt-1 text-xs text-ink-faint">Proposé par {source.authorName}</p>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="mt-6 text-sm text-ink-soft">Le dossier est encore vide. La première source peut être la vôtre.</p>
+		{/if}
+
+		{#if form?.formulaire === 'source' && form?.succesSource}
+			<p class="mt-6 rounded border border-line bg-surface px-4 py-3 text-sm text-ink">
+				{#if form.enAttenteSource}
+					Merci ! Votre source a bien été reçue : elle apparaîtra dans le dossier après un coup d'œil de l'équipe.
+				{:else}
+					Merci, votre source est dans le dossier.
+				{/if}
+			</p>
+		{/if}
+
+		{#if data.defiSource}
+			<details class="mt-6" bind:open={partageOuvert}>
+				<summary class="inline-block cursor-pointer list-none rounded-full bg-pourpre px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90">
+					Partager une source
+				</summary>
+
+				<form
+					method="POST"
+					action="?/partagerSource"
+					class="mt-4 space-y-4"
+					use:enhance={() => {
+						envoiSourceEnCours = true;
+						return async ({ update }) => {
+							await update();
+							envoiSourceEnCours = false;
+						};
+					}}
+				>
+					{#if form?.formulaire === 'source' && form?.erreurSource}
+						<p role="alert" class="rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
+							{form.erreurSource}
+						</p>
+					{/if}
+
+					<div>
+						<label class="block text-sm font-semibold text-ink" for="titre">
+							De quoi s'agit-il ?
+							<span class="block text-xs font-normal text-ink-faint">Le titre du livre, de la vidéo, de l'article, du site…</span>
+						</label>
+						<input
+							id="titre"
+							name="titre"
+							type="text"
+							required
+							maxlength="120"
+							value={form?.formulaire === 'source' ? (form.titre ?? '') : ''}
+							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+						/>
+					</div>
+
+					<div>
+						<label class="block text-sm font-semibold text-ink" for="lien">
+							Le lien <span class="font-normal text-ink-faint">(facultatif)</span>
+							<span class="block text-xs font-normal text-ink-faint">Une vidéo YouTube, un article en ligne, un site… Pour un livre, laissez vide.</span>
+						</label>
+						<input
+							id="lien"
+							name="lien"
+							type="url"
+							inputmode="url"
+							maxlength="500"
+							placeholder="https://"
+							value={form?.formulaire === 'source' ? (form.lien ?? '') : ''}
+							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+						/>
+					</div>
+
+					<div>
+						<label class="block text-sm font-semibold text-ink" for="note">
+							Un mot pour dire pourquoi <span class="font-normal text-ink-faint">(facultatif)</span>
+						</label>
+						<textarea
+							id="note"
+							name="note"
+							rows="2"
+							maxlength="300"
+							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+							>{form?.formulaire === 'source' ? (form.note ?? '') : ''}</textarea
+						>
+					</div>
+
+					<div>
+						<label class="block text-sm font-semibold text-ink" for="pseudoSource">
+							Votre prénom ou pseudonyme <span class="font-normal text-ink-faint">(facultatif)</span>
+						</label>
+						<input
+							id="pseudoSource"
+							name="pseudoSource"
+							type="text"
+							maxlength="60"
+							autocomplete="off"
+							value={form?.formulaire === 'source' ? (form.pseudoSource ?? '') : ''}
+							class="mt-1 w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+						/>
+					</div>
+
+					<!-- Champ-piège : masqué aux humains, souvent rempli par les robots. -->
+					<div class="hidden" aria-hidden="true">
+						<label for="site-source">Ne pas remplir</label>
+						<input id="site-source" name="site" type="text" tabindex="-1" autocomplete="off" />
+					</div>
+
+					<!-- La preuve de travail ne se calcule qu'une fois le formulaire déplié. -->
+					{#if partageOuvert && !data.sourceDirecte}
+						<PreuveDeTravail defi={data.defiSource} />
+					{/if}
+
+					<div class="flex flex-wrap items-center gap-3">
+						<button
+							type="submit"
+							disabled={envoiSourceEnCours}
+							class="rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+							>{envoiSourceEnCours ? 'Envoi…' : 'Ajouter au dossier'}</button
+						>
+						<p class="text-xs text-ink-faint">
+							{#if data.sourceDirecte}
+								Vous êtes connecté : la source est publiée immédiatement.
+							{:else}
+								Les sources sont relues avant d'apparaître. Aucune inscription, aucune adresse IP conservée en clair.
+							{/if}
+						</p>
+					</div>
+				</form>
+			</details>
+		{/if}
+	</section>
+{/if}
 
 <section id="commentaires" class="mx-auto mt-16 max-w-2xl border-t border-line pt-10">
 	<h2 class="text-xl font-extrabold text-ink">

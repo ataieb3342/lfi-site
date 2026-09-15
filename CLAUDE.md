@@ -176,6 +176,30 @@ l'avance, puis publie un résumé des échanges. Sur le site :
   sauté ou déplacé casserait la mécanique. Créer une fiche par apéro prend une
   minute et laisse la main aux humains.
 
+### Le dossier partagé d'un apéro
+
+Chaque fiche d'apéro porte une liste de **sources** (table `sources`) : un
+livre, une vidéo, un podcast, un article, un site… que n'importe quel visiteur
+peut proposer depuis la fiche, sous « Pour préparer la soirée ». C'est un
+dossier collectif, volontairement peu formel : un titre obligatoire, un lien
+facultatif (un livre n'en a pas), un mot pour dire pourquoi, un prénom si on
+veut. Les textes du site le disent : rien d'obligatoire, on vient aussi sans
+avoir rien lu.
+
+- Même circuit que les commentaires (champ-piège, preuve de travail, quotas,
+  empreinte d'IP pseudonymisée), mais **la relecture est systématique** pour
+  les visiteurs, quel que soit le réglage de pré-modération : une liste de
+  liens publiée sans regard humain est une invitation à l'hameçonnage. Un
+  administrateur connecté publie directement, et l'action est tracée.
+- **Le lien est vérifié à l'enregistrement** : seulement `http(s)://`, sinon
+  un `javascript:…` s'exécuterait au clic. Le nom du site (« youtube.com »)
+  est calculé dans `present.ts` et affiché à côté du titre.
+- Relecture dans Administration → Sources des apéros (`admin/(interne)/sources`),
+  copie de l'écran des commentaires. « Bloquer cette origine » rejette d'un
+  coup les sources *et* les commentaires en attente de la même empreinte,
+  depuis l'un ou l'autre écran.
+- La suppression d'un apéro emporte ses sources (clé étrangère en cascade).
+
 ## Le carrousel d'accueil
 
 `src/lib/components/CarrouselAccueil.svelte`. Quatre sortes de diapositives,

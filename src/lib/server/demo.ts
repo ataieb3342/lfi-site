@@ -1,6 +1,6 @@
 import { db, now } from './db.ts';
 import { confirmTotp, countAdmins, createAdmin, storeTotpSecret } from './auth.ts';
-import { createComment, createPublication } from './content.ts';
+import { createComment, createPublication, createSource } from './content.ts';
 import { decryptAtRest, hmac } from './crypto.ts';
 import { supprimerJetonInstallation } from './installation.ts';
 import { setSetting } from './settings.ts';
@@ -133,6 +133,8 @@ type Fiche = {
 	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
 	actionDans?: number | (() => number);
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
+	/** Le dossier partagé d'un apéro : un titre, un lien facultatif, un mot. */
+	sources?: { titre: string; lien?: string; note?: string; auteur: string; statut: 'approved' | 'pending' }[];
 };
 
 const FICHES: Fiche[] = [
@@ -252,7 +254,29 @@ Pas besoin d’avoir lu quoi que ce soit pour venir. On part de ce que chacun sa
 - Les budgets publics de la culture, et ce que changent les coupes annoncées.
 - La culture qui ne passe pas par les institutions : fêtes de quartier, radios associatives, pratiques amateurs.
 
-Le résumé des échanges sera publié sur cette page dans la semaine qui suit.`
+Le résumé des échanges sera publié sur cette page dans la semaine qui suit.`,
+		sources: [
+			{
+				titre: 'Chiffres clés de la culture 2025 (ministère de la Culture)',
+				lien: 'https://www.culture.gouv.fr/Thematiques/Etudes-et-statistiques',
+				note: 'Pour avoir des ordres de grandeur en tête : qui va où, et combien ça coûte.',
+				auteur: 'Marc',
+				statut: 'approved'
+			},
+			{
+				titre: 'La Distinction, Pierre Bourdieu',
+				note: 'Pas besoin de tout lire : l’introduction suffit pour comprendre pourquoi le musée intimide.',
+				auteur: 'Sophie',
+				statut: 'approved'
+			},
+			{
+				titre: 'Le patrimoine, à qui ça appartient ? (vidéo, 25 min)',
+				lien: 'https://www.youtube.com/watch?v=exemple',
+				note: 'Une émission courte et claire sur les monuments et ce qu’on choisit de garder.',
+				auteur: '',
+				statut: 'pending'
+			}
+		]
 	},
 	{
 		kind: 'apero',
@@ -279,6 +303,21 @@ Un long moment a été consacré aux sanctions économiques : qui elles touchent
 Comment soutenir concrètement les mouvements sociaux iraniens depuis Dijon ? Personne n’avait de réponse toute faite ; une participante a proposé d’inviter quelqu’un de la communauté iranienne de Bourgogne à un prochain apéro.
 
 *Ce résumé est écrit par le groupe à partir des notes prises pendant la soirée. Il n’engage pas les personnes présentes.*`,
+		sources: [
+			{
+				titre: 'Iran, dossier du Monde diplomatique',
+				lien: 'https://www.monde-diplomatique.fr/index/sujet/iran',
+				note: 'Les archives du Diplo sur le sujet, gratuites pour une bonne partie.',
+				auteur: 'Inès',
+				statut: 'approved'
+			},
+			{
+				titre: 'Persepolis, Marjane Satrapi (bande dessinée)',
+				note: 'Pour ressentir 1979 et les années qui suivent de l’intérieur.',
+				auteur: 'Le groupe',
+				statut: 'approved'
+			}
+		],
 		commentaires: [
 			{
 				auteur: 'Inès',
@@ -308,7 +347,29 @@ Faut-il boycotter des événements culturels ou sportifs, au risque de pénalise
 
 ## Ce que nous en faisons
 
-Une participante a proposé de dresser la liste des campagnes de boycott en cours auxquelles le groupe pourrait se joindre, pour en discuter à une prochaine réunion.`
+Une participante a proposé de dresser la liste des campagnes de boycott en cours auxquelles le groupe pourrait se joindre, pour en discuter à une prochaine réunion.`,
+		sources: [
+			{
+				titre: 'Le boycott, une histoire politique (podcast, 45 min)',
+				lien: 'https://www.radiofrance.fr/franceculture',
+				note: 'De Montgomery à l’Afrique du Sud : les grandes campagnes et ce qui les a fait gagner.',
+				auteur: 'Karim',
+				statut: 'approved'
+			},
+			{
+				titre: 'Consommateurs engagés, Sophie Dubuisson-Quellier',
+				note: 'Un petit livre de socio sur le boycott et le « buycott ». Se lit en une soirée.',
+				auteur: 'Léa',
+				statut: 'approved'
+			},
+			{
+				titre: 'Campagnes en cours (site du collectif Éthique sur l’étiquette)',
+				lien: 'https://ethique-sur-etiquette.org',
+				note: 'Pour voir concrètement à quoi ressemble une campagne organisée.',
+				auteur: '',
+				statut: 'approved'
+			}
+		]
 	},
 	{
 		kind: 'article',
@@ -482,6 +543,22 @@ function remplirContenus(adminId: number) {
 			base
 				.prepare('update comments set created_at = ?, moderated_at = ? where id = ?')
 				.run(ilYaNJours(Math.max(0, publieIlYa - 1), 9 + i), c.statut === 'approved' ? now() : null, idCommentaire);
+		}
+
+		for (const [i, src] of (fiche.sources ?? []).entries()) {
+			const idSource = createSource({
+				publicationId: id,
+				title: src.titre,
+				url: src.lien ?? '',
+				note: src.note ?? '',
+				authorName: src.auteur,
+				status: src.statut,
+				ipHash: hmac('ip', `demo-source-${i}`),
+				userAgent: 'demo'
+			});
+			base
+				.prepare('update sources set created_at = ?, moderated_at = ? where id = ?')
+				.run(ilYaNJours(Math.max(0, publieIlYa - 1), 10 + i), src.statut === 'approved' ? now() : null, idSource);
 		}
 	}
 

@@ -42,12 +42,19 @@
 				{#if prochain.summary}
 					<p class="mt-4 max-w-xl leading-relaxed text-white/90">{prochain.summary}</p>
 				{/if}
-				<div class="mt-8">
+				<div class="mt-8 flex flex-wrap items-center gap-4">
 					<a
 						href="/aperos/{prochain.slug}"
 						class="inline-block rounded-full bg-white px-5 py-2.5 text-sm font-bold text-pourpre transition-colors hover:bg-white/90"
 						>En savoir plus</a
 					>
+					<a href="/aperos/{prochain.slug}#sources" class="text-sm font-semibold text-white/90 underline-offset-4 hover:underline">
+						{#if prochain.nombreSources}
+							Pour préparer la soirée : {prochain.nombreSources} source{prochain.nombreSources > 1 ? 's' : ''} partagée{prochain.nombreSources > 1 ? 's' : ''}
+						{:else}
+							Partager une source pour préparer la soirée
+						{/if}
+					</a>
 				</div>
 			{:else}
 				<h2 class="titre-affiche mt-3 text-2xl text-white sm:text-4xl">Le prochain thème arrive bientôt</h2>
@@ -113,6 +120,9 @@
 							<a href="/aperos/{apero.slug}" class="font-semibold text-brand hover:underline">Lire le résumé des échanges</a>
 							{#if apero.commentCount}
 								<span class="text-ink-faint"> · {apero.commentCount} commentaire{apero.commentCount > 1 ? 's' : ''}</span>
+							{/if}
+							{#if apero.nombreSources}
+								<span class="text-ink-faint"> · {apero.nombreSources} source{apero.nombreSources > 1 ? 's' : ''} partagée{apero.nombreSources > 1 ? 's' : ''}</span>
 							{/if}
 						</p>
 					{/if}

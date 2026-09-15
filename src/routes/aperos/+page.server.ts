@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { listPublished } from '$lib/server/content';
+import { countApprovedSources, listPublished } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
 
 /**
@@ -18,7 +18,10 @@ export const load: PageServerLoad = async () => {
 		...presentPublication(ligne),
 		// Vrai dès que quelqu'un a écrit le résumé : avant, la fiche passée
 		// affiche « résumé à venir » plutôt qu'une page vide.
-		resumeDisponible: ligne.body.trim().length > 0
+		resumeDisponible: ligne.body.trim().length > 0,
+		// Le dossier partagé : ce que les uns et les autres proposent de lire
+		// ou de voir avant la soirée.
+		nombreSources: countApprovedSources(ligne.id)
 	}));
 
 	return {

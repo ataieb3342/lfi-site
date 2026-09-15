@@ -43,6 +43,7 @@ scripts/           sauvegarde et restauration
 | Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
 | Annoncer une action à venir | Même écran, type « Actualité » + renseigner la date de l'action |
 | Relire les commentaires reçus | Administration → Commentaires |
+| Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Ajouter une image | Administration → Images |
 | Changer le nom du site, l'adresse de contact | Administration → Réglages |
 | Ouvrir ou fermer les commentaires du site | Administration → Réglages |

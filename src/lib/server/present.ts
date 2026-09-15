@@ -1,6 +1,6 @@
-import type { Comment, PublicationListItem, Publication } from './content.ts';
+import type { Comment, PublicationListItem, Publication, Source } from './content.ts';
 import { getMedia } from './media.ts';
-import type { PublicationVue, CommentaireVue } from '$lib/types';
+import type { PublicationVue, CommentaireVue, SourceVue } from '$lib/types';
 
 /**
  * Conversion des lignes SQL en objets destinés au navigateur.
@@ -44,4 +44,30 @@ export function presentComment(row: Comment): CommentaireVue {
 	};
 }
 
-export type { PublicationVue, CommentaireVue };
+/**
+ * Une source partagée sort sans empreinte d'IP. Le nom du site est calculé ici
+ * (« youtube.com », « cairn.info ») pour que la liste dise d'un coup d'œil
+ * vers quoi mène le lien.
+ */
+export function presentSource(row: Source): SourceVue {
+	return {
+		id: row.id,
+		title: row.title,
+		url: row.url,
+		site: nomDuSite(row.url),
+		note: row.note,
+		authorName: row.author_name,
+		createdAt: row.created_at
+	};
+}
+
+function nomDuSite(url: string): string {
+	if (!url) return '';
+	try {
+		return new URL(url).hostname.replace(/^www\./, '');
+	} catch {
+		return '';
+	}
+}
+
+export type { PublicationVue, CommentaireVue, SourceVue };

@@ -32,3 +32,16 @@ export type CommentaireVue = {
 	body: string;
 	createdAt: string;
 };
+
+/** Une source partagée avant un apéro (livre, vidéo, article, site…). */
+export type SourceVue = {
+	id: number;
+	title: string;
+	/** Vide pour un livre ou une source sans lien. */
+	url: string;
+	/** Nom du site du lien, sans « www. » : vide s'il n'y a pas de lien. */
+	site: string;
+	note: string;
+	authorName: string;
+	createdAt: string;
+};

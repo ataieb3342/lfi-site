@@ -236,6 +236,32 @@ const MIGRATIONS: string[] = [
 	create index publications_kind on publications(kind, status, published_at desc);
 	create index publications_agenda on publications(kind, status, event_at);
 	`
+	,
+	// 004 — les sources partagées avant un apéro
+	//
+	// Un dossier collectif par apéro : livres, vidéos, articles, sites… que
+	// chacun peut proposer depuis la fiche. Même mécanique que les commentaires
+	// (envoi anonyme, relecture avant publication, empreinte d'IP pseudonymisée),
+	// mais dans une table à part : une source a un titre et un lien, pas un
+	// texte libre, et elle se lit comme une liste, pas comme un fil.
+	`
+	create table sources (
+		id integer primary key,
+		publication_id integer not null references publications(id) on delete cascade,
+		title text not null,
+		url text not null default '',        -- vide pour un livre ou une source sans lien
+		note text not null default '',       -- un mot pour dire pourquoi, facultatif
+		author_name text not null default '',
+		status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+		created_at text not null,
+		moderated_at text,
+		moderated_by integer references admins(id) on delete set null,
+		ip_hash text not null default '',   -- pseudonymisé (HMAC), jamais d'IP en clair
+		user_agent text not null default ''
+	);
+	create index sources_publication on sources(publication_id, status, created_at);
+	create index sources_moderation on sources(status, created_at desc);
+	`
 ];
 
 function migrer(base: DatabaseSync) {

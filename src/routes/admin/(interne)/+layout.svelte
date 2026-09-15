@@ -9,6 +9,7 @@
 		{ href: '/admin', label: 'Tableau de bord', exact: true },
 		{ href: '/admin/publications', label: 'Publications' },
 		{ href: '/admin/commentaires', label: 'Commentaires', badge: data.commentairesEnAttente },
+		{ href: '/admin/sources', label: 'Sources des apéros', badge: data.sourcesEnAttente },
 		{ href: '/admin/medias', label: 'Images' },
 		...(data.adminCourant.role === 'owner' ? [{ href: '/admin/comptes', label: 'Comptes' }] : []),
 		{ href: '/admin/reglages', label: 'Réglages' },

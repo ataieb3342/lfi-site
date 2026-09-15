@@ -355,3 +355,116 @@ export function listBlockedIps() {
 export function unblockIpHash(ipHash: string) {
 	db().prepare('delete from blocked_ips where ip_hash = ?').run(ipHash);
 }
+
+/* ----------------------------------------------------- sources d'un apéro */
+
+/**
+ * Une source partagée avant un apéro : un livre, une vidéo, un article, un
+ * site… Le lien est facultatif (un livre n'en a pas forcément). Même
+ * circuit que les commentaires : envoi anonyme, relecture, empreinte d'IP
+ * pseudonymisée.
+ */
+export type Source = {
+	id: number;
+	publication_id: number;
+	title: string;
+	url: string;
+	note: string;
+	author_name: string;
+	status: 'pending' | 'approved' | 'rejected';
+	created_at: string;
+	moderated_at: string | null;
+	ip_hash: string;
+};
+
+export function listApprovedSources(publicationId: number): Source[] {
+	return db()
+		.prepare(
+			`select id, publication_id, title, url, note, author_name, status, created_at, moderated_at, ip_hash
+			 from sources where publication_id = ? and status = 'approved' order by created_at`
+		)
+		.all(publicationId) as Source[];
+}
+
+export function countApprovedSources(publicationId: number): number {
+	return (
+		db()
+			.prepare("select count(*) as n from sources where publication_id = ? and status = 'approved'")
+			.get(publicationId) as { n: number }
+	).n;
+}
+
+export function createSource(input: {
+	publicationId: number;
+	title: string;
+	url: string;
+	note: string;
+	authorName: string;
+	status: 'pending' | 'approved';
+	ipHash: string;
+	userAgent: string;
+}): number {
+	const result = db()
+		.prepare(
+			`insert into sources (publication_id, title, url, note, author_name, status, created_at, ip_hash, user_agent)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		)
+		.run(
+			input.publicationId,
+			input.title,
+			input.url,
+			input.note,
+			input.authorName,
+			input.status,
+			now(),
+			input.ipHash,
+			input.userAgent.slice(0, 200)
+		);
+	return Number(result.lastInsertRowid);
+}
+
+export function countPendingSources(): number {
+	return (db().prepare("select count(*) as n from sources where status = 'pending'").get() as { n: number }).n;
+}
+
+export type SourceForModeration = Source & { publication_title: string; publication_slug: string; publication_kind: Kind };
+
+export function listSourcesForModeration(status: 'pending' | 'approved' | 'rejected'): SourceForModeration[] {
+	return db()
+		.prepare(
+			`select s.*, p.title as publication_title, p.slug as publication_slug, p.kind as publication_kind
+			 from sources s join publications p on p.id = s.publication_id
+			 where s.status = ?
+			 order by s.created_at desc
+			 limit 300`
+		)
+		.all(status) as SourceForModeration[];
+}
+
+export function getSource(id: number): Source | undefined {
+	return db().prepare('select * from sources where id = ?').get(id) as Source | undefined;
+}
+
+export function moderateSource(id: number, status: 'approved' | 'rejected', adminId: number) {
+	db().prepare('update sources set status = ?, moderated_at = ?, moderated_by = ? where id = ?').run(
+		status,
+		now(),
+		adminId,
+		id
+	);
+}
+
+export function deleteSource(id: number) {
+	db().prepare('delete from sources where id = ?').run(id);
+}
+
+/** Rejette d'un coup toutes les sources en attente venant de la même origine. */
+export function rejectAllSourcesFromIpHash(ipHash: string, adminId: number): number {
+	const result = db()
+		.prepare(
+			`update sources set status = 'rejected', moderated_at = ?, moderated_by = ?
+			 where ip_hash = ? and status = 'pending'`
+		)
+		.run(now(), adminId, ipHash);
+	return Number(result.changes);
+}

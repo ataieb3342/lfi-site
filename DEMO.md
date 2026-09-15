@@ -10,7 +10,8 @@ Le site démarre avec la variable `MODE_DEMO=1`. Au premier chargement, si la
 base est vide :
 
 - des articles, des actualités (dont trois actions à venir, pour voir le
-  carrousel et le tri « agenda ») et quelques commentaires fictifs sont créés ;
+  carrousel et le tri « agenda »), quelques commentaires fictifs et des sources
+  partagées pour les apéros sont créés ;
 - un compte administrateur `demo` est créé, double authentification comprise ;
 - la page `/admin/connexion` affiche l'identifiant, le mot de passe et le code
   à 6 chiffres du moment : **n'importe qui peut essayer l'administration**.

@@ -8,6 +8,7 @@ import {
 	listCommentsForModeration,
 	moderateComment,
 	rejectAllFromIpHash,
+	rejectAllSourcesFromIpHash,
 	unblockIpHash
 } from '$lib/server/content';
 import { audit } from '$lib/server/auth';
@@ -85,8 +86,15 @@ export const actions: Actions = {
 		if (!/^[a-f0-9]{64}$/.test(empreinte)) return fail(400, { erreur: 'Empreinte invalide.' });
 
 		const rejetes = rejectAllFromIpHash(empreinte, admin.id);
+		const sourcesRejetees = rejectAllSourcesFromIpHash(empreinte, admin.id);
 		blockIpHash(empreinte, `Bloqué par ${admin.username}`);
-		audit(admin, 'origine.blocage', empreinte.slice(0, 12), `${rejetes} commentaire(s) rejeté(s)`, locals.ipHash);
+		audit(
+			admin,
+			'origine.blocage',
+			empreinte.slice(0, 12),
+			`${rejetes} commentaire(s) et ${sourcesRejetees} source(s) rejeté(s)`,
+			locals.ipHash
+		);
 		retour(url);
 	},
 

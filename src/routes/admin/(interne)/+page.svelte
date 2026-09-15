@@ -30,6 +30,13 @@
 	</a>
 {/if}
 
+{#if data.sourcesEnAttente > 0}
+	<a href="/admin/sources" class="alerte mt-3 block hover:underline">
+		{data.sourcesEnAttente}
+		{data.sourcesEnAttente > 1 ? 'sources proposées attendent' : 'source proposée attend'} votre relecture.
+	</a>
+{/if}
+
 <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
 	{#each chiffres as chiffre (chiffre.label)}
 		<div class="carte">
