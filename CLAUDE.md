@@ -214,6 +214,20 @@ avoir rien lu.
   depuis l'un ou l'autre écran.
 - La suppression d'un apéro emporte ses sources (clé étrangère en cascade).
 
+### La bibliothèque commune
+
+Une source proposée depuis un apéro contient soit un lien, soit un PDF. Les PDF
+sont limités à 50 Mo, identifiés par leur signature `%PDF-`, stockés sous un nom
+aléatoire dans `data/bibliotheque/` et toujours soumis à modération. La personne
+qui propose un PDF doit préciser la licence ou l'autorisation de republication.
+
+Seuls les PDF approuvés sont accessibles au public dans `/bibliotheque`. Une
+session d'administration peut ouvrir un PDF en attente pour le relire. Rejeter,
+supprimer ou bloquer l'origine d'une proposition supprime également le fichier ;
+la suppression d'un apéro nettoie les PDF de ses sources. Le serveur accepte des
+requêtes de 60 Mo afin de laisser une marge au formulaire, mais le contrôle
+applicatif reste fixé à 50 Mo.
+
 ## Le carrousel d'accueil
 
 `src/lib/components/CarrouselAccueil.svelte`. Quatre sortes de diapositives,

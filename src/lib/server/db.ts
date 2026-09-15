@@ -262,6 +262,21 @@ const MIGRATIONS: string[] = [
 	create index sources_publication on sources(publication_id, status, created_at);
 	create index sources_moderation on sources(status, created_at desc);
 	`
+	,
+	// 005 — un lien ou un PDF dans le dossier d'un apéro et la bibliothèque commune
+	`
+	alter table sources add column pdf_filename text;
+	alter table sources add column pdf_original_name text not null default '';
+	alter table sources add column pdf_bytes integer;
+	create unique index sources_pdf_filename on sources(pdf_filename) where pdf_filename is not null;
+	create index sources_bibliotheque on sources(status, created_at desc)
+		where url != '' or pdf_filename is not null;
+	`
+	,
+	// 006 — justification des droits de republication d'un PDF
+	`
+	alter table sources add column droits_diffusion text not null default '';
+	`
 ];
 
 function migrer(base: DatabaseSync) {

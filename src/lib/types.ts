@@ -44,4 +44,7 @@ export type SourceVue = {
 	note: string;
 	authorName: string;
 	createdAt: string;
+	droitsDiffusion: string;
+	pdf: { url: string; nom: string; octets: number } | null;
+	apero?: { titre: string; url: string };
 };

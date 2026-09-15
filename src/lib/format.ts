@@ -42,6 +42,12 @@ export function formatRelative(iso: string | null | undefined): string {
 	return formatDate(iso);
 }
 
+/** Taille lisible d'un document : « 820 Ko » ou « 45,2 Mo ». */
+export function formatTailleFichier(octets: number): string {
+	if (octets < 1024 * 1024) return `${Math.max(1, Math.round(octets / 1024))} Ko`;
+	return `${(octets / 1024 / 1024).toFixed(1).replace('.', ',')} Mo`;
+}
+
 export const LIBELLE_KIND: Record<string, string> = {
 	article: 'Article',
 	actu: 'Actualité',

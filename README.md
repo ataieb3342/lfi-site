@@ -4,8 +4,8 @@ Site d'information : articles, actualités, commentaires anonymes modérés,
 administration protégée par double authentification.
 
 - **Hébergement** : VPS français (OVH ou Scaleway), Docker + Caddy.
-- **Données** : un fichier SQLite et un dossier d'images. Sauvegarder revient à
-  copier `data/`.
+- **Données** : un fichier SQLite, les images et les PDF de la bibliothèque.
+  Sauvegarder revient à copier `data/`.
 - **Vie privée** : aucun cookie chez les visiteurs, aucun service tiers, aucune
   adresse IP conservée en clair.
 
@@ -44,6 +44,7 @@ scripts/           sauvegarde et restauration
 | Annoncer une action à venir | Même écran, type « Actualité » + renseigner la date de l'action |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
+| Consulter les ressources validées | Bibliothèque |
 | Ajouter une image | Administration → Images |
 | Changer le nom du site, l'adresse de contact | Administration → Réglages |
 | Ouvrir ou fermer les commentaires du site | Administration → Réglages |

@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
-	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, LIBELLE_KIND } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatTailleFichier, LIBELLE_KIND } from '$lib/format';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -127,7 +127,12 @@
 				{#each data.sources as source (source.id)}
 					<li class="rounded-lg border border-line bg-surface px-4 py-3">
 						<p class="font-semibold text-ink">
-							{#if source.url}
+							{#if source.pdf}
+								<a class="text-brand underline-offset-4 hover:underline" href={source.pdf.url}
+									>{source.title}</a
+								>
+								<span class="ml-2 rounded bg-surface-alt px-1.5 py-0.5 text-xs font-medium text-ink-faint">PDF</span>
+							{:else if source.url}
 								<a
 									href={source.url}
 									target="_blank"
@@ -141,6 +146,12 @@
 						</p>
 						{#if source.note}
 							<p class="mt-1 text-sm text-ink-soft">{source.note}</p>
+						{/if}
+						{#if source.pdf}
+							<p class="mt-2 text-xs text-ink-faint">
+								<a class="font-semibold text-brand hover:underline" href={source.pdf.url}>Lire ou télécharger le PDF</a>
+								· {formatTailleFichier(source.pdf.octets)}
+							</p>
 						{/if}
 						{#if source.authorName}
 							<p class="mt-1 text-xs text-ink-faint">Proposé par {source.authorName}</p>
@@ -170,6 +181,7 @@
 
 				<form
 					method="POST"
+					enctype="multipart/form-data"
 					action="?/partagerSource"
 					class="mt-4 space-y-4"
 					use:enhance={() => {
@@ -202,22 +214,59 @@
 						/>
 					</div>
 
-					<div>
-						<label class="block text-sm font-semibold text-ink" for="lien">
-							Le lien <span class="font-normal text-ink-faint">(facultatif)</span>
-							<span class="block text-xs font-normal text-ink-faint">Une vidéo YouTube, un article en ligne, un site… Pour un livre, laissez vide.</span>
-						</label>
-						<input
-							id="lien"
-							name="lien"
-							type="url"
-							inputmode="url"
-							maxlength="500"
-							placeholder="https://"
-							value={form?.formulaire === 'source' ? (form.lien ?? '') : ''}
-							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
-						/>
-					</div>
+					<fieldset class="rounded-lg border border-line px-4 pb-4">
+						<legend class="px-2 text-sm font-semibold text-ink">Lien ou fichier PDF</legend>
+						<p class="text-xs text-ink-faint">Choisissez une seule des deux possibilités.</p>
+
+						<div class="mt-3">
+							<label class="block text-sm font-semibold text-ink" for="pdf">Fichier PDF</label>
+							<span class="block text-xs text-ink-faint">50 Mo maximum</span>
+							<input
+								id="pdf"
+								name="pdf"
+								type="file"
+								accept="application/pdf,.pdf"
+								class="mt-1 block w-full rounded border border-line-forte bg-surface px-3 py-2 text-sm text-ink file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:font-semibold file:text-brand"
+							/>
+						</div>
+
+						<div class="mt-4">
+							<label class="block text-sm font-semibold text-ink" for="droitsDiffusion">
+								Droits de diffusion <span class="font-normal text-ink-faint">(pour un PDF)</span>
+							</label>
+							<span class="block text-xs text-ink-faint">Licence libre, domaine public ou autorisation de l’auteur</span>
+							<input
+								id="droitsDiffusion"
+								name="droitsDiffusion"
+								type="text"
+								maxlength="300"
+								placeholder="Par exemple : CC BY 4.0"
+								value={form?.formulaire === 'source' ? (form.droitsDiffusion ?? '') : ''}
+								class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+							/>
+						</div>
+
+						<div class="my-5 flex items-center gap-3" aria-hidden="true">
+							<span class="h-px flex-1 bg-line"></span>
+							<span class="text-xs font-semibold text-ink-faint">ou</span>
+							<span class="h-px flex-1 bg-line"></span>
+						</div>
+
+						<div>
+							<label class="block text-sm font-semibold text-ink" for="lien">Lien</label>
+							<span class="block text-xs text-ink-faint">Vidéo, article ou site internet</span>
+							<input
+								id="lien"
+								name="lien"
+								type="url"
+								inputmode="url"
+								maxlength="500"
+								placeholder="https://"
+								value={form?.formulaire === 'source' ? (form.lien ?? '') : ''}
+								class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+							/>
+						</div>
+					</fieldset>
 
 					<div>
 						<label class="block text-sm font-semibold text-ink" for="note">
@@ -255,7 +304,7 @@
 					</div>
 
 					<!-- La preuve de travail ne se calcule qu'une fois le formulaire déplié. -->
-					{#if partageOuvert && !data.sourceDirecte}
+					{#if partageOuvert && !data.sourceSansPreuve}
 						<PreuveDeTravail defi={data.defiSource} />
 					{/if}
 
@@ -267,11 +316,7 @@
 							>{envoiSourceEnCours ? 'Envoi…' : 'Ajouter au dossier'}</button
 						>
 						<p class="text-xs text-ink-faint">
-							{#if data.sourceDirecte}
-								Vous êtes connecté : la source est publiée immédiatement.
-							{:else}
-								Les sources sont relues avant d'apparaître. Aucune inscription, aucune adresse IP conservée en clair.
-							{/if}
+							Les sources sont toujours relues avant d'apparaître. Aucune inscription, aucune adresse IP conservée en clair.
 						</p>
 					</div>
 				</form>

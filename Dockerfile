@@ -23,6 +23,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV DATABASE_PATH=/app/data/site.db
 ENV UPLOADS_PATH=/app/data/uploads
+ENV BIBLIOTHEQUE_PATH=/app/data/bibliotheque
 
 # Le site ne tourne jamais en root : si une faille permettait d'exécuter du
 # code, celui-ci n'aurait pas les droits d'écrire ailleurs que dans /app/data.
@@ -33,7 +34,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
 COPY docker/demarrer.sh ./
 
-RUN mkdir -p /app/data/uploads && chown -R site:site /app/data
+RUN mkdir -p /app/data/uploads /app/data/bibliotheque && chown -R site:site /app/data
 USER site
 
 EXPOSE 3000

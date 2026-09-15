@@ -2,6 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
 	blockIpHash,
+	detachPendingPdfsFromIpHash,
+	detachPdfFromSource,
 	deleteSource,
 	getSource,
 	listSourcesForModeration,
@@ -11,13 +13,14 @@ import {
 } from '$lib/server/content';
 import { audit } from '$lib/server/auth';
 import { RUBRIQUE_PAR_KIND } from '$lib/rubriques';
+import { supprimerPdf } from '$lib/server/bibliotheque';
 
 /**
  * Relecture des sources proposées pour les apéros. Même écran que la
  * modération des commentaires : en attente, publiées, rejetées.
  *
- * Une source, c'est avant tout un lien : c'est lui qu'il faut ouvrir avant
- * de publier. La page l'affiche en entier pour qu'on voie où il mène.
+ * Un lien est affiché en entier pour que sa destination soit claire. Un PDF
+ * reste privé mais peut être téléchargé par l'équipe pendant sa relecture.
  */
 const ETATS = ['pending', 'approved', 'rejected'] as const;
 type Etat = (typeof ETATS)[number];
@@ -33,10 +36,14 @@ export const load: PageServerLoad = async ({ url }) => {
 			titre: s.title,
 			lien: s.url,
 			note: s.note,
+			droitsDiffusion: s.droits_diffusion,
 			auteur: s.author_name,
 			creeLe: s.created_at,
 			empreinte: s.ip_hash,
 			empreinteCourte: s.ip_hash.slice(0, 8),
+			pdfNom: s.pdf_original_name,
+			pdfOctets: s.pdf_bytes,
+			pdfLien: s.pdf_filename ? `/bibliotheque/fichiers/${s.pdf_filename}` : '',
 			publicationTitre: s.publication_title,
 			publicationLien: `/${RUBRIQUE_PAR_KIND[s.publication_kind]}/${s.publication_slug}`
 		}))
@@ -53,6 +60,9 @@ export const actions: Actions = {
 		const id = Number((await request.formData()).get('id'));
 		const source = getSource(id);
 		if (!source) return fail(404, { erreur: 'Source introuvable.' });
+		if (!source.url && !source.pdf_filename) {
+			return fail(400, { erreur: 'Cette source ne contient plus de lien ni de PDF publiable.' });
+		}
 
 		moderateSource(id, 'approved', admin.id);
 		audit(admin, 'source.publication', String(id), `${source.title} ${source.url}`.trim(), locals.ipHash);
@@ -65,6 +75,8 @@ export const actions: Actions = {
 		const source = getSource(id);
 		if (!source) return fail(404, { erreur: 'Source introuvable.' });
 
+		supprimerPdf(source.pdf_filename);
+		detachPdfFromSource(id);
 		moderateSource(id, 'rejected', admin.id);
 		audit(admin, 'source.rejet', String(id), `${source.title} ${source.url}`.trim(), locals.ipHash);
 		retour(url);
@@ -76,6 +88,7 @@ export const actions: Actions = {
 		const source = getSource(id);
 		if (!source) return fail(404, { erreur: 'Source introuvable.' });
 
+		supprimerPdf(source.pdf_filename);
 		deleteSource(id);
 		audit(admin, 'source.suppression', String(id), `${source.title} ${source.url}`.trim(), locals.ipHash);
 		retour(url);
@@ -90,6 +103,7 @@ export const actions: Actions = {
 		const empreinte = String(form.get('empreinte') ?? '');
 		if (!/^[a-f0-9]{64}$/.test(empreinte)) return fail(400, { erreur: 'Empreinte invalide.' });
 
+		for (const filename of detachPendingPdfsFromIpHash(empreinte)) supprimerPdf(filename);
 		const sourcesRejetees = rejectAllSourcesFromIpHash(empreinte, admin.id);
 		const commentairesRejetes = rejectAllFromIpHash(empreinte, admin.id);
 		blockIpHash(empreinte, `Bloqué par ${admin.username}`);
