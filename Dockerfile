@@ -31,6 +31,7 @@ RUN addgroup -S site && adduser -S -G site site
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
+COPY docker/demarrer.sh ./
 
 RUN mkdir -p /app/data/uploads && chown -R site:site /app/data
 USER site
@@ -40,4 +41,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 	CMD node -e "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
-CMD ["node", "build/index.js"]
+CMD ["sh", "demarrer.sh"]

@@ -16,10 +16,9 @@ services:
     region: frankfurt
     dockerfilePath: ./Dockerfile
     healthCheckPath: /
-    # ORIGIN doit être l'adresse publique exacte, sinon SvelteKit refuse les
-    # formulaires (protection anti-CSRF). Render la fournit dans
+    # ORIGIN (adresse publique exacte, exigée par SvelteKit pour accepter les
+    # formulaires) n'est pas définie ici : docker/demarrer.sh la reprend de
     # RENDER_EXTERNAL_URL, quel que soit le nom finalement attribué au service.
-    dockerCommand: sh -c 'export ORIGIN="${ORIGIN:-$RENDER_EXTERNAL_URL}"; exec node build/index.js'
     envVars:
       - key: MODE_DEMO
         value: '1'
