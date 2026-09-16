@@ -1,4 +1,8 @@
 import type { RequestHandler } from './$types';
-import { servirFichierDeJeu } from '../fichiers';
+import { JEUX } from '$lib/jeux';
+import { servirFichierEmbarque } from '$lib/fichiers-embarques';
 
-export const GET: RequestHandler = ({ params }) => servirFichierDeJeu(params.jeu, params.fichier);
+const DOSSIERS = JEUX.map((jeu) => jeu.dossier);
+
+export const GET: RequestHandler = ({ params }) =>
+	servirFichierEmbarque('jeux', DOSSIERS, params.jeu, params.fichier);

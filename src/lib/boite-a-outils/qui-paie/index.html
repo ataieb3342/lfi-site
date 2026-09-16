@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Qui paie vraiment l’impôt ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre</p>
+			<h1>Qui paie vraiment l’impôt ?</h1>
+			<p class="chapeau">
+				On entend souvent que « les riches paient déjà tout ». Entrez votre salaire :
+				vous verrez ce que vous versez réellement, et ce que versent ceux d’en haut.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-salaire">
+			<h2 id="titre-salaire">Votre situation</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="salaire">Salaire net mensuel, avant impôt sur le revenu</label>
+				<div class="champ-ligne">
+					<input type="range" id="salaire" min="800" max="12000" step="50" value="2000">
+					<input type="number" id="salaire-nombre" min="800" max="100000" step="50" value="2000"
+					       aria-label="Salaire net mensuel en euros">
+					<span class="unite">€ net / mois</span>
+				</div>
+			</div>
+
+			<div class="champ">
+				<label for="parts">Parts fiscales de votre foyer</label>
+				<div class="champ-ligne">
+					<input type="range" id="parts" min="1" max="4" step="0.5" value="1">
+					<output id="parts-texte" for="parts">1 part — une personne seule</output>
+				</div>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-total">
+			<h2 id="titre-total">Ce que vous versez</h2>
+			<p class="grand-chiffre" id="taux-total">—</p>
+			<p class="sous-chiffre" id="phrase-total">de vos revenus partent en impôts et taxes.</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-detail">
+			<h2 id="titre-detail">Le détail</h2>
+			<p class="legende">
+				Part de votre revenu net annuel que représente chaque prélèvement.
+			</p>
+			<ul class="barres" id="detail"></ul>
+
+			<div class="avertissement">
+				<strong>Et les cotisations sociales ?</strong>
+				Environ <span id="cotisations">—</span> par mois sont prélevées sur votre brut au titre
+				des cotisations retraite, chômage et maladie. Elles ne sont pas comptées ci-dessus :
+				ce n’est pas de l’argent qui disparaît, c’est votre retraite, votre indemnisation en cas
+				de perte d’emploi et vos soins remboursés — du salaire différé, pas un impôt.
+			</div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-sommet">
+			<h2 id="titre-sommet">Et tout en haut ?</h2>
+			<p class="legende">
+				Taux d’imposition effectif mesuré par l’Institut des politiques publiques, en tenant
+				compte de <strong>tous</strong> les impôts directs — y compris l’impôt sur les bénéfices
+				des sociétés que ces foyers détiennent. Sans cela, l’essentiel de leurs revenus reste
+				invisible : il ne passe jamais par une fiche de paie.
+			</p>
+			<ul class="barres" id="sommet"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem">
+				Le taux monte avec le revenu… jusqu’à un certain point. Passé le sommet, il
+				<strong>redescend</strong> : les 75 foyers les plus riches de France sont imposés à un taux
+				plus faible que des cadres supérieurs. Non par fraude, mais parce que leurs revenus
+				restent logés dans des sociétés, taxées moins lourdement que les revenus des personnes.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-retenir">
+			<h2 id="titre-retenir">À retenir</h2>
+			<ul>
+				<li>
+					L’impôt sur le revenu est progressif, mais il ne représente qu’une part minoritaire
+					de ce que paie un salarié. La CSG et la TVA, elles, frappent au même taux quels que
+					soient les revenus.
+				</li>
+				<li>
+					La TVA pèse environ <strong>12 % du revenu</strong> des 10 % les plus modestes,
+					contre <strong>5 %</strong> pour les 10 % les plus aisés : celui qui dépense tout ce
+					qu’il gagne est taxé sur tout ce qu’il gagne.
+				</li>
+				<li>
+					Au sommet, le système cesse d’être progressif. C’est le fait le plus établi et le
+					moins connu de la fiscalité française.
+				</li>
+			</ul>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Barème de l’impôt sur le revenu 2026 (revenus 2025), loi de finances pour 2026 :
+					tranches à 0 %, 11 %, 30 %, 41 % et 45 %, après abattement de 10 % pour frais
+					professionnels. La décote est appliquée : 897 € moins 45,25 % de l’impôt pour une
+					personne seule, 1 483 € pour un couple, dans la limite de 1 982 € et 3 277 €
+					d’impôt brut. C’est elle qui annule l’impôt sur le revenu autour du SMIC.
+				</li>
+				<li>
+					CSG et CRDS : 9,7 % du salaire brut (assiette de 98,25 %), taux en vigueur.
+				</li>
+				<li>
+					TVA : Insee et Observatoire des inégalités — la TVA représente environ 12 % du revenu
+					disponible des 10 % les plus modestes contre 5 % pour les 10 % les plus aisés.
+					Selon la méthode de calcul retenue, l’écart varie (d’autres travaux donnent 14 % contre 8 %),
+					mais le sens ne change jamais.
+				</li>
+				<li>
+					Taux d’imposition au sommet : Laurent Bach, Antoine Bozio, Arthur Guillouzouic et
+					Clément Malgouyres, « Quels impôts les milliardaires paient-ils ? », note n° 92 de
+					l’Institut des politiques publiques, juin 2023 (données fiscales de 2016).
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Ce calcul est une estimation.</strong> Il applique le barème officiel à un salaire,
+				mais ne tient pas compte du plafonnement du quotient familial, des crédits et réductions
+				d’impôt, ni des revenus autres que salariaux. Le montant de TVA est un ordre de grandeur
+				établi à partir des taux d’effort moyens observés par l’Insee, pas un relevé de vos achats.
+				Pour un calcul exact, utilisez le simulateur officiel des impôts.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

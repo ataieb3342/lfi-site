@@ -38,7 +38,9 @@ aucun service externe, aucune dépendance native.
 | `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites` et la fiche d'un apéro |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
+| `src/lib/boite-a-outils/` + `src/routes/boite-a-outils/` | Page publique `/boite-a-outils` : les outils interactifs de vulgarisation (voir plus bas) |
 | `src/lib/jeux/` + `src/routes/jeux/` | Les jeux de la bibliothèque, servis tels quels (voir plus bas) |
+| `src/lib/fichiers-embarques.ts` | Sert les fichiers des jeux et des modules, avec leur CSP |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
 Les dépendances runtime se comptent sur une main : `markdown-it` et `qrcode`.
@@ -223,6 +225,34 @@ sont limités à 50 Mo, identifiés par leur signature `%PDF-`, stockés sous un
 aléatoire dans `data/bibliotheque/` et toujours soumis à modération. La personne
 qui propose un PDF doit préciser la licence ou l'autorisation de republication.
 
+La page `/bibliotheque` porte les **ressources** (les sources des apéros) et les
+**jeux**, et s'ouvre sur un encart qui renvoie à la boîte à outils. Les outils
+interactifs ont leur propre page : ils sont appelés à se multiplier, et faire
+tourner un simulateur n'est pas la même chose que consulter un lien. Une version
+antérieure les empilait ici, et la page devenait interminable.
+
+**Les ressources sont en liste, pas en cartes** : une ressource est un lien, pas
+un produit en vitrine, et la liste en montre quinze là où la grille en montrait
+quatre. Les jeux, eux, sont en cartes.
+
+Les cartes du site — outils comme jeux — **n'ont pas de bouton** : le lien du
+titre est étendu à toute la carte par son `::after`. Un bouton sous chaque carte,
+répété une dizaine de fois, n'ajoutait rien.
+
+Attention si l'on habille un encart avec `.fond-degrade` : **ne pas le combiner
+avec `.carte`**. `.carte` est déclarée après dans `app.css` et écrase le fond, ce
+qui donne du texte blanc sur fond blanc. La surface porte déjà son fond et son
+texte ; il ne lui manque que le rembourrage et l'arrondi.
+
+Les ressources ont un champ de recherche qui filtre la liste **dans le
+navigateur**, sur les données déjà chargées — titre, note, auteur, nom du site
+et titre de l'apéro, plus le mot « pdf » pour les documents. La comparaison se
+fait en minuscules et sans accents des deux côtés, sinon « economie » ne
+trouverait pas « économie ». Le champ n'est affiché **que si le script est
+actif** (motif `scriptActif`, comme dans le carrousel) : sans JavaScript, la
+liste complète reste visible et aucun champ ne promet ce qu'il ne peut pas
+faire.
+
 Seuls les PDF approuvés sont accessibles au public dans `/bibliotheque`. Une
 session d'administration peut ouvrir un PDF en attente pour le relire. Rejeter,
 supprimer ou bloquer l'origine d'une proposition supprime également le fichier ;
@@ -327,8 +357,8 @@ dans `src/lib/jeux.ts` (dossier, titre, description). Un dossier absent de cette
 liste n'est pas servi.
 
 Les fichiers sont lus **à la compilation** (`import.meta.glob` avec `?raw` dans
-`src/routes/jeux/[jeu]/fichiers.ts`) et embarqués dans `build/` : rien à copier
-au déploiement. Ils ne passent pas par `static/` pour deux raisons : le serveur
+`src/lib/fichiers-embarques.ts`, partagé avec la boîte à outils) et
+embarqués dans `build/` : rien à copier au déploiement. Ils ne passent pas par `static/` pour deux raisons : le serveur
 de développement et celui de production n'y traitent pas `index.html` de la
 même façon, et les fichiers de `static/` sont servis sans en-têtes de sécurité.
 Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
@@ -337,11 +367,67 @@ Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
   'always'` sur la route) : c'est ce qui permet à son `index.html` de charger
   `style.css` et `game.js` par des adresses relatives.
 - Seuls `.html`, `.js` et `.css` sont servis. Pas d'images ni de sons pour
-  l'instant : en ajouter demande d'étendre `TYPES` dans `fichiers.ts`.
+  l'instant : en ajouter demande d'étendre `TYPES` dans `fichiers-embarques.ts`.
 - Le jeu s'ouvre en plein écran, sans l'habillage du site ; son `index.html`
   contient un lien « Retour à la bibliothèque ».
 - Les `game.js` commencent par `// @ts-nocheck` : ce sont des scripts servis
   tels quels, `npm run check` ne les vérifie pas.
+- En développement, ces fichiers sont servis avec `Cache-Control: no-store` ;
+  en production, une heure de cache. Sans cela, le navigateur sert pendant une
+  heure la version précédente d'un jeu qu'on vient de modifier, et on cherche
+  longtemps une erreur qui n'existe plus.
+
+## La boîte à outils
+
+`/boite-a-outils` rassemble des outils interactifs de vulgarisation : le visiteur
+entre son salaire ou son patrimoine, et voit ce que les chiffres publics disent
+de sa situation. Même mécanique que les jeux, mais dans `src/lib/boite-a-outils/`
+et listés dans `src/lib/boite-a-outils.ts`. Chaque outil vit à
+`/boite-a-outils/<dossier>/` et son script s'appelle `outil.js` (et non
+`game.js`).
+
+C'est **une page à part entière**, pas une section de la bibliothèque : ils sont
+appelés à devenir nombreux, et ce sont des outils d'argumentation pour la
+campagne, pas des distractions. C'est aussi pourquoi ils ne sont pas servis sous
+`/jeux/` : l'adresse d'une page se partage, et `/jeux/qui-paie-vraiment`
+décrédibiliserait l'outil avant même qu'on l'ouvre.
+
+La page **n'est pas dans l'en-tête de bureau** — une cinquième rubrique le ferait
+déborder sur les écrans moyens. On y accède par le pied de page, par le menu
+mobile (qui liste tout) et par l'encart en tête de la bibliothèque.
+
+Les outils sont groupés en **rubriques** (`RUBRIQUES` dans `boite-a-outils.ts`,
+chaque outil portant un champ `rubrique`). Elles existent pour que la page reste
+lisible quand il y en aura vingt : une liste de vingt cartes ne se lit pas. Une
+rubrique sans outil n'est pas affichée, on peut donc en déclarer une à l'avance.
+Le `satisfies` sur `OUTILS` fait échouer `npm run check` si un outil pointe vers
+une rubrique qui n'existe pas — une faute de frappe est attrapée à la
+compilation, pas par un trou dans la page.
+
+Quatre règles, dont la première n'est pas négociable :
+
+1. **Chaque chiffre porte sa source et son année**, visibles en bas de la page,
+   et chaque outil dit en toutes lettres ce que son calcul ne prend pas en
+   compte. Le site est une cible politique : un chiffre invérifiable ou
+   exagéré est une munition offerte aux adversaires, et une seule erreur
+   trouvée discrédite tous les autres.
+2. **Ne jamais « arrondir dans le bon sens ».** L'outil sur l'impôt applique
+   la décote, qui annule l'impôt sur le revenu autour du SMIC : sans elle, il
+   surestimait de moitié ce que paient les foyers modestes — précisément ceux
+   à qui il s'adresse. Un chiffre gonflé en notre faveur est un chiffre faux.
+3. **Rien de ce que saisit le visiteur ne quitte son navigateur.** Aucun envoi
+   au serveur, aucun stockage : il n'y a donc aucune donnée à protéger, et la
+   page peut le promettre sans mentir. La CSP interdit de toute façon tout
+   appel réseau depuis ces pages.
+4. Les `outil.js` commencent par `// @ts-nocheck`, comme les `game.js`.
+
+Les chiffres actuels viennent de l'Insee (dépenses publiques par fonction 2024,
+patrimoine des ménages 2024, dépenses pré-engagées), de la loi de finances pour
+2026 (barème et décote de l'impôt sur le revenu), de l'Institut des politiques
+publiques (note n° 92 sur l'imposition des plus fortunés) et du classement
+*Challenges* des fortunes françaises. **Ils vieillissent** : le barème change
+chaque année, le SMIC et les classements aussi. Les valeurs sont regroupées en
+haut de chaque `outil.js`, sous un commentaire qui le dit.
 
 ## Ajouter une page fixe
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Où va l’argent public ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre</p>
+			<h1>Où va l’argent public ?</h1>
+			<p class="chapeau">
+				1 672 milliards d’euros par an. Le chiffre est si gros qu’il ne veut plus rien dire.
+				Ramenez-le à vos euros à vous : la répartition devient lisible en quelques secondes.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vue">
+			<h2 id="titre-vue">Comment regarder ce budget</h2>
+			<p class="legende">Ce sont les mêmes chiffres, exprimés dans trois unités différentes.</p>
+
+			<div class="onglets" role="group" aria-label="Choix de l’unité">
+				<button type="button" data-vue="milliards" aria-pressed="true">En milliards d’euros</button>
+				<button type="button" data-vue="cent" aria-pressed="false">Pour 100 € versés</button>
+				<button type="button" data-vue="moi" aria-pressed="false">Sur ma contribution</button>
+			</div>
+
+			<div class="champ" id="champ-contribution" hidden>
+				<label for="contribution">Ce que vous versez en impôts et taxes, par mois</label>
+				<div class="champ-ligne">
+					<input type="range" id="contribution" min="50" max="3000" step="10" value="450">
+					<input type="number" id="contribution-nombre" min="1" max="100000" step="10" value="450"
+					       aria-label="Contribution mensuelle en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+				<p class="barre-detail">
+					Vous ne savez pas quoi mettre ? Le module
+					<a href="/boite-a-outils/qui-paie/">« Qui paie vraiment l’impôt ? »</a> calcule ce montant
+					à partir de votre salaire.
+				</p>
+			</div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-postes">
+			<h2 id="titre-postes">Poste par poste</h2>
+			<p class="legende" id="legende-postes">
+				Dépenses de l’ensemble des administrations publiques — État, collectivités locales et
+				Sécurité sociale réunis — en 2024.
+			</p>
+			<ul class="barres" id="postes"></ul>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-lecon">
+			<h2 id="titre-lecon">Ce que ça veut dire</h2>
+			<p class="sous-chiffre">
+				<strong>Près de 6 euros sur 10 vont à la protection sociale et à la santé.</strong>
+				Retraites, remboursements de soins, allocations familiales, chômage : « la dépense
+				publique », c’est d’abord de l’argent qui revient aux gens. Réduire « le train de vie
+				de l’État » de plusieurs dizaines de milliards sans toucher à ces deux postes est
+				arithmétiquement impossible — et quand on y touche, ce sont les retraites et l’hôpital.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-dette">
+			<h2 id="titre-dette">Et la dette dans tout ça ?</h2>
+			<p class="legende" style="margin-bottom:0">
+				Les intérêts de la dette sont comptés dans les « services généraux ». Leur montant
+				dépend du périmètre retenu : autour de 59 milliards d’euros pour l’ensemble des
+				administrations en 2026, mais jusqu’à 77 milliards si l’on retient une autre convention
+				comptable pour le seul budget de l’État. Méfiez-vous des chiffres cités sans leur
+				périmètre : c’est le premier endroit où un débat se truque, dans les deux sens.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Insee Première n° 2093, « Usage de l’argent public : les dépenses publiques par
+					fonction en 2024 » : 1 672 milliards d’euros de dépenses publiques, soit 57 % du PIB,
+					répartis selon la nomenclature internationale des fonctions des administrations.
+				</li>
+				<li>
+					Charge d’intérêts de la dette : projet de loi de finances pour 2026 et travaux de
+					Fipeco ; les écarts entre chiffres publiés tiennent au périmètre (État seul ou
+					ensemble des administrations publiques).
+				</li>
+			</ul>
+			<div class="avertissement">
+				Ces chiffres portent sur <strong>toutes</strong> les administrations publiques, pas sur le
+				seul budget de l’État voté chaque automne (594 milliards d’euros au budget général en 2026).
+				C’est le périmètre le plus honnête pour répondre à la question « où va l’argent public ? »,
+				puisque les retraites et l’assurance maladie ne passent pas par le budget de l’État.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

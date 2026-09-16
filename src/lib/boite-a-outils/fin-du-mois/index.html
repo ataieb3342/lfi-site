@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Où passe mon salaire ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre</p>
+			<h1>Où passe mon salaire ?</h1>
+			<p class="chapeau">
+				« Il suffit de mieux gérer son budget. » Avant de gérer quoi que ce soit, une grande
+				partie du salaire est déjà partie : elle est engagée par des contrats qu’on ne peut pas
+				renégocier ce mois-ci. Voici ce qu’il reste ensuite, et ce que déplacerait une hausse
+				des salaires.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-foyer">
+			<h2 id="titre-foyer">Votre foyer</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="revenu">Revenus nets du foyer, par mois</label>
+				<div class="champ-ligne">
+					<input type="range" id="revenu" min="600" max="8000" step="1" value="1478">
+					<input type="number" id="revenu-nombre" min="1" step="10" value="1478"
+					       aria-label="Revenus nets mensuels en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+				<p class="barre-detail">
+					Salaires, pensions et allocations compris. Par défaut : le SMIC net, soit 1 478 €
+					depuis juin 2026.
+				</p>
+			</div>
+
+			<div class="champ">
+				<label for="logement">Logement : loyer ou crédit, charges et énergie comprises</label>
+				<div class="champ-ligne">
+					<input type="range" id="logement" min="0" max="3000" step="1" value="337">
+					<input type="number" id="logement-nombre" min="0" step="10" value="337"
+					       aria-label="Dépense de logement mensuelle en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-reste">
+			<h2 id="titre-reste">Ce qu’il vous reste</h2>
+			<p class="grand-chiffre" id="reste">—</p>
+			<p class="sous-chiffre" id="reste-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-repartition">
+			<h2 id="titre-repartition">Où part l’argent, avant vos choix</h2>
+			<p class="legende">
+				Les « dépenses pré-engagées » sont celles qui découlent d’un contrat difficile à
+				renégocier à court terme : logement, assurances, abonnements téléphoniques et internet,
+				cantine scolaire. Elles ne se décident plus au moment de payer.
+			</p>
+			<ul class="barres" id="repartition"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-effort">
+			<h2 id="titre-effort">Votre effort pour le logement</h2>
+			<p class="grand-chiffre" id="effort">—</p>
+			<p class="sous-chiffre" id="effort-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-mesures">
+			<h2 id="titre-mesures">Et si les salaires augmentaient ?</h2>
+			<p class="legende">
+				Le SMIC net s’élève à 1 477,93 € depuis le 1<sup>er</sup> juin 2026. Le porter à
+				1 600 € net est une mesure chiffrable : voici ce que cela change, en euros, pour un
+				foyer au SMIC.
+			</p>
+			<ul class="barres" id="mesures"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem" id="mesures-phrase"></p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-inegalite">
+			<h2 id="titre-inegalite">Pourquoi ce n’est pas la même contrainte pour tous</h2>
+			<p class="sous-chiffre">
+				En moyenne, les dépenses pré-engagées absorbent <strong>30 %</strong> du revenu des
+				ménages français. Mais chez les <strong>10 % les plus modestes</strong>, elles en
+				absorbent environ <strong>75 %</strong>. C’est toute la différence entre un budget
+				serré et un budget bloqué : à ce niveau, une facture imprévue de 200 € n’est plus un
+				désagrément, c’est un découvert. Le « reste à vivre » n’est pas une variable
+				d’ajustement — c’est ce qui rend une vie possible ou non.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Insee : les dépenses pré-engagées représentent 30,3 % du revenu disponible brut des
+					ménages en 2024, dont 22,8 points pour le seul logement. Leur part est passée de
+					13,4 % en 1959 à plus de 30 % aujourd’hui.
+				</li>
+				<li>
+					Poids des dépenses contraintes chez les ménages les plus modestes : environ 75 % du
+					revenu pour le premier décile (Insee, données de 2017, reprises par l’Observatoire
+					des inégalités).
+				</li>
+				<li>
+					SMIC : 1 867,02 € brut et 1 477,93 € net mensuels depuis la revalorisation du
+					1<sup>er</sup> juin 2026.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Ce calcul est une estimation.</strong> La part des dépenses pré-engagées autres
+				que le logement est celle observée en moyenne par l’Insee : la vôtre peut être très
+				différente. L’effet d’une hausse du SMIC est calculé sur le seul salaire net ; il ne
+				tient pas compte des effets de bord sur la prime d’activité ou les allocations, qui
+				peuvent réduire le gain réel pour certains foyers. C’est un ordre de grandeur pour
+				discuter, pas un document à opposer à votre banque.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>
