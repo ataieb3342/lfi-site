@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>La fraude fiscale, en chiffres vérifiables</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre</p>
+			<h1>La fraude fiscale, en chiffres vérifiables</h1>
+			<p class="chapeau">
+				On entend « 100 milliards » d’un côté, « chiffre fantaisiste » de l’autre. La vérité
+				est que personne ne connaît le montant total de la fraude — c’est la nature même d’une
+				fraude. En revanche, ce que l’administration réclame et ce qu’elle encaisse sont
+				publiés chaque année. Commençons par là.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-reclame">
+			<h2 id="titre-reclame">Ce que l’État réclame, ce qu’il encaisse</h2>
+			<p class="legende">
+				Résultats du contrôle fiscal de la direction générale des finances publiques, 2025.
+				Ces deux nombres ne sont pas des estimations : ce sont des résultats comptables.
+			</p>
+			<ul class="barres" id="recouvrement"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem" id="recouvrement-phrase"></p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-estimation">
+			<h2 id="titre-estimation">Et la fraude totale ?</h2>
+			<p class="legende">
+				Là, on entre dans l’estimation — et nous ne trancherons pas à votre place. Déplacez le
+				curseur entre les bornes réellement publiées : de 20 milliards, qui correspond à la
+				seule fraude à la TVA chiffrée par l’Insee, à 100 milliards, estimation du principal
+				syndicat des finances publiques pour l’ensemble des impôts.
+			</p>
+
+			<div class="champ">
+				<label for="estimation">Estimation de la fraude fiscale annuelle</label>
+				<div class="champ-ligne">
+					<input type="range" id="estimation" min="20" max="100" step="1" value="26">
+					<input type="number" id="estimation-nombre" min="1" step="1" value="26"
+					       aria-label="Estimation de la fraude fiscale annuelle, en milliards d’euros">
+					<span class="unite">Md€ / an</span>
+				</div>
+				<p class="barre-detail" id="estimation-legende">—</p>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-part">
+			<h2 id="titre-part">Ce qui est effectivement récupéré</h2>
+			<p class="grand-chiffre" id="part">—</p>
+			<p class="sous-chiffre" id="part-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-manque">
+			<h2 id="titre-manque">Ce que le manque représente</h2>
+			<p class="legende">
+				Le montant non récupéré, comparé aux dépenses publiques annuelles par fonction.
+			</p>
+			<ul class="barres" id="manque"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-moyens">
+			<h2 id="titre-moyens">Le paradoxe des moyens</h2>
+			<p class="sous-chiffre">
+				Entre 2015 et 2024, les effectifs consacrés au contrôle fiscal ont diminué de
+				<strong>19 %</strong>. Sur la seule année 2024, le nombre de contrôles menés dans les
+				entreprises a reculé de <strong>18,6 %</strong>.
+			</p>
+			<p class="sous-chiffre">
+				Résultat : les sommes effectivement recouvrées au titre du contrôle fiscal sont
+				passées de <strong>12,2 milliards d’euros en 2015 à 11,4 milliards en 2024</strong>,
+				en euros courants — donc davantage encore en euros constants. Pendant la même période,
+				les recettes fiscales totales collectées par l’administration augmentaient de
+				<strong>44 %</strong>.
+			</p>
+			<p class="sous-chiffre">
+				Autrement dit : l’assiette a grossi, et le contrôle a rétréci. Ce n’est pas un
+				problème de logiciel ou de méthode, c’est un choix de moyens — donc un choix politique,
+				donc réversible.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-honnete">
+			<h2 id="titre-honnete">Pourquoi nous n’écrivons pas « 100 milliards »</h2>
+			<p class="sous-chiffre">
+				Ce chiffre existe : il vient du syndicat Solidaires Finances Publiques, qui a d’abord
+				avancé 60 à 80 milliards en 2013, puis 80 à 100 milliards en 2018. C’est un travail
+				sérieux, mené par des gens qui connaissent le sujet de l’intérieur — mais c’est une
+				estimation syndicale, contestée, et la Cour des comptes juge qu’il n’existe pas
+				aujourd’hui de chiffrage global fiable de la fraude.
+			</p>
+			<p class="sous-chiffre">
+				Nous n’en avons pas besoin. <strong>Les chiffres de l’administration elle-même
+				suffisent</strong> : elle réclame 17,1 milliards et en encaisse 11,4, avec des
+				effectifs en baisse de près d’un cinquième. Un argument qui tient avec les chiffres de
+				l’adversaire est un argument qu’on ne peut pas nous retirer.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Direction générale des finances publiques, résultats du contrôle fiscal :
+					17,1 milliards d’euros de droits et pénalités notifiés en 2025, en progression de
+					27 % depuis 2021 ; 11,4 milliards effectivement encaissés en 2025, comme en 2024.
+					En 2024, 16,7 milliards avaient été notifiés.
+				</li>
+				<li>
+					Moyens du contrôle fiscal : − 19 % d’effectifs entre 2015 et 2024 ; − 18,6 % de
+					contrôles externes en entreprise sur la seule année 2024. Sommes recouvrées :
+					12,2 milliards en 2015, 11,4 milliards en 2024, en euros courants, pour des
+					recettes fiscales totales en hausse de 44 % sur la période.
+				</li>
+				<li>
+					Estimation basse : fraude à la taxe sur la valeur ajoutée évaluée entre 20 et
+					26 milliards d’euros par an (Insee, rapport de 2022). Elle ne porte que sur un
+					impôt.
+				</li>
+				<li>
+					Estimation haute : 80 à 100 milliards d’euros par an, tous impôts confondus
+					(Solidaires Finances Publiques, estimation de 2018, révisée à la hausse depuis une
+					première fourchette de 60 à 80 milliards en 2013).
+				</li>
+				<li>
+					Dépenses publiques par fonction : Insee Première n° 2093, dépenses de 2024.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Fraude et évasion ne sont pas la même chose.</strong> La fraude est illégale ;
+				l’optimisation, elle, est légale, et les montants qu’elle déplace ne figurent dans
+				aucun de ces chiffres. Par ailleurs, les sommes notifiées incluent les pénalités, et
+				une partie des redressements est ensuite annulée par le juge : l’écart entre notifié
+				et encaissé ne s’explique donc pas uniquement par l’insolvabilité ou l’évitement. Enfin,
+				aucun chiffrage global de la fraude ne fait consensus — c’est pourquoi cette page vous
+				laisse choisir votre hypothèse plutôt que d’en imposer une.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

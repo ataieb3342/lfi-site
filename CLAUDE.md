@@ -422,12 +422,35 @@ Quatre règles, dont la première n'est pas négociable :
 4. Les `outil.js` commencent par `// @ts-nocheck`, comme les `game.js`.
 
 Les chiffres actuels viennent de l'Insee (dépenses publiques par fonction 2024,
-patrimoine des ménages 2024, dépenses pré-engagées), de la loi de finances pour
-2026 (barème et décote de l'impôt sur le revenu), de l'Institut des politiques
-publiques (note n° 92 sur l'imposition des plus fortunés) et du classement
-*Challenges* des fortunes françaises. **Ils vieillissent** : le barème change
-chaque année, le SMIC et les classements aussi. Les valeurs sont regroupées en
-haut de chaque `outil.js`, sous un commentaire qui le dit.
+patrimoine des ménages 2024, dépenses pré-engagées, indice des prix à la
+consommation, note de conjoncture), de la loi de finances pour 2026 (barème et
+décote de l'impôt sur le revenu), de la loi de financement de la Sécurité
+sociale pour 2026 (suspension de la réforme des retraites), de la Drees
+(espérance de vie sans incapacité), du ministère de l'Intérieur (résultats des
+législatives de 2024), de la DGFiP (résultats du contrôle fiscal), de l'IGEDD
+(série Friggit sur les prix du logement), de l'observatoire des loyers de la
+DHUP, de l'Institut des politiques publiques (note n° 92 sur l'imposition des
+plus fortunés), du cabinet Proxinvest (rémunérations des dirigeants du CAC 40)
+et du classement *Challenges* des fortunes françaises. **Ils vieillissent** : le
+barème change chaque année, le SMIC, les prix du logement et les classements
+aussi. Les valeurs sont regroupées en haut de chaque `outil.js`, sous un
+commentaire qui le dit.
+
+Deux sujets demandent une vigilance particulière :
+
+- **Les retraites.** Trois états du droit se superposent depuis le 1er septembre
+  2026 : celui d'avant 2023, la réforme de 2023, et sa suspension par la LFSS
+  2026. `retraite/outil.js` porte les trois calendriers, génération par
+  génération. La suspension est temporaire : les natifs de 1969 et après
+  partent toujours à 64 ans.
+- **Les chiffres contestés.** Quand une estimation ne fait pas consensus (le
+  rendement de l'impôt plancher sur les très hauts patrimoines, le montant de la
+  fraude fiscale), l'outil affiche la **fourchette** publiée, et non le chiffre
+  qui nous arrange — quitte à laisser le visiteur choisir son hypothèse au
+  curseur. De même, l'outil sur la proportionnelle affiche que ce scrutin aurait
+  donné une cinquantaine de sièges de plus au RN en 2024. Un argument qui ne
+  tient que lorsqu'il nous arrange n'est pas un argument, et une seule erreur
+  trouvée discrédite les dix autres outils.
 
 ## Ajouter une page fixe
 

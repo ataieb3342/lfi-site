@@ -42,6 +42,24 @@ export const RUBRIQUES = [
 		titre: 'Les richesses et la vie quotidienne',
 		description:
 			'Ce que les gens possèdent, ce qu’il leur reste à la fin du mois, et l’écart entre les deux bouts.'
+	},
+	{
+		id: 'travail-retraite',
+		titre: 'Le travail et la retraite',
+		description:
+			'Ce que le travail rapporte, ce qu’il use, et à quel âge il s’arrête — si l’on est encore en état d’en profiter.'
+	},
+	{
+		id: 'se-loger',
+		titre: 'Se loger',
+		description:
+			'Le premier poste de dépense des ménages, et le premier obstacle. Vu depuis Dijon, avec les prix d’ici.'
+	},
+	{
+		id: 'democratie',
+		titre: 'La démocratie',
+		description:
+			'Ce que vaut une voix, ce qu’on en fait, et ce qu’un autre mode de scrutin y changerait.'
 	}
 ] as const;
 
@@ -72,6 +90,48 @@ export const OUTILS = [
 		rubrique: 'richesses',
 		titre: 'Où passe mon salaire ?',
 		description: 'Ce qu’un salaire absorbe avant le premier choix libre.'
+	},
+	{
+		dossier: 'tres-hauts-patrimoines',
+		rubrique: 'impots-budget',
+		titre: 'Un impôt plancher sur les très hauts patrimoines',
+		description: 'Le seuil des 100 millions, et la distance qui vous en sépare.'
+	},
+	{
+		dossier: 'fraude-fiscale',
+		rubrique: 'impots-budget',
+		titre: 'La fraude fiscale, en chiffres vérifiables',
+		description: 'Ce que l’État réclame, ce qu’il encaisse, et ce qui manque.'
+	},
+	{
+		dossier: 'panier',
+		rubrique: 'richesses',
+		titre: 'Votre salaire a-t-il suivi les prix ?',
+		description: 'Cinq ans de hausses, confrontés à votre feuille de paie.'
+	},
+	{
+		dossier: 'remunerations-dirigeants',
+		rubrique: 'richesses',
+		titre: 'Combien gagne un patron du CAC 40 ?',
+		description: '6,5 millions par an, rapportés à ce que vous gagnez.'
+	},
+	{
+		dossier: 'retraite',
+		rubrique: 'travail-retraite',
+		titre: 'Quand pourrai-je partir à la retraite ?',
+		description: 'Votre âge de départ, sous les trois lois qui se superposent.'
+	},
+	{
+		dossier: 'se-loger',
+		rubrique: 'se-loger',
+		titre: 'Se loger à Dijon : combien d’années de salaire ?',
+		description: 'Le prix d’un logement dijonnais, mesuré en années de revenu.'
+	},
+	{
+		dossier: 'proportionnelle',
+		rubrique: 'democratie',
+		titre: 'Votre voix pèse combien ?',
+		description: 'Le prix d’un siège en 2024, et l’Assemblée à la proportionnelle.'
 	}
 ] as const satisfies readonly {
 	dossier: string;
