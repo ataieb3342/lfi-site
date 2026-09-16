@@ -138,6 +138,10 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 - `--color-line` est le filet décoratif ; `--color-line-forte`
   sert aux contours qu'on manipule (champs, boutons secondaires, pastilles),
   pour tenir le contraste de 3 pour 1 exigé sur les commandes.
+- **Toutes les pages ont la même en-tête** : un surlignage en petites capitales
+  dans la couleur de la rubrique, le titre en `.titre-affiche`, un chapô, et un
+  filet `border-b border-line pb-6` qui la sépare du contenu. Une page sans ce
+  filet se voit tout de suite.
 - **Le texte posé sur un fond violet passe par `text-sur-brand`**, jamais
   `text-white` : en thème sombre le violet devient un lavande clair et le
   texte doit devenir sombre. La classe `.bouton` le fait déjà.

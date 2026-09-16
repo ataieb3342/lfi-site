@@ -15,14 +15,14 @@
 	/>
 </svelte:head>
 
-<header class="max-w-2xl">
+<header class="border-b border-line pb-6">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Comprendre et argumenter</p>
 	<h1 class="titre-affiche mt-2 text-4xl text-ink">Boîte à outils</h1>
-	<p class="mt-4 text-lg text-ink-soft">
+	<p class="mt-4 max-w-2xl text-lg text-ink-soft">
 		Entrez votre salaire, votre loyer ou votre patrimoine : ces outils vous montrent ce que les
 		chiffres officiels disent de votre situation, et de celle du pays.
 	</p>
-	<p class="mt-3 text-ink-soft">
+	<p class="mt-3 max-w-2xl text-ink-soft">
 		Chacun affiche ses sources et dit ce que son calcul ne prend pas en compte. Rien de ce que
 		vous saisissez ne quitte votre navigateur : ni envoi, ni enregistrement, ni mesure d’audience.
 	</p>

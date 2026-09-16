@@ -63,10 +63,10 @@
 	<meta name="description" content="Les liens et documents PDF partagés autour des apéros thématiques, et quelques jeux faits maison." />
 </svelte:head>
 
-<header class="max-w-2xl">
+<header class="border-b border-line pb-6">
 	<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Ressources partagées</p>
 	<h1 class="titre-affiche mt-2 text-4xl text-ink">Bibliothèque</h1>
-	<p class="mt-4 text-lg text-ink-soft">
+	<p class="mt-4 max-w-2xl text-lg text-ink-soft">
 		Ce que nous lisons, regardons et écoutons — proposé et relu par le groupe.
 	</p>
 </header>
