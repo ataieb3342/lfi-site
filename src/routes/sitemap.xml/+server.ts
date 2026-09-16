@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { listPublished } from '$lib/server/content';
 import { RUBRIQUE_PAR_KIND } from '$lib/rubriques';
 import { JEUX, urlJeu } from '$lib/jeux';
+import { OUTILS, urlOutil } from '$lib/boite-a-outils';
 
 const PAGES_FIXES = [
 	'/',
@@ -9,10 +10,12 @@ const PAGES_FIXES = [
 	'/actualites',
 	'/aperos',
 	'/bibliotheque',
+	'/boite-a-outils',
 	'/le-groupe',
 	'/nous-rejoindre',
 	'/mentions-legales',
 	'/confidentialite',
+	...OUTILS.map(urlOutil),
 	...JEUX.map(urlJeu)
 ];
 

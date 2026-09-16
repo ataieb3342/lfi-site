@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Qui possède la France ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre</p>
+			<h1>Qui possède la France ?</h1>
+			<p class="chapeau">
+				Demandez à quelqu’un d’imaginer l’écart entre lui et un milliardaire : il se trompera
+				d’un facteur mille. Notre cerveau ne sait pas se représenter ces ordres de grandeur.
+				Celui-ci va essayer de vous les montrer.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Votre patrimoine</h2>
+			<p class="legende">
+				Tout ce que vous possédez — logement, épargne, voiture — <strong>avant</strong> de
+				déduire vos crédits en cours. Rien n’est envoyé nulle part : tout reste dans votre
+				navigateur.
+			</p>
+
+			<div class="champ">
+				<label for="patrimoine">Patrimoine brut du foyer</label>
+				<div class="champ-ligne">
+					<input type="range" id="patrimoine" min="0" max="60" step="0.5" value="24"
+					       aria-describedby="patrimoine-aide">
+					<input type="number" id="patrimoine-nombre" min="0" step="1000" value="150000"
+					       aria-label="Patrimoine brut en euros">
+					<span class="unite">€</span>
+				</div>
+				<p class="barre-detail" id="patrimoine-aide">
+					Le curseur avance par paliers de plus en plus grands : sans cela, toute la
+					population française tiendrait dans son premier centimètre.
+				</p>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-position">
+			<h2 id="titre-position">Votre place</h2>
+			<p class="grand-chiffre" id="position">—</p>
+			<p class="sous-chiffre" id="position-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-echelle">
+			<h2 id="titre-echelle">L’écart, à l’échelle</h2>
+			<p class="legende">
+				Une barre ordinaire ne peut pas représenter ces écarts : la vôtre serait invisible.
+				Alors changeons d’unité. Imaginons que votre patrimoine mesure
+				<strong>un centimètre</strong> — et voyons jusqu’où vont les autres.
+				<br>
+				<em>Les barres sont ici en échelle logarithmique : chaque fois qu’elles avancent
+				d’un cinquième de la largeur, le montant est multiplié par dix. C’est la seule
+				façon de faire tenir ces cinq repères sur un même graphique — et c’est une
+				convention qu’il vaut la peine de savoir repérer, parce qu’elle rend visuellement
+				modestes des écarts qui ne le sont pas.</em>
+			</p>
+			<ul class="barres" id="echelle"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-concentration">
+			<h2 id="titre-concentration">Comment le patrimoine se partage</h2>
+			<p class="legende">
+				Part du patrimoine total détenue par chaque groupe de ménages, en 2024.
+			</p>
+			<ul class="barres" id="concentration"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem">
+				Les inégalités de patrimoine sont <strong>bien plus fortes</strong> que les inégalités de
+				revenus : l’indice de Gini, qui mesure la concentration, vaut 0,65 pour le patrimoine
+				contre 0,30 pour le niveau de vie. C’est pourquoi un débat qui ne parle que des salaires
+				passe à côté de l’essentiel — et pourquoi la question de l’héritage est centrale.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-fortunes">
+			<h2 id="titre-fortunes">Les plus grandes fortunes de France</h2>
+			<p class="legende">Classement 2026, en milliards d’euros.</p>
+			<ul class="barres" id="fortunes"></ul>
+			<div class="avertissement">
+				Les 500 plus grandes fortunes françaises pèsent ensemble
+				<strong>1 076 milliards d’euros</strong>. À titre de comparaison, la France dépense
+				1 672 milliards par an pour l’ensemble de ses services publics, retraites et santé
+				comprises — voir <a href="/boite-a-outils/budget/">« Où va l’argent public ? »</a>.
+			</div>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Insee Focus n° 371, « Les montants de patrimoine détenus par les ménages en 2024 » :
+					patrimoine brut médian de 205 100 € (148 100 € net), seuil des 10 % les mieux dotés à
+					857 700 €, des 5 % à 1 268 200 €, du 1 % à 3 020 900 €. Les 10 % les mieux dotés
+					détiennent 48 % du patrimoine brut total, le 1 % en détient 15 %, et la moitié la moins
+					dotée 7 %. Indice de Gini : 0,652 pour le patrimoine, 0,299 pour le niveau de vie.
+				</li>
+				<li>
+					Classement des fortunes professionnelles françaises, <em>Challenges</em>, 2026 :
+					153 familles milliardaires, 1 076 milliards d’euros cumulés pour les 500 premières.
+					À noter, puisque cela compte pour juger d’une source : <em>Challenges</em> appartient
+					depuis fin 2025 à Bernard Arnault, qui figure en tête de son propre classement.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Votre position est une estimation.</strong> Elle est interpolée entre les seuils
+				publiés par l’Insee, qui ne donne pas la distribution complète. L’ordre de grandeur est
+				juste ; le chiffre exact au pourcent près ne l’est pas. Les patrimoines des grandes
+				fortunes sont eux-mêmes des estimations : contrairement aux revenus, ils ne font l’objet
+				d’aucune déclaration publique obligatoire.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

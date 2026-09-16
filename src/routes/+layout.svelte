@@ -9,8 +9,9 @@
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	// L'en-tête ne montre que les rubriques de contenu : quatre liens et un
-	// bouton « Nous rejoindre ». Le logo ramène à l'accueil, et « Le groupe »
-	// est dans le pied de page. Le menu mobile, lui, liste tout.
+	// bouton « Nous rejoindre ». Le logo ramène à l'accueil ; « Le groupe » et
+	// « Boîte à outils » sont dans le pied de page, un cinquième lien ici ferait
+	// déborder l'en-tête sur les écrans moyens. Le menu mobile, lui, liste tout.
 	const liens = [
 		{ href: '/actualites', label: 'Actualités' },
 		{ href: '/articles', label: 'Articles' },
@@ -18,7 +19,13 @@
 		{ href: '/bibliotheque', label: 'Bibliothèque' }
 	];
 	const rejoindre = { href: '/nous-rejoindre', label: 'Nous rejoindre' };
-	const liensMobile = [{ href: '/', label: 'Accueil' }, ...liens, { href: '/le-groupe', label: 'Le groupe' }, rejoindre];
+	const liensMobile = [
+		{ href: '/', label: 'Accueil' },
+		...liens,
+		{ href: '/boite-a-outils', label: 'Boîte à outils' },
+		{ href: '/le-groupe', label: 'Le groupe' },
+		rejoindre
+	];
 
 	function actif(href: string): boolean {
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
@@ -162,6 +169,7 @@
 				<li><a class="hover:text-white hover:underline" href="/le-groupe">Le groupe</a></li>
 				<li><a class="hover:text-white hover:underline" href="/nous-rejoindre">Nous rejoindre</a></li>
 				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
+				<li><a class="hover:text-white hover:underline" href="/boite-a-outils">Boîte à outils</a></li>
 				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>
 				<li><a class="hover:text-white hover:underline" href="/mentions-legales">Mentions légales</a></li>
 				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>

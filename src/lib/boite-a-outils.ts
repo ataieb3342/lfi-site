@@ -1,0 +1,99 @@
+/**
+ * La boîte à outils : les outils interactifs de vulgarisation.
+ *
+ * Le visiteur entre son salaire ou son patrimoine, et voit ce que les chiffres
+ * publics disent de sa situation. Même mécanique que les jeux
+ * (`src/lib/jeux.ts`) : un dossier de `src/lib/boite-a-outils/` avec un
+ * `index.html`, un `outil.js` et un `style.css`, en JavaScript simple et sans
+ * dépendance, servi tel quel à l'adresse `/boite-a-outils/<dossier>/`.
+ *
+ * Ils ont leur propre page plutôt qu'une section de la bibliothèque : ils sont
+ * appelés à se multiplier, et ce n'est pas la même chose que consulter un lien
+ * ou un PDF. Ils sont séparés des jeux pour la même raison, en plus nette : un
+ * visiteur ne doit pas prendre un outil d'argumentation pour une distraction.
+ *
+ * Règle à tenir : **chaque chiffre affiché par un module porte sa source et son
+ * année**, visibles en bas de page. Le site est une cible politique ; un chiffre
+ * invérifiable est une munition offerte aux adversaires.
+ *
+ * Pour ajouter un outil : déposer son dossier ici et ajouter une ligne
+ * ci-dessous, en le rattachant à une rubrique. Un dossier absent de cette liste
+ * n'est pas servi.
+ */
+
+/**
+ * Les rubriques regroupent les outils par sujet. Elles existent pour que la
+ * page reste lisible quand il y en aura vingt et plus seulement quatre : une
+ * liste de vingt cartes ne se lit pas.
+ *
+ * Une rubrique sans outil n'est pas affichée. On peut donc en déclarer une à
+ * l'avance, le jour où l'on commence à travailler sur un nouveau sujet, sans
+ * casser la page.
+ */
+export const RUBRIQUES = [
+	{
+		id: 'impots-budget',
+		titre: 'L’impôt et le budget de l’État',
+		description:
+			'Ce que l’on verse, qui verse quoi, et ce que la collectivité en fait.'
+	},
+	{
+		id: 'richesses',
+		titre: 'Les richesses et la vie quotidienne',
+		description:
+			'Ce que les gens possèdent, ce qu’il leur reste à la fin du mois, et l’écart entre les deux bouts.'
+	}
+] as const;
+
+export type Rubrique = (typeof RUBRIQUES)[number];
+export type RubriqueId = Rubrique['id'];
+
+export const OUTILS = [
+	{
+		dossier: 'qui-paie',
+		rubrique: 'impots-budget',
+		titre: 'Qui paie vraiment l’impôt ?',
+		description: 'Ce que vous versez vraiment, comparé aux plus grandes fortunes.'
+	},
+	{
+		dossier: 'budget',
+		rubrique: 'impots-budget',
+		titre: 'Où va l’argent public ?',
+		description: 'Les 1 672 milliards, poste par poste — et sur votre contribution.'
+	},
+	{
+		dossier: 'patrimoine',
+		rubrique: 'richesses',
+		titre: 'Qui possède la France ?',
+		description: 'Votre place dans la population, et l’écart réel avec le sommet.'
+	},
+	{
+		dossier: 'fin-du-mois',
+		rubrique: 'richesses',
+		titre: 'Où passe mon salaire ?',
+		description: 'Ce qu’un salaire absorbe avant le premier choix libre.'
+	}
+] as const satisfies readonly {
+	dossier: string;
+	rubrique: RubriqueId;
+	titre: string;
+	description: string;
+}[];
+
+export type Outil = (typeof OUTILS)[number];
+
+export function urlOutil(outil: Outil): string {
+	return `/boite-a-outils/${outil.dossier}/`;
+}
+
+/**
+ * Les rubriques dans leur ordre de déclaration, chacune avec ses outils.
+ * Les rubriques vides sont écartées : la page n'affiche jamais un titre suivi
+ * de rien.
+ */
+export function rubriquesGarnies(): { rubrique: Rubrique; modules: Outil[] }[] {
+	return RUBRIQUES.map((rubrique) => ({
+		rubrique,
+		modules: OUTILS.filter((outil) => outil.rubrique === rubrique.id)
+	})).filter((groupe) => groupe.modules.length > 0);
+}
