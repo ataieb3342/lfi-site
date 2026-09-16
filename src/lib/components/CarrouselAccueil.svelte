@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
+	import Encart from '$lib/components/Encart.svelte';
 	import { formatDate, formatDateLongue } from '$lib/format';
 	import type { PublicationVue } from '$lib/types';
 
@@ -40,16 +41,23 @@
 		| { id: string; type: 'apero'; action: PublicationVue }
 		| { id: string; type: 'identite' }
 		| { id: string; type: 'action'; action: PublicationVue }
+		| { id: string; type: 'ressources' }
 		| { id: string; type: 'application' };
 
 	// Le prochain apéro ouvre le carrousel : c'est le rendez-vous récurrent, le
 	// plus concret pour un visiteur, et il change toutes les deux semaines.
-	// Puis l'identité du groupe, les actions à venir (trois au plus), et la
-	// bulle de l'application si elle est activée.
+	// Puis l'identité du groupe, les actions à venir (trois au plus), les
+	// ressources (bibliothèque et boîte à outils), et la bulle de l'application
+	// si elle est activée.
+	//
+	// La diapositive des ressources est placée après les actions et non juste
+	// après l'identité : les deux sont sur la surface violette, et deux
+	// diapositives de la même couleur qui se suivent se confondent.
 	const diapositives = $derived<Diapositive[]>([
 		...(apero ? [{ id: `apero-${apero.id}`, type: 'apero' as const, action: apero }] : []),
 		{ id: 'identite', type: 'identite' },
 		...actions.slice(0, 3).map((a) => ({ id: `action-${a.id}`, type: 'action' as const, action: a })),
+		{ id: 'ressources', type: 'ressources' },
 		...(app.actif ? [{ id: 'application', type: 'application' as const }] : [])
 	]);
 
@@ -191,6 +199,29 @@
 							</div>
 						</div>
 					</div>
+				{:else if diapo.type === 'ressources'}
+					<!-- Ce qu'on peut lire et manipuler sur le site : la bibliothèque et
+					     la boîte à outils, deux pages absentes de l'en-tête de bureau. -->
+					<Encart
+						sureligne="Comprendre et argumenter"
+						titre="La bibliothèque et la boîte à outils"
+						texte="Les livres, vidéos et documents partagés autour de nos apéros, et des outils interactifs qui vous montrent ce que les chiffres officiels disent de votre situation."
+						autonome={false}
+						hauteurPleine
+					>
+						{#snippet actions()}
+							<a
+								href="/bibliotheque"
+								class="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-brand transition-colors hover:bg-white/90"
+								>Voir la bibliothèque</a
+							>
+							<a
+								href="/boite-a-outils"
+								class="rounded-full border border-white/50 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/10"
+								>Boîte à outils</a
+							>
+						{/snippet}
+					</Encart>
 				{:else}
 					<BandeauApplication
 						actif={app.actif}

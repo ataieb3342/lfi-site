@@ -1,7 +1,7 @@
 import { db, now } from './db.ts';
 import { supprimerPdf } from './bibliotheque.ts';
 
-export type Kind = 'article' | 'actu' | 'apero';
+export type Kind = 'article' | 'actu' | 'apero' | 'revue';
 export type Status = 'draft' | 'published';
 
 export type Publication = {

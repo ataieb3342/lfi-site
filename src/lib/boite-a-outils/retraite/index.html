@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Quand pourrai-je partir à la retraite ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Quand pourrai-je partir à la retraite ?</h1>
+			<p class="chapeau">
+				Trois lois se superposent désormais : le droit d’avant 2023, la réforme de 2023, et sa
+				suspension partielle entrée en vigueur le 1<sup>er</sup> septembre 2026. Selon votre
+				année de naissance, vous ne relevez pas des mêmes règles. Voici lesquelles, et ce
+				qu’elles changent.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Votre génération</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="naissance">Année de naissance</label>
+				<div class="champ-ligne">
+					<input type="range" id="naissance" min="1961" max="2010" step="1" value="1975">
+					<input type="number" id="naissance-nombre" min="1961" max="2010" step="1" value="1975"
+					       aria-label="Année de naissance">
+				</div>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-depart">
+			<h2 id="titre-depart">Votre âge de départ, aujourd’hui</h2>
+			<p class="grand-chiffre" id="depart">—</p>
+			<p class="sous-chiffre" id="depart-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-regimes">
+			<h2 id="titre-regimes">Les trois lois, pour votre génération</h2>
+			<p class="legende">
+				L’âge légal est celui à partir duquel on <em>peut</em> partir. Il ne suffit pas : il
+				faut aussi avoir cotisé le nombre de trimestres requis, sans quoi la pension est
+				amputée à vie.
+			</p>
+			<ul class="barres" id="regimes"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-cout">
+			<h2 id="titre-cout">Ce que la réforme vous coûte</h2>
+			<p class="grand-chiffre" id="cout">—</p>
+			<p class="sous-chiffre" id="cout-phrase">—</p>
+			<div class="grille-chiffres" id="cout-details"></div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-sante">
+			<h2 id="titre-sante">Et en bonne santé ?</h2>
+			<p class="legende">
+				L’espérance de vie <strong>sans incapacité</strong> mesure le nombre d’années qu’une
+				personne peut espérer vivre sans être limitée, dans les gestes de la vie quotidienne,
+				par un problème de santé. C’est le seul chiffre qui dise quelque chose de la retraite
+				réellement vécue.
+			</p>
+			<div class="grille-chiffres">
+				<div class="chiffre-boite">
+					<span class="etiquette">Sans incapacité, à la naissance — femmes</span>
+					<span class="valeur">64,1 ans</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Sans incapacité, à la naissance — hommes</span>
+					<span class="valeur">63,7 ans</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Il reste, à 65 ans — femmes</span>
+					<span class="valeur">11,8 ans</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Il reste, à 65 ans — hommes</span>
+					<span class="valeur">10,5 ans</span>
+				</div>
+			</div>
+			<p class="sous-chiffre" id="sante-phrase" style="margin-top:1.25rem">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-suspension">
+			<h2 id="titre-suspension">La suspension n’est pas une abrogation</h2>
+			<p class="sous-chiffre">
+				Le budget de la Sécurité sociale pour 2026 a mis en pause la montée en charge de la
+				réforme, pour les départs prenant effet à compter du 1<sup>er</sup> septembre 2026.
+				<strong>2,2 millions de personnes nées entre 1964 et 1968</strong> en bénéficient :
+				1,2 million partiront plus tôt — de trois mois en moyenne — et un million toucheront
+				une pension légèrement supérieure. Concrètement, aucune pension prenant effet d’ici
+				janvier 2028 ne se verra opposer un âge légal supérieur à 62 ans et 9 mois.
+			</p>
+			<p class="sous-chiffre">
+				Puis la montée reprend. <strong>Toutes les personnes nées à partir de 1969 partiront
+				à 64 ans, avec 43 années de cotisation.</strong> Le calendrier a été décalé de quelques
+				mois pour cinq générations ; il n’a pas été annulé.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Âge légal et durée d’assurance : loi du 14 avril 2023 de financement rectificative de
+					la Sécurité sociale, et loi de financement de la Sécurité sociale pour 2026, qui en
+					suspend la montée en charge pour les pensions prenant effet à compter du
+					1<sup>er</sup> septembre 2026 (circulaire Cnav 2026-07).
+				</li>
+				<li>
+					Durée d’assurance avant 2023 : calendrier issu de la loi du 20 janvier 2014, dite
+					loi Touraine — de 167 trimestres pour la génération 1958 à 172 pour la génération
+					1973 et les suivantes.
+				</li>
+				<li>
+					Nombre de bénéficiaires de la suspension : projections de la Caisse nationale
+					d’assurance vieillesse, 2,2 millions de personnes nées entre 1964 et 1968.
+				</li>
+				<li>
+					Espérance de vie sans incapacité : Drees, <em>Études et Résultats</em> n° 1363,
+					janvier 2026, portant sur l’année 2024. À la naissance : 64,1 ans pour les femmes,
+					63,7 ans pour les hommes. À 65 ans : 11,8 ans pour les femmes, 10,5 ans pour les
+					hommes. Entre 2008 et 2024, la part des années vécues sans incapacité a reculé,
+					de 77 % à 75 % pour les femmes et de 81 % à 79 % pour les hommes.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Cet outil ne calcule pas votre retraite.</strong> Il donne l’âge légal et la
+				durée requise pour votre génération, rien de plus. Il ne tient compte ni des carrières
+				longues, ni de la pénibilité, ni de l’invalidité, ni du handicap, ni des régimes
+				spéciaux, ni de la décote et de la surcote, ni du minimum de pension — autant de
+				dispositifs qui peuvent avancer ou retarder votre départ de plusieurs années. Pour les
+				générations 1961 et 1965, les règles diffèrent selon le mois de naissance ; l’outil
+				retient la situation de la majorité de la génération. Votre relevé personnel se trouve
+				sur info-retraite.fr, et lui seul fait foi.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

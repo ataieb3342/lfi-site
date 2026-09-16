@@ -8,6 +8,7 @@
 		{ label: 'Articles publiés', valeur: data.stats.articles },
 		{ label: 'Actualités publiées', valeur: data.stats.actus },
 		{ label: 'Apéros', valeur: data.stats.aperos },
+		{ label: 'Revues de presse', valeur: data.stats.revues },
 		{ label: 'Brouillons', valeur: data.stats.brouillons },
 		{ label: 'Commentaires en ligne', valeur: data.stats.commentaires }
 	]);

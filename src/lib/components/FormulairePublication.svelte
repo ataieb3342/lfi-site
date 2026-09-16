@@ -114,7 +114,7 @@
 					{#each outils as outil (outil.label)}
 						<button
 							type="button"
-							class="rounded border border-line-forte bg-surface px-2.5 py-1 text-xs font-semibold text-ink hover:bg-surface-alt"
+							class="rounded border border-line-forte bg-carte px-2.5 py-1 text-xs font-semibold text-ink hover:bg-surface-alt"
 							title={outil.titre}
 							onclick={outil.action}>{outil.label}</button
 						>
@@ -157,10 +157,13 @@
 					<option value="article" selected={v.kind === 'article'}>Article</option>
 					<option value="actu" selected={v.kind === 'actu'}>Actualité</option>
 					<option value="apero" selected={v.kind === 'apero'}>Apéro thématique</option>
+					<option value="revue" selected={v.kind === 'revue'}>Revue de presse</option>
 				</select>
 				<p class="aide">
 					Pour un apéro : le thème en titre, la date de la soirée ci-dessous. Après la soirée,
-					rouvrez la même fiche et écrivez le résumé des échanges dans le texte.
+					rouvrez la même fiche et écrivez le résumé des échanges dans le texte. Une revue de
+					presse rassemble ce qu'on a lu ailleurs : les liens vont dans le texte, chacun avec
+					sa source et ce qu'on en retient.
 				</p>
 			</div>
 

@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { formatTailleFichier } from '$lib/format';
 	import { JEUX, urlJeu } from '$lib/jeux';
+	import Encart from '$lib/components/Encart.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -62,10 +63,10 @@
 	<meta name="description" content="Les liens et documents PDF partagés autour des apéros thématiques, et quelques jeux faits maison." />
 </svelte:head>
 
-<header class="max-w-2xl">
+<header class="border-b border-line pb-6">
 	<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Ressources partagées</p>
 	<h1 class="titre-affiche mt-2 text-4xl text-ink">Bibliothèque</h1>
-	<p class="mt-4 text-lg text-ink-soft">
+	<p class="mt-4 max-w-2xl text-lg text-ink-soft">
 		Ce que nous lisons, regardons et écoutons — proposé et relu par le groupe.
 	</p>
 </header>
@@ -75,17 +76,12 @@
      un simulateur. Cet encart est leur porte d'entrée depuis la bibliothèque —
      la page n'est pas dans l'en-tête de bureau, qui déborderait à cinq
      rubriques, mais dans le pied de page et le menu mobile. -->
-<aside class="fond-degrade relative mt-10 rounded-xl p-6">
-	<p class="text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Comprendre et argumenter</p>
-	<h2 class="mt-2 text-2xl font-extrabold text-white">
-		<a class="after:absolute after:inset-0" href="/boite-a-outils">Boîte à outils</a>
-	</h2>
-	<p class="mt-2 max-w-xl text-white/85">
-		Entrez votre salaire, votre loyer ou votre patrimoine : nos outils interactifs vous montrent
-		ce que les chiffres officiels disent de votre situation. Impôts, budget de l’État, patrimoine,
-		fin du mois.
-	</p>
-</aside>
+<Encart
+	sureligne="Comprendre et argumenter"
+	titre="Boîte à outils"
+	texte="Entrez votre salaire, votre loyer ou votre patrimoine : nos outils interactifs vous montrent ce que les chiffres officiels disent de votre situation. Impôts, budget de l’État, patrimoine, fin du mois."
+	href="/boite-a-outils"
+/>
 
 <section class="mt-14" aria-labelledby="ressources">
 	<h2 id="ressources" class="text-2xl font-extrabold text-ink">Ressources</h2>

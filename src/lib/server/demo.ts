@@ -124,7 +124,7 @@ function ilYaNJours(n: number, heure = 18): string {
 }
 
 type Fiche = {
-	kind: 'article' | 'actu' | 'apero';
+	kind: 'article' | 'actu' | 'apero' | 'revue';
 	title: string;
 	summary: string;
 	body: string;
@@ -367,6 +367,41 @@ Une participante a proposé de dresser la liste des campagnes de boycott en cour
 				lien: 'https://ethique-sur-etiquette.org',
 				note: 'Pour voir concrètement à quoi ressemble une campagne organisée.',
 				auteur: '',
+				statut: 'approved'
+			}
+		]
+	},
+	{
+		kind: 'revue',
+		title: 'Revue de presse : logement, budget municipal et ligne ferroviaire',
+		summary:
+			'Trois lectures de la semaine, avec ce que nous en retenons pour Dijon. Les liens renvoient vers les articles d’origine.',
+		publieIlYa: 2,
+		body: `Chaque semaine, nous rassemblons ici quelques articles lus ailleurs, avec ce que nous en retenons. Les titres renvoient vers les journaux qui les ont publiés : lisez-les, et faites-vous votre idée.
+
+## Logement : les loyers dijonnais au-dessus de la moyenne régionale
+
+L’observatoire local des loyers publie ses chiffres annuels. Le loyer médian au mètre carré progresse plus vite que les salaires, et l’écart se creuse surtout sur les petites surfaces — celles que louent les étudiants et les jeunes actifs.
+
+**Ce que nous en retenons :** la question du logement n’est pas un ressenti, elle est mesurée. C’est le premier poste de dépense des ménages, et le premier obstacle pour s’installer ici.
+
+## Budget municipal : les arbitrages de l’automne
+
+La presse locale détaille les choix budgétaires présentés en conseil. Les dépenses d’investissement sont maintenues, celles de fonctionnement contenues — ce qui se traduit, concrètement, par des horaires d’équipements publics revus à la baisse.
+
+**Ce que nous en retenons :** « contenir le fonctionnement » n’est jamais neutre. Ce sont des heures d’ouverture de bibliothèque, des postes de médiathèque, des créneaux de piscine.
+
+## Ligne ferroviaire : un rapport de plus
+
+Un nouveau rapport sur la desserte ferroviaire de la région est paru. Il confirme ce que les usagers constatent tous les matins sur les lignes du quotidien.
+
+**Ce que nous en retenons :** les rapports s’empilent depuis dix ans. Ce qui manque n’est pas le diagnostic, c’est l’argent public engagé sur les trains du quotidien plutôt que sur les lignes à grande vitesse.
+
+*Cette revue de presse est une sélection commentée par le groupe. Les articles cités n’engagent que leurs auteurs.*`,
+		commentaires: [
+			{
+				auteur: 'Claire',
+				texte: 'Merci pour cette sélection, c’est plus utile que de tout lire soi-même.',
 				statut: 'approved'
 			}
 		]

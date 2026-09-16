@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Combien gagne un patron du CAC 40 ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Combien gagne un patron du CAC 40 ?</h1>
+			<p class="chapeau">
+				6,5 millions d’euros en moyenne pour l’année 2024. Le nombre est facile à citer et
+				difficile à se représenter. Entrez votre salaire : la comparaison, elle, se
+				représente très bien.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Votre salaire</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="salaire">Votre salaire net mensuel</label>
+				<div class="champ-ligne">
+					<input type="range" id="salaire" min="600" max="10000" step="10" value="2200">
+					<input type="number" id="salaire-nombre" min="1" step="50" value="2200"
+					       aria-label="Salaire net mensuel en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-rattrapage">
+			<h2 id="titre-rattrapage">Votre année de travail, il la gagne en</h2>
+			<p class="grand-chiffre" id="rattrapage">—</p>
+			<p class="sous-chiffre" id="rattrapage-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-compteur">
+			<h2 id="titre-compteur">Pendant que vous lisez cette page</h2>
+			<p class="legende">
+				Les deux rémunérations annuelles, réparties seconde par seconde sur l’année, depuis
+				l’ouverture de cette page. Le compteur ne prétend pas décrire un salaire horaire : il
+				étale les deux montants de la même façon, pour que l’écart se voie.
+			</p>
+			<div class="grille-chiffres" id="compteur"></div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-echelle">
+			<h2 id="titre-echelle">L’écart, en clair</h2>
+			<ul class="barres" id="echelle"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-dix-ans">
+			<h2 id="titre-dix-ans">Dix ans d’écart qui se creuse</h2>
+			<p class="legende">
+				Évolution des rémunérations sur les dix dernières années, dirigeants du CAC 40 d’un
+				côté, leurs propres salariés de l’autre.
+			</p>
+			<ul class="barres" id="dix-ans"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem">
+				Ce ne sont pas deux économies différentes : ce sont les mêmes entreprises, les mêmes
+				années, les mêmes résultats. Une seule répartition a changé.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-contient">
+			<h2 id="titre-contient">Ce que ces 6,5 millions ne contiennent pas</h2>
+			<p class="sous-chiffre">
+				Ce montant est la rémunération <em>versée au titre de la fonction</em> : fixe, part
+				variable, actions attribuées. Il <strong>n’inclut ni les dividendes</strong> que le
+				dirigeant perçoit comme actionnaire, <strong>ni les revenus de son patrimoine
+				personnel</strong>. Pour beaucoup de dirigeants, en particulier les fondateurs, ces
+				revenus-là dépassent largement la rémunération affichée.
+			</p>
+			<p class="sous-chiffre">
+				Le chiffre de 6,5 millions est donc un <strong>plancher</strong>, pas un total. C’est
+				aussi pourquoi un débat sur les seules rémunérations passe à côté de l’essentiel : au
+				sommet, l’argent vient du capital, pas de la feuille de paie.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Rémunération des dirigeants exécutifs des sociétés du CAC 40 au titre de
+					l’exercice 2024 : 6,5 millions d’euros en moyenne, 5,6 millions en médiane — son
+					plus haut niveau historique. Étude annuelle du cabinet Proxinvest, publiée en
+					novembre 2025. La moyenne recule de 9 % par rapport à 2023, année exceptionnelle.
+				</li>
+				<li>
+					Évolution sur dix ans : + 90 % pour les rémunérations des dirigeants, + 23 % pour
+					celles de leurs salariés (même étude).
+				</li>
+				<li>
+					SMIC net mensuel : 1 477,93 € depuis le 1<sup>er</sup> juin 2026.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Les rapports affichés sur cette page sont calculés, pas recopiés.</strong> Ils
+				divisent la rémunération moyenne des dirigeants par le salaire que vous avez saisi,
+				ou par le SMIC net en vigueur — vous pouvez refaire l’opération. D’autres
+				publications avancent des rapports différents, parce qu’elles retiennent le SMIC brut,
+				le salaire médian de l’entreprise, ou une autre année de référence : les écarts entre
+				chiffrages viennent de là, pas d’un désaccord sur les montants. Enfin, il s’agit
+				d’une <strong>moyenne sur quarante entreprises</strong> : les rémunérations
+				individuelles vont du simple au quintuple autour de ce chiffre.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

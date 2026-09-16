@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Votre salaire a-t-il suivi les prix ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Votre salaire a-t-il suivi les prix ?</h1>
+			<p class="chapeau">
+				« L’inflation est retombée. » C’est vrai : les prix montent lentement à nouveau. Mais
+				ils ne sont pas redescendus — ils continuent de monter, à partir du niveau atteint.
+				Entre janvier 2021 et aujourd’hui, l’alimentation a augmenté de plus de 22 %. Et votre
+				salaire ?
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Vos chiffres</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="salaire-2021">Votre salaire net mensuel début 2021</label>
+				<div class="champ-ligne">
+					<input type="range" id="salaire-2021" min="600" max="8000" step="10" value="2000">
+					<input type="number" id="salaire-2021-nombre" min="1" step="50" value="2000"
+					       aria-label="Salaire net mensuel en 2021, en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+
+			<div class="champ">
+				<label for="salaire-actuel">Votre salaire net mensuel aujourd’hui</label>
+				<div class="champ-ligne">
+					<input type="range" id="salaire-actuel" min="600" max="8000" step="10" value="2200">
+					<input type="number" id="salaire-actuel-nombre" min="1" step="50" value="2200"
+					       aria-label="Salaire net mensuel actuel, en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+
+			<div class="champ">
+				<label for="courses">Ce que vous dépensez en courses, par mois</label>
+				<div class="champ-ligne">
+					<input type="range" id="courses" min="50" max="1500" step="10" value="400">
+					<input type="number" id="courses-nombre" min="1" step="10" value="400"
+					       aria-label="Budget alimentaire mensuel, en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-bilan">
+			<h2 id="titre-bilan">Depuis 2021, vous avez</h2>
+			<p class="grand-chiffre" id="bilan">—</p>
+			<p class="sous-chiffre" id="bilan-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-course">
+			<h2 id="titre-course">La course entre vos revenus et les prix</h2>
+			<p class="legende">
+				Hausses cumulées depuis janvier 2021. Tant que la barre de votre salaire est plus
+				courte que celle des prix, vous achetez moins avec ce que vous gagnez.
+			</p>
+			<ul class="barres" id="course"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-panier">
+			<h2 id="titre-panier">Votre panier de courses</h2>
+			<p class="grand-chiffre" id="panier">—</p>
+			<p class="sous-chiffre" id="panier-phrase">—</p>
+			<div class="grille-chiffres" id="panier-details"></div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-general">
+			<h2 id="titre-general">Ce n’est pas qu’une impression</h2>
+			<p class="sous-chiffre">
+				Le pouvoir d’achat du salaire moyen a reculé de <strong>1,3 % en 2022</strong> puis de
+				<strong>1,0 % en 2023</strong>, en euros constants. Il est remonté de 0,8 % en 2024.
+				Résultat : à la mi-2026, d’après l’Insee, <strong>le pouvoir d’achat du salaire moyen
+				n’a toujours pas retrouvé son niveau de 2021</strong>.
+			</p>
+			<p class="sous-chiffre">
+				Cinq ans de travail en plus, et le même pouvoir d’achat — au mieux. C’est ce que
+				mesure une institution publique, pas un tract.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-inegal">
+			<h2 id="titre-inegal">Pourquoi tout le monde ne ressent pas la même inflation</h2>
+			<p class="sous-chiffre">
+				L’indice des prix mesure un panier moyen. Mais un ménage modeste consacre une part
+				bien plus grande de son revenu à l’alimentation, à l’énergie et au logement — ceux-là
+				mêmes qui ont le plus augmenté. À taux d’inflation identique, la hausse frappe donc
+				plus durement les budgets les plus serrés. Le chiffre officiel n’est pas faux : il est
+				moyen, et personne ne vit au milieu.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Insee, indice des prix à la consommation. Entre janvier 2021 et janvier 2026,
+					l’ensemble des prix à la consommation a augmenté de 15,5 %, et les prix
+					alimentaires de 22,3 %.
+				</li>
+				<li>
+					Insee, note de conjoncture de mars 2026 : à la mi-2026, le pouvoir d’achat du
+					salaire moyen par tête des branches marchandes non agricoles n’aurait toujours pas
+					retrouvé son niveau de 2021, avant la poussée d’inflation de 2022-2023.
+				</li>
+				<li>
+					Évolution du pouvoir d’achat du salaire moyen par tête, en euros constants :
+					− 1,3 % en 2022, − 1,0 % en 2023, + 0,8 % en 2024 (Insee).
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Le calcul applique à votre situation des indices nationaux.</strong> Votre
+				panier n’est pas le panier moyen de l’Insee : si vous achetez surtout des produits
+				frais, ou surtout des surgelés, votre hausse réelle diffère. Le montant en « euros de
+				2021 » suppose que votre panier d’aujourd’hui contient la même chose qu’alors, ce qui
+				est rarement vrai — face à la hausse, beaucoup de gens ont changé de marques ou de
+				rayons, et cette substitution n’apparaît nulle part dans le chiffre. Enfin, seuls les
+				salaires nets sont comparés : ni les prestations sociales, ni la prime d’activité, ni
+				les changements de situation familiale n’entrent dans ce calcul.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

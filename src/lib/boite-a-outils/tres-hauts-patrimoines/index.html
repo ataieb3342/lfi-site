@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Un impôt plancher sur les très hauts patrimoines</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Un impôt plancher sur les très hauts patrimoines</h1>
+			<p class="chapeau">
+				Proposé par l’économiste Gabriel Zucman, discuté puis rejeté à l’Assemblée nationale
+				en octobre 2025 : un prélèvement annuel d’au moins 2 % sur les patrimoines dépassant
+				100 millions d’euros. Ces débats parlent beaucoup de « ceux qui paient ». Voici où
+				vous vous situez.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Votre patrimoine</h2>
+			<p class="legende">
+				Tout ce que vous possédez, moins ce que vous devez : logement, épargne, voiture,
+				placements, moins le capital restant dû de vos crédits. Rien n’est envoyé nulle part.
+			</p>
+
+			<div class="champ">
+				<label for="patrimoine">Patrimoine net du foyer</label>
+				<div class="champ-ligne">
+					<input type="range" id="patrimoine" min="0" max="2000000" step="5000" value="200000">
+					<input type="number" id="patrimoine-nombre" min="0" step="10000" value="200000"
+					       aria-label="Patrimoine net du foyer en euros">
+					<span class="unite">€</span>
+				</div>
+				<p class="barre-detail">
+					Le curseur s’arrête à deux millions d’euros — au-delà, il ne servirait plus à
+					personne. La case accepte n’importe quel montant : tapez 100 000 000 pour voir ce
+					que la page répond.
+				</p>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-concerne">
+			<h2 id="titre-concerne">Seriez-vous concerné ?</h2>
+			<p class="grand-chiffre" id="concerne">—</p>
+			<p class="sous-chiffre" id="concerne-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-echelle">
+			<h2 id="titre-echelle">L’échelle dont on parle</h2>
+			<p class="legende">
+				Cent millions d’euros est un nombre qu’on lit sans le voir. Voici deux façons de le
+				rendre visible.
+			</p>
+			<div class="grille-chiffres" id="echelle"></div>
+			<p class="sous-chiffre" id="echelle-phrase" style="margin-top:1.25rem">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-qui">
+			<h2 id="titre-qui">Qui paierait</h2>
+			<div class="grille-chiffres">
+				<div class="chiffre-boite">
+					<span class="etiquette">Foyers concernés</span>
+					<span class="valeur">≈ 1 800</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Part des contribuables</span>
+					<span class="valeur">0,01 %</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Taux plancher</span>
+					<span class="valeur">2 %</span>
+				</div>
+				<div class="chiffre-boite">
+					<span class="etiquette">Seuil de déclenchement</span>
+					<span class="valeur">100 M€</span>
+				</div>
+			</div>
+			<p class="sous-chiffre" style="margin-top:1.25rem">
+				Un <strong>plancher</strong>, et non un impôt de plus : ceux qui acquittent déjà 2 %
+				de leur patrimoine en impôts ne verseraient rien au titre de cette mesure. Elle ne
+				vise que les patrimoines dont l’imposition effective tombe en dessous de ce seuil —
+				situation que l’Institut des politiques publiques a documentée au sommet de la
+				distribution, où le taux d’imposition réel redescend au lieu de continuer à monter.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-rendement">
+			<h2 id="titre-rendement">Ce que cela rapporterait</h2>
+			<p class="legende">
+				Les estimations publiées vont de 5 à 25 milliards d’euros par an. L’écart ne porte pas
+				sur l’arithmétique, mais sur les hypothèses : combien de contribuables réorganiseraient
+				leur patrimoine, combien partiraient. Nous affichons les deux bouts de la fourchette,
+				parce qu’annoncer le seul chiffre haut serait exactement le reproche qu’on nous ferait.
+			</p>
+			<ul class="barres" id="rendement"></ul>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-vote">
+			<h2 id="titre-vote">Ce qu’en a fait l’Assemblée</h2>
+			<p class="sous-chiffre">
+				En octobre 2025, lors de l’examen du budget pour 2026, la mesure a été
+				<strong>rejetée par 231 voix contre 168</strong>. Une version allégée, proposée par les
+				députés socialistes, a été rejetée à son tour par 228 voix contre 171.
+			</p>
+			<p class="sous-chiffre">
+				Une soixantaine de voix séparaient les deux camps, sur une mesure qui concerne
+				1 800 foyers. C’est un ordre de grandeur utile à garder en tête quand on entend dire
+				qu’une élection ne change rien.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-objection">
+			<h2 id="titre-objection">L’objection, et ce qu’on peut en dire</h2>
+			<p class="sous-chiffre">
+				<strong>« Ils partiront. »</strong> C’est l’argument central des opposants, et il n’est
+				pas absurde : un patrimoine financier se déplace plus facilement qu’une usine. Les
+				partisans de la mesure répondent qu’elle vise la résidence fiscale et prévoit un
+				dispositif de sortie, et que l’expérience de l’impôt de solidarité sur la fortune
+				montre des départs réels mais très inférieurs aux prévisions avancées à l’époque.
+			</p>
+			<p class="sous-chiffre">
+				Le désaccord est réel et il est honnête de le dire. Il porte sur l’ampleur des
+				départs, pas sur le constat de départ : au sommet de la distribution, le taux
+				d’imposition effectif cesse de progresser.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Dispositif proposé : prélèvement annuel plancher de 2 % sur les patrimoines nets
+					supérieurs à 100 millions d’euros, d’après les travaux de Gabriel Zucman, repris
+					par amendement lors de l’examen du projet de loi de finances pour 2026. Environ
+					1 800 foyers concernés, soit de l’ordre de 0,01 % des contribuables.
+				</li>
+				<li>
+					Rendement : les estimations publiées lors du débat parlementaire s’échelonnent de
+					5 à 25 milliards d’euros par an, selon les hypothèses retenues sur l’optimisation
+					et l’expatriation fiscales. Il n’existe pas de consensus sur ce point.
+				</li>
+				<li>
+					Votes de l’Assemblée nationale, octobre 2025 : rejet par 231 voix contre 168, puis
+					rejet de la version allégée par 228 voix contre 171.
+				</li>
+				<li>
+					Taux d’imposition effectif au sommet de la distribution : Institut des politiques
+					publiques, note n° 92, juin 2023, sur données fiscales de 2016.
+				</li>
+				<li>
+					Dépenses publiques par fonction, pour les comparaisons de rendement : Insee
+					Première n° 2093, dépenses de 2024.
+				</li>
+				<li>
+					SMIC net mensuel : 1 477,93 € depuis le 1<sup>er</sup> juin 2026.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Le rendement de cette mesure est incertain, et nous ne prétendons pas le
+				trancher.</strong> Une fourchette de 5 à 25 milliards est large : elle signifie que
+				personne ne sait, à ce stade, ce que la mesure rapporterait réellement. Les
+				comparaisons budgétaires ci-dessus valent donc pour les deux bornes, jamais pour la
+				seule borne haute. Par ailleurs, le comptage à « 1 800 foyers » repose sur les
+				patrimoines déclarés ou estimés : par construction, ceux qui échappent déjà à
+				l’administration fiscale n’y figurent pas.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

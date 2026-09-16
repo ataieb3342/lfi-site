@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Se loger à Dijon : combien d’années de salaire ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Se loger à Dijon : combien d’années de salaire ?</h1>
+			<p class="chapeau">
+				« Il faut se loger selon ses moyens. » Encore faut-il que les moyens suivent les prix.
+				Depuis 2000, le prix des logements a augmenté près de deux fois plus vite que les
+				revenus. Voici ce que cela donne, ici, avec vos chiffres.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-vous">
+			<h2 id="titre-vous">Votre situation</h2>
+			<p class="legende">Rien n’est envoyé nulle part : tout est calculé dans votre navigateur.</p>
+
+			<div class="champ">
+				<label for="revenu">Revenus nets du foyer, par mois</label>
+				<div class="champ-ligne">
+					<input type="range" id="revenu" min="600" max="8000" step="10" value="2200">
+					<input type="number" id="revenu-nombre" min="1" step="50" value="2200"
+					       aria-label="Revenus nets mensuels en euros">
+					<span class="unite">€ / mois</span>
+				</div>
+			</div>
+
+			<div class="champ">
+				<label for="surface">Surface du logement</label>
+				<div class="champ-ligne">
+					<input type="range" id="surface" min="15" max="150" step="1" value="60">
+					<input type="number" id="surface-nombre" min="1" step="5" value="60"
+					       aria-label="Surface du logement en mètres carrés">
+					<span class="unite">m²</span>
+				</div>
+				<p class="barre-detail">
+					Environ 30 m² pour un studio, 45 m² pour un deux-pièces, 60 m² pour un trois-pièces.
+				</p>
+			</div>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-acheter">
+			<h2 id="titre-acheter">Pour l’acheter, il vous faut</h2>
+			<p class="grand-chiffre" id="annees">—</p>
+			<p class="sous-chiffre" id="annees-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-2000">
+			<h2 id="titre-2000">Le même logement, en 2000</h2>
+			<p class="legende">
+				Entre 1965 et 2000, le rapport entre le prix des logements et le revenu des ménages
+				est resté remarquablement stable. Il s’en est détaché au début des années 2000 et n’y
+				est jamais revenu : c’est ce que montre la série suivie depuis trente ans par
+				l’Inspection générale de l’environnement et du développement durable.
+			</p>
+			<ul class="barres" id="comparaison"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem" id="comparaison-phrase"></p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-louer">
+			<h2 id="titre-louer">Pour le louer</h2>
+			<p class="grand-chiffre" id="loyer">—</p>
+			<p class="sous-chiffre" id="loyer-phrase">—</p>
+			<div class="grille-chiffres" id="louer-details"></div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-emprunt">
+			<h2 id="titre-emprunt">Ce qu’une banque peut vous prêter</h2>
+			<p class="legende">
+				Le Haut Conseil de stabilité financière plafonne le taux d’effort à 35 % des revenus
+				et la durée du prêt à 25 ans. Le calcul ci-dessous applique ces deux limites
+				<strong>sans compter les intérêts</strong> — il surestime donc franchement votre
+				capacité d’emprunt. Votre banque vous prêtera nettement moins.
+			</p>
+			<p class="grand-chiffre" id="emprunt">—</p>
+			<p class="sous-chiffre" id="emprunt-phrase">—</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-pourquoi">
+			<h2 id="titre-pourquoi">Pourquoi ce n’est pas « le marché »</h2>
+			<p class="sous-chiffre">
+				De 1965 à 2000, le prix des logements a suivi les revenus, de très près. Rien dans la
+				démographie, dans le coût de la construction ou dans la rareté du terrain n’a changé
+				assez brutalement en 2001 pour expliquer le décrochage. Ce qui a changé, c’est
+				l’allongement des crédits, la baisse durable des taux, et le fait qu’un logement soit
+				devenu un placement autant qu’un toit.
+			</p>
+			<p class="sous-chiffre">
+				Un prix qui double par rapport aux revenus ne crée pas de logements : il transfère de
+				la richesse de ceux qui achètent vers ceux qui possèdent déjà. Et il fait de l’héritage
+				— plutôt que du travail — la condition d’accès à la propriété.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Prix de vente à Dijon : environ 2 650 € le mètre carré pour un appartement en 2026.
+					Ordre de grandeur issu des transactions réelles publiées en données ouvertes
+					(base « Demandes de valeurs foncières » de la direction générale des finances
+					publiques) et des observatoires immobiliers privés, qui convergent.
+				</li>
+				<li>
+					Loyer à Dijon : 13,34 € le mètre carré et par mois, loyer médian des appartements,
+					charges non comprises — observatoire des loyers de la direction de l’habitat, de
+					l’urbanisme et des paysages, campagne 2025.
+				</li>
+				<li>
+					Rapport prix des logements / revenu par ménage : série de l’Inspection générale de
+					l’environnement et du développement durable (travaux de Jacques Friggit). Ce
+					rapport, stable de 1965 à 2000, a depuis presque doublé. Nous retenons ici un
+					coefficient de 1,8, soit le bas de la fourchette.
+				</li>
+				<li>
+					Taux d’effort moyen des ménages pour le logement : 22,8 % du revenu disponible
+					brut (Insee, 2024).
+				</li>
+				<li>
+					Règles d’octroi des crédits immobiliers : décision du Haut Conseil de stabilité
+					financière — taux d’effort limité à 35 % des revenus, durée limitée à 25 ans.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Ce sont des moyennes de ville, pas une estimation de bien.</strong> À Dijon, le
+				prix au mètre carré va du simple au double selon le quartier, l’étage, l’état et la
+				performance énergétique : un même appartement peut valoir 1 700 € le mètre carré ou
+				3 900 €. Les « années de salaire » sont des années de revenu <em>intégral</em> — sans
+				manger, sans se déplacer, sans rien payer d’autre : c’est une unité de comparaison
+				dans le temps, pas un plan de financement. Enfin, le calcul de capacité d’emprunt
+				ignore les intérêts, ce qui le rend nettement trop favorable.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

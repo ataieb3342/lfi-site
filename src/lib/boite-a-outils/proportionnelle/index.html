@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Votre voix pèse combien ?</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<p class="retour-site"><a href="/boite-a-outils">← Retour à la boîte à outils</a></p>
+
+		<header class="entete">
+			<p class="sur-titre">Comprendre et argumenter</p>
+			<h1>Votre voix pèse combien ?</h1>
+			<p class="chapeau">
+				Aux législatives de 2024, il a fallu beaucoup plus de voix pour élire certains députés
+				que d’autres. Cet outil part des résultats officiels — des nombres publiés, figés,
+				vérifiables — et montre l’Assemblée que donnerait la proportionnelle.
+			</p>
+		</header>
+
+		<section class="carte" aria-labelledby="titre-cout">
+			<h2 id="titre-cout">Combien de voix a coûté un siège ?</h2>
+			<p class="legende">
+				Le nombre de voix obtenues au premier tour, divisé par le nombre de sièges finalement
+				obtenus. Une simple division, sur les chiffres du ministère de l’Intérieur.
+			</p>
+			<ul class="barres" id="cout-siege"></ul>
+			<p class="barre-detail" style="margin-top:1.25rem" id="cout-phrase"></p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-systeme">
+			<h2 id="titre-systeme">Et avec une dose de proportionnelle ?</h2>
+			<p class="legende">
+				Le débat public ne porte pas seulement sur la proportionnelle intégrale : il porte
+				aussi sur une « dose ». Déplacez le curseur pour voir l’Assemblée de 2024 telle
+				qu’elle aurait été, de notre scrutin actuel jusqu’à la proportionnelle complète.
+			</p>
+
+			<div class="champ">
+				<label for="dose">Part des sièges répartis à la proportionnelle</label>
+				<div class="champ-ligne">
+					<input type="range" id="dose" min="0" max="100" step="5" value="100">
+					<input type="number" id="dose-nombre" min="0" max="100" step="5" value="100"
+					       aria-label="Part des sièges à la proportionnelle, en pourcentage">
+					<span class="unite">%</span>
+				</div>
+				<p class="barre-detail" id="dose-legende">—</p>
+			</div>
+
+			<ul class="barres" id="repartition" style="margin-top:1.5rem"></ul>
+		</section>
+
+		<section class="carte carte-accent" aria-labelledby="titre-honnete">
+			<h2 id="titre-honnete">Disons-le tout de suite</h2>
+			<p class="sous-chiffre">
+				À la proportionnelle intégrale, <strong>le Rassemblement national aurait obtenu une
+				cinquantaine de sièges de plus</strong>, et le Nouveau Front populaire une trentaine
+				de moins. Nous l’affichons parce que c’est le résultat du calcul, et parce qu’un
+				argument qui ne tient que lorsqu’il nous arrange n’est pas un argument.
+			</p>
+			<p class="sous-chiffre">
+				La proportionnelle se défend pour ce qu’elle est : un scrutin où le nombre de sièges
+				suit le nombre de voix. Si elle nous coûte des sièges une année, elle reste juste.
+				C’est précisément ce qui la distingue d’un calcul d’intérêt.
+			</p>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-abstention">
+			<h2 id="titre-abstention">Le premier parti de France</h2>
+			<p class="legende">
+				Les électeurs inscrits qui n’ont pas voté, ou dont le bulletin était blanc ou nul.
+				Si l’Assemblée leur réservait des sièges à proportion, voici combien resteraient vides.
+			</p>
+			<p class="grand-chiffre" id="vides">—</p>
+			<p class="sous-chiffre" id="vides-phrase">—</p>
+			<div class="grille-chiffres" id="participation"></div>
+		</section>
+
+		<section class="carte" aria-labelledby="titre-limite">
+			<h2 id="titre-limite">Ce que ce calcul ne dit pas</h2>
+			<p class="sous-chiffre">
+				<strong>Ce n’est pas l’Assemblée qu’on aurait eue.</strong> Avec un autre mode de
+				scrutin, les gens ne votent pas pareil : il n’y a plus de vote utile, plus de
+				désistement entre les deux tours, plus de « front républicain », et des listes qui ne
+				se présentent aujourd’hui nulle part auraient des candidats partout. Ce calcul montre
+				l’écart entre les voix exprimées et les sièges attribués — pas un résultat de
+				remplacement.
+			</p>
+			<p class="sous-chiffre">
+				Il porte sur les voix du <strong>premier tour</strong>, seul tour où chacun vote pour
+				la force qu’il préfère, et sur les sièges issus des <strong>deux tours</strong>.
+				C’est la comparaison la plus fidèle qu’on puisse faire, et c’est aussi sa limite :
+				les deux nombres ne viennent pas du même scrutin.
+			</p>
+		</section>
+
+		<footer class="sources">
+			<h2>Sources</h2>
+			<ul>
+				<li>
+					Ministère de l’Intérieur, résultats des élections législatives des 30 juin et
+					7 juillet 2024. Premier tour : 49 332 709 inscrits, 32 908 657 votants
+					(66,71 % de participation), 582 908 bulletins blancs, 267 803 nuls, et
+					32 057 946 suffrages exprimés.
+				</li>
+				<li>
+					Voix au premier tour par bloc : Rassemblement national et alliés 10 713 202 ;
+					Nouveau Front populaire 9 245 923 ; Ensemble pour la République 6 987 247 ;
+					Les Républicains et alliés 2 721 843 ; autres listes 2 389 731. La somme est
+					égale au nombre de suffrages exprimés.
+				</li>
+				<li>
+					Sièges après le second tour, sur 577 : Nouveau Front populaire 193 ; Ensemble
+					pour la République 168 ; Rassemblement national et alliés 143 ; Les Républicains
+					et alliés 60 ; autres 13.
+				</li>
+				<li>
+					Répartition proportionnelle calculée à la plus forte moyenne des restes, sur
+					l’ensemble des 577 sièges, sans seuil d’accès.
+				</li>
+			</ul>
+			<div class="avertissement">
+				<strong>Sur le regroupement en blocs.</strong> Le ministère de l’Intérieur classe les
+				candidats en une trentaine de « nuances », que chaque publication regroupe ensuite à
+				sa façon : selon que l’on compte ou non les divers droite avec Les Républicains, ou
+				les divers centre avec Ensemble, les pourcentages publiés varient de quelques
+				dixièmes de point. Les nombres retenus ici forment un ensemble cohérent — leur somme
+				tombe juste, aux suffrages exprimés comme aux 577 sièges. La ligne « autres » est un
+				reste hétérogène : elle réunit des listes qui n’ont rien à voir entre elles, de
+				l’extrême gauche aux régionalistes. À la proportionnelle, elles concourraient
+				séparément et obtiendraient, chacune, moins de sièges que ce total ne le suggère.
+			</div>
+		</footer>
+	</div>
+
+	<script src="outil.js"></script>
+</body>
+</html>

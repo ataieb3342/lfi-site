@@ -42,9 +42,17 @@
 	</p>
 {/if}
 
+<!-- Lien de retour pour les deux rubriques absentes de l'en-tête de bureau :
+     sans lui, on ne retrouve la liste que par le pied de page. -->
 {#if p.kind === 'apero'}
 	<p class="mb-6 text-sm">
 		<a class="font-semibold text-brand hover:underline" href="/aperos">← Tous les apéros</a>
+	</p>
+{:else if p.kind === 'revue'}
+	<p class="mb-6 text-sm">
+		<a class="font-semibold text-brand hover:underline" href="/revue-de-presse"
+			>← Toutes les revues de presse</a
+		>
 	</p>
 {/if}
 
@@ -125,7 +133,7 @@
 		{#if data.sources.length}
 			<ul class="mt-6 space-y-4">
 				{#each data.sources as source (source.id)}
-					<li class="rounded-lg border border-line bg-surface px-4 py-3">
+					<li class="rounded-lg border border-line bg-carte px-4 py-3">
 						<p class="font-semibold text-ink">
 							{#if source.pdf}
 								<a class="text-brand underline-offset-4 hover:underline" href={source.pdf.url}
@@ -164,7 +172,7 @@
 		{/if}
 
 		{#if form?.formulaire === 'source' && form?.succesSource}
-			<p class="mt-6 rounded border border-line bg-surface px-4 py-3 text-sm text-ink">
+			<p class="mt-6 rounded border border-line bg-carte px-4 py-3 text-sm text-ink">
 				{#if form.enAttenteSource}
 					Merci ! Votre source a bien été reçue : elle apparaîtra dans le dossier après un coup d'œil de l'équipe.
 				{:else}
@@ -210,7 +218,7 @@
 							required
 							maxlength="120"
 							value={form?.formulaire === 'source' ? (form.titre ?? '') : ''}
-							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 						/>
 					</div>
 
@@ -226,7 +234,7 @@
 								name="pdf"
 								type="file"
 								accept="application/pdf,.pdf"
-								class="mt-1 block w-full rounded border border-line-forte bg-surface px-3 py-2 text-sm text-ink file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:font-semibold file:text-brand"
+								class="mt-1 block w-full rounded border border-line-forte bg-carte px-3 py-2 text-sm text-ink file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:font-semibold file:text-brand"
 							/>
 						</div>
 
@@ -242,7 +250,7 @@
 								maxlength="300"
 								placeholder="Par exemple : CC BY 4.0"
 								value={form?.formulaire === 'source' ? (form.droitsDiffusion ?? '') : ''}
-								class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+								class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 							/>
 						</div>
 
@@ -263,7 +271,7 @@
 								maxlength="500"
 								placeholder="https://"
 								value={form?.formulaire === 'source' ? (form.lien ?? '') : ''}
-								class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+								class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 							/>
 						</div>
 					</fieldset>
@@ -277,7 +285,7 @@
 							name="note"
 							rows="2"
 							maxlength="300"
-							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 							>{form?.formulaire === 'source' ? (form.note ?? '') : ''}</textarea
 						>
 					</div>
@@ -293,7 +301,7 @@
 							maxlength="60"
 							autocomplete="off"
 							value={form?.formulaire === 'source' ? (form.pseudoSource ?? '') : ''}
-							class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+							class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 						/>
 					</div>
 
@@ -396,7 +404,7 @@
 					maxlength="60"
 					autocomplete="off"
 					value={form?.pseudo ?? ''}
-					class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+					class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 				/>
 			</div>
 
@@ -408,7 +416,7 @@
 					rows="5"
 					required
 					maxlength="3000"
-					class="mt-1 w-full rounded border border-line-forte bg-surface px-3 py-2 text-ink"
+					class="mt-1 w-full rounded border border-line-forte bg-carte px-3 py-2 text-ink"
 					>{form?.corps ?? ''}</textarea
 				>
 			</div>
