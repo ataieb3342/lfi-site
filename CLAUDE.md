@@ -488,6 +488,17 @@ Quatre règles, dont la première n'est pas négociable :
    appel réseau depuis ces pages.
 4. Les `outil.js` commencent par `// @ts-nocheck`, comme les `game.js`.
 
+Chaque outil a **sa** couleur (`--accent` et `--accent-fort` de son `style.css`),
+qui habille ses cartes de résultat et ses graphiques. Le surlignage de l'en-tête,
+lui, est l'étiquette de la rubrique : il dit « Comprendre et argumenter » et
+porte le violet (`--rubrique`) sur tous les outils, comme la page qui y mène. Un
+outil dont le surlignage change de couleur ou de texte n'a plus l'air de venir
+de la même rubrique que la page qu'on vient de quitter.
+
+Le reste de la palette (`--surface`, `--carte`, `--surface-alt`, `--ink`…) est
+recopié d'`app.css` dans chaque `style.css` : **la retoucher sur le site oblige
+à la répercuter ici**, sinon passer du site à un outil fait un saut de couleur.
+
 Les chiffres actuels viennent de l'Insee (dépenses publiques par fonction 2024,
 patrimoine des ménages 2024, dépenses pré-engagées, indice des prix à la
 consommation, note de conjoncture), de la loi de finances pour 2026 (barème et

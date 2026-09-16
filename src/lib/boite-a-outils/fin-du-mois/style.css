@@ -1,10 +1,10 @@
 /*
- * Feuille de style commune aux modules « Comprendre ».
+ * Feuille de style commune aux outils de la boîte à outils.
  *
  * Elle est recopiée à l'identique dans chaque dossier de module : seules les
- * deux variables --accent et --accent-clair changent, pour donner sa couleur à
- * chaque module. Les pages de module sont servies une par dossier
- * (/comprendre/<dossier>/style.css), il n'y a donc pas de fichier partagé
+ * deux variables --accent et --accent-fort changent, pour donner sa couleur à
+ * chaque outil. Les pages d'outil sont servies une par dossier
+ * (/boite-a-outils/<dossier>/style.css), il n'y a donc pas de fichier partagé
  * possible sans compliquer la route — et la duplication d'un fichier de style
  * se relit sans difficulté.
  *
@@ -16,15 +16,16 @@
 }
 
 :root {
+	--rubrique: #58277e;
 	--accent: #43206c;
 	--accent-fort: #2f1650;
 
 	--ink: #2a1f36;
 	--ink-soft: #4d4459;
 	--ink-faint: #6f6679;
-	--surface: #faf8fc;
-	--carte: #ffffff;
-	--surface-alt: #f2eef7;
+	--surface: #f4eefb;
+	--carte: #fdfbff;
+	--surface-alt: #e9dff6;
 	--line: #e1dbe8;
 	--line-forte: #918799;
 	--sur-accent: #ffffff;
@@ -33,6 +34,7 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		--rubrique: #c1a0ef;
 		--accent: #d8c2f7;
 		--accent-fort: #e8dcfb;
 
@@ -40,8 +42,8 @@
 		--ink-soft: #bbb2c8;
 		--ink-faint: #9a92a6;
 		--surface: #130f1a;
-		--carte: #1c1626;
-		--surface-alt: #241c30;
+		--carte: #1d1629;
+		--surface-alt: #271e36;
 		--line: #2f2740;
 		--line-forte: #6d6280;
 		/* En thème sombre l'accent devient clair : le texte posé dessus passe
@@ -108,7 +110,7 @@ a {
 	font-weight: 700;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: var(--accent-fort);
+	color: var(--rubrique);
 }
 
 h1 {
