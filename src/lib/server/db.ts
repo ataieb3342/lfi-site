@@ -277,6 +277,42 @@ const MIGRATIONS: string[] = [
 	`
 	alter table sources add column droits_diffusion text not null default '';
 	`
+	,
+	// 007 — un quatrième type de publication : la revue de presse
+	//
+	// Même procédure que les 002 et 003 : SQLite ne sait pas modifier une
+	// contrainte CHECK, la table est reconstruite à l'identique avec la nouvelle
+	// valeur. Une revue de presse est un article comme un autre du point de vue
+	// de la base ; c'est son `kind` qui lui donne sa rubrique et son encart.
+	`
+	create table publications_nouveau (
+		id integer primary key,
+		kind text not null check (kind in ('article', 'actu', 'apero', 'revue')),
+		slug text not null unique,
+		title text not null,
+		summary text not null default '',
+		body text not null default '',
+		cover_media_id integer references media(id) on delete set null,
+		status text not null default 'draft' check (status in ('draft', 'published')),
+		comments_open integer not null default 1,
+		pinned integer not null default 0,
+		event_at text,
+		published_at text,
+		created_at text not null,
+		updated_at text not null,
+		author_id integer references admins(id) on delete set null,
+		author_name text not null default ''
+	);
+
+	insert into publications_nouveau select * from publications;
+
+	drop table publications;
+	alter table publications_nouveau rename to publications;
+
+	create index publications_feed on publications(status, published_at desc);
+	create index publications_kind on publications(kind, status, published_at desc);
+	create index publications_agenda on publications(kind, status, event_at);
+	`
 ];
 
 function migrer(base: DatabaseSync) {

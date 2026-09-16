@@ -22,6 +22,7 @@
 	const liensMobile = [
 		{ href: '/', label: 'Accueil' },
 		...liens,
+		{ href: '/revue-de-presse', label: 'Revue de presse' },
 		{ href: '/boite-a-outils', label: 'Boîte à outils' },
 		{ href: '/le-groupe', label: 'Le groupe' },
 		rejoindre
@@ -77,7 +78,7 @@
 <!-- Filet aux couleurs du mouvement, présent sur toutes les pages. -->
 <div class="filet-degrade h-1" aria-hidden="true"></div>
 
-<header class="border-b border-line bg-surface">
+<header class="border-b border-line bg-carte">
 	<div class="mx-auto flex max-w-5xl items-center gap-4 px-4 py-4">
 		<a href="/" class="flex items-center gap-3 no-underline">
 			<Logo class="h-10 w-auto shrink-0" />
@@ -121,7 +122,7 @@
 				>Menu</summary
 			>
 			<nav
-				class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-line bg-surface p-2 shadow-lg"
+				class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-line bg-carte p-2 shadow-lg"
 				aria-label="Navigation principale"
 			>
 				<ul>
@@ -168,6 +169,7 @@
 			<ul class="space-y-2 text-sm text-white/80">
 				<li><a class="hover:text-white hover:underline" href="/le-groupe">Le groupe</a></li>
 				<li><a class="hover:text-white hover:underline" href="/nous-rejoindre">Nous rejoindre</a></li>
+				<li><a class="hover:text-white hover:underline" href="/revue-de-presse">Revue de presse</a></li>
 				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
 				<li><a class="hover:text-white hover:underline" href="/boite-a-outils">Boîte à outils</a></li>
 				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>

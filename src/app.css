@@ -22,16 +22,23 @@
 	--color-pourpre: #9a3263; /* teinte intermédiaire du dégradé */
 
 	/*
-	 * Texte et fond. Le fond n'est pas un blanc pur mais un blanc cassé à peine
-	 * violacé, et le texte un noir adouci : le contraste reste très large
-	 * (au-delà de 14 pour 1, la norme demande 4,5) mais la page n'éblouit plus.
+	 * Texte et fond. Le fond n'est pas un blanc pur mais un lavande très clair,
+	 * et le texte un noir adouci : le contraste reste très large (au-delà de 12
+	 * pour 1, la norme demande 4,5) mais la page n'éblouit plus et ne paraît pas
+	 * vide.
+	 *
+	 * Trois niveaux, du plus foncé au plus clair : `surface` est la page,
+	 * `carte` est ce qui se pose dessus (cartes, panneaux, menu déroulant),
+	 * `surface-alt` est ce qui s'y creuse (étiquettes, zones désactivées). Cette
+	 * petite hiérarchie suffit à donner du relief sans ajouter d'ombres.
 	 */
 	--color-ink: #2a1f36;
 	--color-ink-soft: #4d4459;
 	--color-ink-faint: #6f6679;
 
-	--color-surface: #faf8fc;
-	--color-surface-alt: #f2eef7;
+	--color-surface: #f4eefb;
+	--color-carte: #fdfbff;
+	--color-surface-alt: #e9dff6;
 	/* Filet décoratif : séparateurs, bordures de cartes. Volontairement discret. */
 	--color-line: #e1dbe8;
 	/* Contour des éléments qu'on manipule : champs, boutons secondaires,
@@ -97,7 +104,8 @@
 		--color-ink-faint: #9a92a6;
 
 		--color-surface: #130f1a;
-		--color-surface-alt: #1c1626;
+		--color-carte: #1d1629;
+		--color-surface-alt: #271e36;
 		--color-line: #2f2740;
 		--color-line-forte: #6d6280;
 		--color-sur-brand: #1a0f2e;
@@ -119,7 +127,8 @@
 	--color-ink-faint: #9a92a6;
 
 	--color-surface: #130f1a;
-	--color-surface-alt: #1c1626;
+	--color-carte: #1d1629;
+	--color-surface-alt: #271e36;
 	--color-line: #2f2740;
 	--color-line-forte: #6d6280;
 	--color-sur-brand: #1a0f2e;
@@ -289,7 +298,9 @@ h1, h2, h3, h4 {
 .champ {
 	width: 100%;
 	border: 1px solid var(--color-line-forte);
-	background: var(--color-surface);
+	/* Un champ se pose sur la page, comme une carte : il doit rester plus clair
+	   qu'elle, sinon on ne voit plus où l'on écrit. */
+	background: var(--color-carte);
 	color: var(--color-ink);
 	border-radius: 0.375rem;
 	padding: 0.5rem 0.75rem;
@@ -355,7 +366,9 @@ h1, h2, h3, h4 {
 .carte {
 	border: 1px solid var(--color-line);
 	border-radius: 0.625rem;
-	background: var(--color-surface);
+	/* Plus claire que la page en thème clair, plus claire aussi en thème sombre :
+	   dans les deux cas, la carte se détache du fond sans ombre portée. */
+	background: var(--color-carte);
 	padding: 1.25rem;
 }
 

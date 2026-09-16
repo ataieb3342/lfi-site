@@ -24,6 +24,7 @@
 			<option value="article" selected={data.filtres.kind === 'article'}>Articles</option>
 			<option value="actu" selected={data.filtres.kind === 'actu'}>Actualités</option>
 			<option value="apero" selected={data.filtres.kind === 'apero'}>Apéros</option>
+			<option value="revue" selected={data.filtres.kind === 'revue'}>Revues de presse</option>
 		</select>
 	</div>
 	<div>

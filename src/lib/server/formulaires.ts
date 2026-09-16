@@ -22,7 +22,7 @@ export async function lirePublication(
 	const authorName = String(form.get('authorName') ?? '').trim();
 	const eventAt = String(form.get('eventAt') ?? '').trim();
 
-	if (kind !== 'article' && kind !== 'actu' && kind !== 'apero') {
+	if (kind !== 'article' && kind !== 'actu' && kind !== 'apero' && kind !== 'revue') {
 		throw new ErreurFormulaire('Type de publication inconnu.');
 	}
 	if (status !== 'draft' && status !== 'published') throw new ErreurFormulaire('État inconnu.');

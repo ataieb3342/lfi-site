@@ -34,8 +34,9 @@ aucun service externe, aucune dépendance native.
 | `src/lib/server/captcha.ts` | Anti-spam par preuve de travail |
 | `src/lib/components/Logo.svelte` | Le phi officiel, en dégradé ou en monochrome |
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
+| `src/lib/components/Encart.svelte` | Le gabarit unique des encarts d'appel |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
-| `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites` et la fiche d'un apéro |
+| `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites`, `/revue-de-presse` et la fiche d'un apéro |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
 | `src/lib/boite-a-outils/` + `src/routes/boite-a-outils/` | Page publique `/boite-a-outils` : les outils interactifs de vulgarisation (voir plus bas) |
@@ -125,9 +126,16 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   majuscules.
 - Boutons en pilule (`rounded-full`), aucun filigrane décoratif, le logo en
   couleur sur fond blanc dans l'en-tête.
-- **Le fond clair n'est pas un blanc pur** (`--color-surface`) et le texte
-  n'est pas un noir pur : le contraste reste très large mais la page
-  n'éblouit pas. `--color-line` est le filet décoratif ; `--color-line-forte`
+- **Le fond clair n'est pas un blanc pur** (`--color-surface`, un lavande très
+  clair) et le texte n'est pas un noir pur : le contraste reste très large mais
+  la page n'éblouit pas et ne paraît pas vide. Trois niveaux, du plus foncé au
+  plus clair : `--color-surface` est la page, `--color-carte` est ce qui se pose
+  dessus (cartes, en-tête, menu déroulant, champs de saisie), `--color-surface-alt`
+  est ce qui s'y creuse (étiquettes, encadrés discrets). Cette hiérarchie donne
+  le relief sans une seule ombre portée — en thème sombre aussi, où la carte est
+  plus claire que la page. Un panneau posé sur la page prend donc `bg-carte`,
+  jamais `bg-surface`, sinon il disparaît dans le fond.
+- `--color-line` est le filet décoratif ; `--color-line-forte`
   sert aux contours qu'on manipule (champs, boutons secondaires, pastilles),
   pour tenir le contraste de 3 pour 1 exigé sur les commandes.
 - **Le texte posé sur un fond violet passe par `text-sur-brand`**, jamais
@@ -143,7 +151,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   mais la couleur principale des textes et liens est le violet, le rouge n'est
   qu'un accent.
 
-## Les trois types de publication
+## Les quatre types de publication
 
 Une seule table `publications`, distinguée par la colonne `kind` :
 
@@ -154,6 +162,24 @@ Une seule table `publications`, distinguée par la colonne `kind` :
   format `AAAA-MM-JJ`).
 - **`apero`** — apéros thématiques (voir plus bas). `event_at` y est
   obligatoire : c'est la date de la soirée.
+- **`revue`** — revues de presse : ce qu'on a lu ailleurs, rassemblé et
+  commenté. C'est un article ordinaire du point de vue de la base ; seuls sa
+  rubrique (`/revue-de-presse`), son étiquette et l'encart qui y mène le
+  distinguent. Les liens vont dans le corps du texte, chacun avec sa source et
+  ce que le groupe en retient.
+
+Ajouter un type demande de toucher, dans cet ordre : la contrainte `check` de
+`publications` (une migration qui reconstruit la table, voir la 007), `Kind`
+dans `rubriques.ts` et `content.ts`, les quatre tables de `rubriques.ts`, le
+`match` de `src/params/rubrique.ts`, `LIBELLE_KIND`, `COULEUR_KIND` et
+`FOND_KIND` de `format.ts`, la validation de `formulaires.ts`, le menu du
+formulaire de publication, le filtre de l'administration et `PAGES_FIXES` du
+plan du site. Le flux RSS et les cartes suivent tout seuls.
+
+La revue de presse **n'est pas dans l'en-tête de bureau** : une cinquième
+rubrique le ferait déborder sur les écrans moyens (même raison que la boîte à
+outils). On y accède par le pied de page, par le menu mobile et par l'encart en
+tête de la liste des articles.
 
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
 actions dont la date n'est pas passée remontent en tête, de la plus proche à la
@@ -262,11 +288,17 @@ applicatif reste fixé à 50 Mo.
 
 ## Le carrousel d'accueil
 
-`src/lib/components/CarrouselAccueil.svelte`. Quatre sortes de diapositives,
+`src/lib/components/CarrouselAccueil.svelte`. Cinq sortes de diapositives,
 dans cet ordre : le prochain apéro thématique (s'il est annoncé, sur la surface
 pourpre `.fond-apero`), l'identité du groupe, les prochaines actions (les
 actualités dont la date n'est pas passée, trois au plus, alimentées
-automatiquement), et la bulle Action populaire. L'apéro passe devant l'identité
+automatiquement), les ressources (bibliothèque et boîte à outils, deux pages
+absentes de l'en-tête de bureau), et la bulle Action populaire. Les deux
+dernières sont des `Encart` en mode `hauteurPleine`.
+
+La diapositive des ressources vient **après** les actions et non juste après
+l'identité : les deux sont sur la surface violette, et deux diapositives de la
+même couleur qui se suivent se confondent. L'apéro passe devant l'identité
 parce que c'est le rendez-vous récurrent, le plus concret pour un visiteur, et
 qu'il change toutes les deux semaines : l'accueil a toujours l'air vivant.
 
@@ -291,15 +323,17 @@ Deux règles à ne pas casser :
 
 ## Le bandeau Action populaire
 
-Affiché au bas de la liste des actualités et de chaque actualité — pas ailleurs :
-c'est là que le visiteur cherche les prochains rendez-vous, donc le moment où
-proposer l'application a du sens. Pour l'étendre à tout le site, déplacer le
-composant dans `src/routes/+layout.svelte`, juste avant le `<footer>`.
+Affiché en tête de la liste des actualités et au bas de chaque actualité — pas
+ailleurs : c'est là que le visiteur cherche les prochains rendez-vous, donc le
+moment où proposer l'application a du sens. Pour l'étendre à tout le site,
+déplacer le composant dans `src/routes/+layout.svelte`, juste avant le
+`<footer>`.
 
-Le bandeau porte les couleurs de l'application (jaune `#f0e80d`, bleu nuit
-`#0b0b33`) et non celles du site, écrites en dur plutôt que prises dans les
-jetons : elles ne doivent bouger ni avec le thème sombre, ni si l'on retouche la
-palette du site. Ce contraste avec le reste de la page est voulu — c'est ce qui
+C'est un `Encart` ordinaire, au même gabarit que ceux de la bibliothèque, des
+articles et de la revue de presse — mais il porte les couleurs de l'application
+(jaune `#f0e80d`, bleu nuit `#0b0b33`) et non celles du site, écrites en dur
+plutôt que prises dans les jetons : elles ne doivent bouger ni avec le thème
+sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu — c'est ce qui
 fait remarquer le bandeau.
 
 Les adresses des magasins d'applications sont dans les réglages
@@ -310,6 +344,35 @@ change, et le modifier ne doit pas demander de redéploiement. Elles sont filtr�
 
 Quand les deux champs sont vides, le bandeau renvoie vers actionpopulaire.fr
 plutôt que d'afficher des boutons morts.
+
+## Les encarts d'appel
+
+`src/lib/components/Encart.svelte` est le gabarit **unique** des invitations
+posées en tête d'une page : la boîte à outils depuis la bibliothèque, la
+bibliothèque depuis la revue de presse, la revue de presse depuis les articles,
+Action populaire depuis les actualités, et deux diapositives du carrousel. Ils
+avaient chacun leur mise en page ; d'une page à l'autre, le visiteur ne
+reconnaissait pas qu'il s'agissait de la même chose.
+
+Un encart est une surface colorée (`.fond-degrade`, `.fond-actu`, `.fond-apero`,
+ou un `style` en dur pour Action populaire), un surlignage en petites capitales,
+un titre d'affiche, un paragraphe, et **au choix** un lien étendu à toute la
+surface (`href`) ou des boutons (`actions`) — jamais les deux : le lien étendu
+passerait derrière les boutons.
+
+Ne jamais ajouter `.carte` à une surface : `.carte` est déclarée après dans
+`app.css` et écraserait le fond, ce qui donne du texte blanc sur fond blanc. La
+surface porte déjà son fond et son texte ; le composant ajoute le reste.
+
+Un encart se place **en tête**, juste sous l'en-tête de la page, jamais en bas :
+c'est une invitation, et une invitation placée après quinze publications et une
+pagination n'est jamais vue. Il mène toujours vers une page, jamais vers une
+publication précise, sinon il faut le modifier à chaque publication.
+
+**Une page n'a qu'un seul pavé coloré.** La page des apéros en a déjà un en tête
+(le prochain apéro) : son renvoi vers la bibliothèque est donc un simple lien en
+fin de page, comme celui de la boîte à outils vers la bibliothèque. Deux
+surfaces colorées sur la même page se font concurrence.
 
 ## Le logo
 

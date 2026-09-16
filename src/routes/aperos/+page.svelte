@@ -133,3 +133,14 @@
 		<p class="text-ink-soft">Aucun apéro passé pour le moment : le premier résumé apparaîtra ici.</p>
 	{/if}
 </section>
+
+<!-- Un simple lien, pas un encart : la page des apéros en compte déjà un gros
+     en tête (le prochain apéro), et un second pavé coloré juste après l'archive
+     ferait doublon. -->
+<section class="mt-14 border-t border-line pt-6">
+	<p class="text-sm text-ink-soft">
+		Tout ce qui est proposé pour préparer les soirées est rassemblé dans la
+		<a class="font-semibold text-brand hover:underline" href="/bibliotheque">bibliothèque</a> : on
+		peut y piocher sans être venu à l'apéro.
+	</p>
+</section>

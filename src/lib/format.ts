@@ -51,7 +51,8 @@ export function formatTailleFichier(octets: number): string {
 export const LIBELLE_KIND: Record<string, string> = {
 	article: 'Article',
 	actu: 'Actualité',
-	apero: 'Apéro thématique'
+	apero: 'Apéro thématique',
+	revue: 'Revue de presse'
 };
 
 /**
@@ -62,14 +63,19 @@ export const LIBELLE_KIND: Record<string, string> = {
 export const COULEUR_KIND: Record<string, string> = {
 	article: 'text-brand',
 	actu: 'text-accent',
-	apero: 'text-pourpre'
+	apero: 'text-pourpre',
+	// La revue de presse est une lecture d'articles : elle reste dans le violet,
+	// en plus soutenu. Aucune quatrième couleur n'est inventée — la palette du
+	// logo n'en a que trois.
+	revue: 'text-brand-dark'
 };
 
 /** Surface colorée de chaque type (voir app.css), pour les diapositives. */
 export const FOND_KIND: Record<string, string> = {
 	article: 'fond-degrade',
 	actu: 'fond-actu',
-	apero: 'fond-apero'
+	apero: 'fond-apero',
+	revue: 'fond-degrade'
 };
 
 /** Chemin public d'une publication. */
