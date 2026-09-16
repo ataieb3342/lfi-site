@@ -8,15 +8,17 @@
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
+	// L'en-tête ne montre que les rubriques de contenu : quatre liens et un
+	// bouton « Nous rejoindre ». Le logo ramène à l'accueil, et « Le groupe »
+	// est dans le pied de page. Le menu mobile, lui, liste tout.
 	const liens = [
-		{ href: '/', label: 'Accueil' },
-		{ href: '/articles', label: 'Articles' },
 		{ href: '/actualites', label: 'Actualités' },
+		{ href: '/articles', label: 'Articles' },
 		{ href: '/aperos', label: 'Apéros' },
-		{ href: '/bibliotheque', label: 'Bibliothèque' },
-		{ href: '/le-groupe', label: 'Le groupe' },
-		{ href: '/nous-rejoindre', label: 'Nous rejoindre' }
+		{ href: '/bibliotheque', label: 'Bibliothèque' }
 	];
+	const rejoindre = { href: '/nous-rejoindre', label: 'Nous rejoindre' };
+	const liensMobile = [{ href: '/', label: 'Accueil' }, ...liens, { href: '/le-groupe', label: 'Le groupe' }, rejoindre];
 
 	function actif(href: string): boolean {
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
@@ -95,6 +97,13 @@
 						>
 					</li>
 				{/each}
+				<li class="ml-2">
+					<a
+						href={rejoindre.href}
+						aria-current={actif(rejoindre.href) ? 'page' : undefined}
+						class="bouton px-4 py-1.5 text-sm">{rejoindre.label}</a
+					>
+				</li>
 			</ul>
 		</nav>
 
@@ -109,7 +118,7 @@
 				aria-label="Navigation principale"
 			>
 				<ul>
-					{#each liens as lien (lien.href)}
+					{#each liensMobile as lien (lien.href)}
 						<li>
 							<a
 								href={lien.href}
@@ -150,7 +159,9 @@
 		</div>
 		<nav aria-label="Pied de page">
 			<ul class="space-y-2 text-sm text-white/80">
+				<li><a class="hover:text-white hover:underline" href="/le-groupe">Le groupe</a></li>
 				<li><a class="hover:text-white hover:underline" href="/nous-rejoindre">Nous rejoindre</a></li>
+				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
 				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>
 				<li><a class="hover:text-white hover:underline" href="/mentions-legales">Mentions légales</a></li>
 				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>

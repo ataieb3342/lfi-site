@@ -45,6 +45,7 @@ scripts/           sauvegarde et restauration
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
+| Ajouter un jeu | Déposer son dossier dans `src/lib/jeux/` et l'ajouter à `src/lib/jeux.ts` |
 | Ajouter une image | Administration → Images |
 | Changer le nom du site, l'adresse de contact | Administration → Réglages |
 | Ouvrir ou fermer les commentaires du site | Administration → Réglages |

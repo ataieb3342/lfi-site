@@ -1,8 +1,20 @@
 import type { RequestHandler } from './$types';
 import { listPublished } from '$lib/server/content';
 import { RUBRIQUE_PAR_KIND } from '$lib/rubriques';
+import { JEUX, urlJeu } from '$lib/jeux';
 
-const PAGES_FIXES = ['/', '/articles', '/actualites', '/aperos', '/bibliotheque', '/le-groupe', '/nous-rejoindre', '/mentions-legales', '/confidentialite'];
+const PAGES_FIXES = [
+	'/',
+	'/articles',
+	'/actualites',
+	'/aperos',
+	'/bibliotheque',
+	'/le-groupe',
+	'/nous-rejoindre',
+	'/mentions-legales',
+	'/confidentialite',
+	...JEUX.map(urlJeu)
+];
 
 export const GET: RequestHandler = async ({ url }) => {
 	const base = url.origin;

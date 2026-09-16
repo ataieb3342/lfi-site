@@ -37,6 +37,8 @@ aucun service externe, aucune dépendance native.
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
 | `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites` et la fiche d'un apéro |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
+| `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
+| `src/lib/jeux/` + `src/routes/jeux/` | Les jeux de la bibliothèque, servis tels quels (voir plus bas) |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
 Les dépendances runtime se comptent sur une main : `markdown-it` et `qrcode`.
@@ -306,6 +308,40 @@ moteur Markdown côté navigateur, donc pas d'écart entre l'aperçu et le site,
 et `html: false` s'applique aussi à l'aperçu. Le formulaire est envoyé sans
 rechargement (`use:enhance`, `reset: false`) pour que l'image choisie et le
 texte tapé restent en place.
+
+## L'en-tête
+
+La navigation de bureau se limite à quatre rubriques de contenu (Actualités,
+Articles, Apéros, Bibliothèque) et un bouton « Nous rejoindre ». Le logo ramène
+à l'accueil ; « Le groupe » est dans le pied de page. Le menu mobile, lui,
+liste tout (`liensMobile` dans `src/routes/+layout.svelte`). Ajouter un lien
+dans l'en-tête de bureau le fait déborder sur les écrans moyens : préférer le
+pied de page ou le menu mobile.
+
+## Les jeux de la bibliothèque
+
+La page `/bibliotheque` montre, sous les sources approuvées, quelques jeux faits
+maison. Chaque jeu est un dossier de `src/lib/jeux/` (un `index.html`, un
+`game.js`, un `style.css`, en JavaScript simple, sans dépendance), et une ligne
+dans `src/lib/jeux.ts` (dossier, titre, description). Un dossier absent de cette
+liste n'est pas servi.
+
+Les fichiers sont lus **à la compilation** (`import.meta.glob` avec `?raw` dans
+`src/routes/jeux/[jeu]/fichiers.ts`) et embarqués dans `build/` : rien à copier
+au déploiement. Ils ne passent pas par `static/` pour deux raisons : le serveur
+de développement et celui de production n'y traitent pas `index.html` de la
+même façon, et les fichiers de `static/` sont servis sans en-têtes de sécurité.
+Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
+
+- Un jeu vit à `/jeux/<dossier>/`, **avec la barre finale** (`trailingSlash =
+  'always'` sur la route) : c'est ce qui permet à son `index.html` de charger
+  `style.css` et `game.js` par des adresses relatives.
+- Seuls `.html`, `.js` et `.css` sont servis. Pas d'images ni de sons pour
+  l'instant : en ajouter demande d'étendre `TYPES` dans `fichiers.ts`.
+- Le jeu s'ouvre en plein écran, sans l'habillage du site ; son `index.html`
+  contient un lien « Retour à la bibliothèque ».
+- Les `game.js` commencent par `// @ts-nocheck` : ce sont des scripts servis
+  tels quels, `npm run check` ne les vérifie pas.
 
 ## Ajouter une page fixe
 
