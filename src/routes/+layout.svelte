@@ -8,10 +8,10 @@
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
-	// L'en-tête ne montre que les rubriques de contenu : quatre liens et un
+	// L'en-tête ne montre que les rubriques de contenu et un
 	// bouton « Nous rejoindre ». Le logo ramène à l'accueil ; « Le groupe » et
-	// « Boîte à outils » sont dans le pied de page, un cinquième lien ici ferait
-	// déborder l'en-tête sur les écrans moyens.
+	// « Boîte à outils » restent dans le pied de page pour ne pas surcharger
+	// l'en-tête sur les écrans moyens.
 	//
 	// Le menu mobile, lui, liste tout : il n'a pas de contrainte de largeur, et
 	// c'est le seul endroit où quelqu'un sur téléphone peut atteindre la boîte à
@@ -19,6 +19,7 @@
 	const liens = [
 		{ href: '/actualites', label: 'Actualités' },
 		{ href: '/articles', label: 'Articles' },
+		{ href: '/agenda', label: 'Agenda' },
 		{ href: '/aperos', label: 'Apéros' },
 		{ href: '/bibliotheque', label: 'Bibliothèque' }
 	];

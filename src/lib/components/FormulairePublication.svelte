@@ -9,6 +9,7 @@
 		authorName?: string;
 		status?: string;
 		eventAt?: string;
+		eventCategory?: string;
 		commentsOpen?: boolean;
 		pinned?: boolean;
 	};
@@ -86,7 +87,8 @@
 		status: valeurs.status ?? publication?.status ?? 'draft',
 		commentsOpen: valeurs.commentsOpen ?? publication?.commentsOpen ?? true,
 		pinned: valeurs.pinned ?? publication?.pinned ?? false,
-		eventAt: valeurs.eventAt ?? publication?.eventAt ?? ''
+		eventAt: valeurs.eventAt ?? publication?.eventAt ?? '',
+		eventCategory: valeurs.eventCategory ?? publication?.eventCategory ?? 'autre'
 	});
 </script>
 
@@ -183,12 +185,26 @@
 			</div>
 
 			<div>
-				<label class="etiquette" for="eventAt">Date de l'action</label>
+				<label class="etiquette" for="eventAt">Date du rendez-vous</label>
 				<input id="eventAt" name="eventAt" type="date" class="champ" value={v.eventAt} />
 				<p class="aide">
 					Obligatoire pour un apéro, facultatif sinon. Renseignée, la publication remonte en
 					tête de sa rubrique jusqu'au jour dit, puis redescend automatiquement. Laissez vide
 					pour une info sans rendez-vous.
+				</p>
+			</div>
+
+			<div>
+				<label class="etiquette" for="eventCategory">Catégorie dans l'agenda</label>
+				<select id="eventCategory" name="eventCategory" class="champ">
+					<option value="action" selected={v.eventCategory === 'action'}>Action</option>
+					<option value="reunion" selected={v.eventCategory === 'reunion'}>Réunion</option>
+					<option value="apero" selected={v.eventCategory === 'apero'}>Apéro</option>
+					<option value="formation" selected={v.eventCategory === 'formation'}>Formation</option>
+					<option value="autre" selected={v.eventCategory === 'autre'}>Autre</option>
+				</select>
+				<p class="aide">
+					Utilisée dans le calendrier lorsque la date du rendez-vous est renseignée.
 				</p>
 			</div>
 

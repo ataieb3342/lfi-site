@@ -21,6 +21,7 @@ export async function lirePublication(
 	const body = String(form.get('body') ?? '');
 	const authorName = String(form.get('authorName') ?? '').trim();
 	const eventAt = String(form.get('eventAt') ?? '').trim();
+	const eventCategory = String(form.get('eventCategory') ?? (kind === 'apero' ? 'apero' : 'autre'));
 
 	if (kind !== 'article' && kind !== 'actu' && kind !== 'apero' && kind !== 'revue') {
 		throw new ErreurFormulaire('Type de publication inconnu.');
@@ -37,6 +38,9 @@ export async function lirePublication(
 	// liste, avant ou après la soirée.
 	if (kind === 'apero' && !eventAt) {
 		throw new ErreurFormulaire("Un apéro a toujours une date : renseignez la date de l'action.");
+	}
+	if (!['action', 'reunion', 'apero', 'formation', 'autre'].includes(eventCategory)) {
+		throw new ErreurFormulaire("La catégorie de l'événement est invalide.");
 	}
 
 	// Image de couverture : suppression, remplacement, ou statu quo.
@@ -63,7 +67,8 @@ export async function lirePublication(
 		commentsOpen: form.get('commentsOpen') === '1',
 		pinned: form.get('pinned') === '1',
 		coverMediaId,
-		eventAt: eventAt || null
+		eventAt: eventAt || null,
+		eventCategory: eventCategory as PublicationInput['eventCategory']
 	};
 }
 
@@ -87,6 +92,7 @@ export function valeursSaisies(form: FormData) {
 		status: String(form.get('status') ?? 'draft'),
 		commentsOpen: form.get('commentsOpen') === '1',
 		pinned: form.get('pinned') === '1',
-		eventAt: String(form.get('eventAt') ?? '')
+		eventAt: String(form.get('eventAt') ?? ''),
+		eventCategory: String(form.get('eventCategory') ?? 'autre')
 	};
 }

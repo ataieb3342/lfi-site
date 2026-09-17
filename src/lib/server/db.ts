@@ -313,6 +313,15 @@ const MIGRATIONS: string[] = [
 	create index publications_kind on publications(kind, status, published_at desc);
 	create index publications_agenda on publications(kind, status, event_at);
 	`
+	,
+	// 008 — catégorie visuelle des rendez-vous dans l'agenda
+	`
+	alter table publications add column event_category text not null default 'autre'
+		check (event_category in ('action', 'reunion', 'apero', 'formation', 'autre'));
+	update publications set event_category = 'apero' where kind = 'apero';
+	update publications set event_category = 'action' where kind = 'actu' and event_at is not null;
+	create index publications_calendrier on publications(status, event_at, event_category);
+	`
 ];
 
 function migrer(base: DatabaseSync) {

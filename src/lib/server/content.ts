@@ -3,6 +3,7 @@ import { supprimerPdf } from './bibliotheque.ts';
 
 export type Kind = 'article' | 'actu' | 'apero' | 'revue';
 export type Status = 'draft' | 'published';
+export type CategorieEvenement = 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
 
 export type Publication = {
 	id: number;
@@ -16,6 +17,7 @@ export type Publication = {
 	comments_open: number;
 	pinned: number;
 	event_at: string | null;
+	event_category: CategorieEvenement;
 	published_at: string | null;
 	created_at: string;
 	updated_at: string;
@@ -117,6 +119,19 @@ export function countPublished(kind?: Kind): number {
 	).n;
 }
 
+/** Rendez-vous publiés d'un mois, classés par jour puis par titre. */
+export function listAgenda(debut: string, fin: string) {
+	return db()
+		.prepare(
+			`${PUBLIC_SELECT}
+			 where p.status = 'published'
+			   and p.event_at is not null
+			   and p.event_at >= ? and p.event_at < ?
+			 order by p.event_at asc, p.title collate nocase asc`
+		)
+		.all(debut, fin) as PublicationListItem[];
+}
+
 export function getPublishedBySlug(slug: string): PublicationListItem | undefined {
 	return db().prepare(`${PUBLIC_SELECT} where p.slug = ? and p.status = 'published'`).get(slug) as
 		| PublicationListItem
@@ -168,6 +183,7 @@ export type PublicationInput = {
 	authorName: string;
 	/** Date de l'action annoncée (AAAA-MM-JJ), ou null. */
 	eventAt: string | null;
+	eventCategory: CategorieEvenement;
 };
 
 export function createPublication(input: PublicationInput, authorId: number): number {
@@ -176,8 +192,8 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 		.prepare(
 			`insert into publications
 			 (kind, slug, title, summary, body, cover_media_id, status, comments_open, pinned,
-			  event_at, published_at, created_at, updated_at, author_id, author_name)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			  event_at, event_category, published_at, created_at, updated_at, author_id, author_name)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -190,6 +206,7 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			input.commentsOpen ? 1 : 0,
 			input.pinned ? 1 : 0,
 			input.eventAt,
+			input.eventCategory,
 			input.status === 'published' ? timestamp : null,
 			timestamp,
 			timestamp,
@@ -214,7 +231,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 	db().prepare(
 		`update publications set
 		   kind = ?, slug = ?, title = ?, summary = ?, body = ?, cover_media_id = ?,
-		   status = ?, comments_open = ?, pinned = ?, event_at = ?, published_at = ?,
+		   status = ?, comments_open = ?, pinned = ?, event_at = ?, event_category = ?, published_at = ?,
 		   updated_at = ?, author_name = ?
 		 where id = ?`
 	).run(
@@ -228,6 +245,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		input.commentsOpen ? 1 : 0,
 		input.pinned ? 1 : 0,
 		input.eventAt,
+		input.eventCategory,
 		publishedAt,
 		now(),
 		input.authorName,

@@ -21,6 +21,8 @@ export type PublicationVue = {
 	commentCount: number;
 	/** Date de l'action annoncée (AAAA-MM-JJ), si la publication en annonce une. */
 	eventAt: string | null;
+	/** Catégorie utilisée pour la couleur et le filtrage dans l'agenda. */
+	eventCategory: 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
 	/** Vrai tant que la date de l'action n'est pas passée. */
 	aVenir: boolean;
 	cover: { url: string; alt: string } | null;

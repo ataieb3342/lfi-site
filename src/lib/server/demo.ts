@@ -592,7 +592,8 @@ function remplirContenus(adminId: number, imageId: number | null) {
 				eventAt:
 					fiche.actionDans === undefined
 						? null
-						: dansNJours(typeof fiche.actionDans === 'function' ? fiche.actionDans() : fiche.actionDans)
+						: dansNJours(typeof fiche.actionDans === 'function' ? fiche.actionDans() : fiche.actionDans),
+				eventCategory: fiche.kind === 'apero' ? 'apero' : fiche.actionDans === undefined ? 'autre' : 'action'
 			},
 			adminId
 		);

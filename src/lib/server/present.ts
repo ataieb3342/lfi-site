@@ -27,6 +27,7 @@ export function presentPublication(row: PublicationListItem | Publication): Publ
 		authorName: row.author_name,
 		commentCount: 'comment_count' in row ? Number(row.comment_count) : 0,
 		eventAt: row.event_at,
+		eventCategory: row.event_category,
 		// Comparaison de chaînes AAAA-MM-JJ : correcte, et sans piège de fuseau
 		// horaire contrairement à un calcul sur des objets Date.
 		aVenir: !!row.event_at && row.event_at >= new Date().toISOString().slice(0, 10),

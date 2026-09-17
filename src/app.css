@@ -382,6 +382,87 @@ main > :first-child {
 	padding: 1.25rem;
 }
 
+/* Agenda : les mêmes couleurs servent à la légende, aux filtres et aux
+   événements. Sur mobile, la grille devient une liste et masque les jours
+   vides : une semaine complète en sept colonnes serait illisible. */
+.agenda-calendrier {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	border: 1px solid var(--color-line);
+	border-radius: 0.75rem;
+	overflow: hidden;
+	background: var(--color-line);
+	gap: 1px;
+}
+.agenda-entete {
+	background: var(--color-surface-alt);
+	padding: 0.65rem 0.25rem;
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 800;
+	color: var(--color-ink-soft);
+	text-transform: uppercase;
+}
+.agenda-jour {
+	min-height: 7.5rem;
+	background: var(--color-surface);
+	padding: 0.5rem;
+}
+.agenda-jour-vide { background: var(--color-surface-alt); opacity: 0.65; }
+.agenda-numero {
+	display: grid;
+	place-items: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	margin-bottom: 0.25rem;
+	font-size: 0.8125rem;
+	font-weight: 800;
+	color: var(--color-ink-soft);
+}
+.agenda-aujourdhui .agenda-numero { border-radius: 9999px; background: var(--color-brand); color: var(--color-sur-brand); }
+.agenda-evenement {
+	display: block;
+	margin-top: 0.25rem;
+	border-left: 4px solid currentColor;
+	border-radius: 0.25rem;
+	padding: 0.3rem 0.4rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1.25;
+	background: color-mix(in srgb, currentColor 11%, var(--color-surface));
+	overflow-wrap: anywhere;
+}
+.agenda-evenement:hover { text-decoration: underline; }
+.agenda-filtre {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	border: 1px solid currentColor;
+	border-radius: 9999px;
+	padding: 0.4rem 0.75rem;
+	background: var(--color-surface);
+	font-size: 0.8125rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+.agenda-filtre span { width: 0.65rem; height: 0.65rem; border-radius: 9999px; background: currentColor; }
+.agenda-filtre-inactif { color: var(--color-ink-faint) !important; opacity: 0.65; text-decoration: line-through; }
+.agenda-action { color: var(--color-accent); }
+.agenda-reunion { color: var(--color-brand); }
+.agenda-apero { color: var(--color-pourpre); }
+.agenda-formation { color: #25735d; }
+.agenda-autre { color: var(--color-ink-soft); }
+
+@media (max-width: 640px) {
+	.agenda-calendrier { display: block; border-radius: 0.5rem; }
+	.agenda-entete, .agenda-jour-vide { display: none; }
+	.agenda-jour { min-height: 3.5rem; border-bottom: 1px solid var(--color-line); }
+	.agenda-jour:last-child { border-bottom: 0; }
+	.agenda-jour:has(.agenda-evenement) { display: grid; grid-template-columns: 2.25rem 1fr; gap: 0 0.5rem; }
+	.agenda-jour:not(:has(.agenda-evenement)) { display: none; }
+	.agenda-jour .agenda-numero { grid-row: 1 / span 20; }
+}
+
 .alerte {
 	border-radius: 0.375rem;
 	padding: 0.75rem 1rem;

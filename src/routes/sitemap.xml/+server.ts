@@ -8,6 +8,7 @@ const PAGES_FIXES = [
 	'/',
 	'/articles',
 	'/actualites',
+	'/agenda',
 	'/aperos',
 	'/revue-de-presse',
 	'/bibliotheque',
