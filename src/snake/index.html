@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tortue melanchon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="game-shell">
+        <section class="game-card">
+            <header class="game-header">
+                <div>
+                    <h1>tortue melanchon</h1>
+                    <h2>Aide tortue melanchon à récupérer le plus de votes pour les élections de 2027.</h2>
+                </div>
+
+                <div class="scores">
+                    <div class="score-box">
+                        <span>Score</span>
+                        <strong id="score">0</strong>
+                    </div>
+                    <div class="score-box">
+                        <span>Record</span>
+                        <strong id="high-score">0</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="game-area">
+                <canvas id="game-board" width="600" height="600" aria-label="Plateau de jeu Snake"></canvas>
+
+                <div id="overlay" class="overlay">
+                    <div class="overlay-panel">
+                        <h2 id="overlay-title">tortue</h2>
+                        <p id="overlay-text">
+                            Utilise les flèches ou ZQSD ou les flèches directif pour déplacer le serpent.
+                        </p>
+                        <button id="start-button" type="button">Jouer</button>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="controls">
+                <p>
+                    <strong>Déplacement :</strong> Flèches ou ZQSD
+                    <span aria-hidden="true">•</span>
+                    <strong>Pause :</strong> Espace
+                </p>
+
+                <div class="actions">
+                    <button id="pause-button" type="button" disabled>Pause</button>
+                    <button id="restart-button" type="button">Recommencer</button>
+                </div>
+            </footer>
+
+            <div class="mobile-controls" aria-label="Commandes tactiles">
+                <button type="button" data-direction="up" aria-label="Haut">▲</button>
+                <div class="mobile-controls-row">
+                    <button type="button" data-direction="left" aria-label="Gauche">◀</button>
+                    <button type="button" data-direction="down" aria-label="Bas">▼</button>
+                    <button type="button" data-direction="right" aria-label="Droite">▶</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="game.js"></script>
+</body>
+</html>

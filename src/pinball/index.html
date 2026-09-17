@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space DSN</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="game-container">
+
+        <header>
+            <h1>SPACE DSN</h1>
+
+            <div class="hud">
+                <span>Score : <strong id="score">0</strong></span>
+                <span>Billes : <strong id="lives">3</strong></span>
+            </div>
+        </header>
+
+        <canvas
+            id="gameCanvas"
+            width="800"
+            height="1000">
+        </canvas>
+
+        <div class="controls">
+            <p>
+                ← / A : flipper gauche
+                &nbsp; | &nbsp;
+                → / D : flipper droit
+            </p>
+
+            <p>
+                ESPACE : lancer la bille
+                &nbsp; | &nbsp;
+                R : recommencer
+            </p>
+        </div>
+
+    </main>
+
+    <script src="game.js"></script>
+
+</body>
+</html>
