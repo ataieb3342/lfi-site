@@ -57,7 +57,7 @@
 {/if}
 
 <article>
-	<header class="border-b border-line pb-6">
+	<header class="border-b border-line pb-4">
 		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{LIBELLE_KIND[p.kind]}</p>
 		<h1 class="mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
 		<p class="mt-3 text-sm text-ink-faint">
@@ -106,13 +106,20 @@
 		</p>
 	{/if}
 
+	<!-- Hauteur plafonnée : sans elle, une photo en portrait prenait plus de la
+	     moitié d'un écran de téléphone avant la première ligne de l'article.
+	     `object-cover` recadre au-delà plutôt que de déformer. -->
 	{#if p.cover}
-		<img src={p.cover.url} alt={p.cover.alt} class="mt-8 w-full rounded-lg" />
+		<img
+			src={p.cover.url}
+			alt={p.cover.alt}
+			class="mt-6 max-h-72 w-full rounded-lg object-cover sm:max-h-96"
+		/>
 	{/if}
 
 	<!-- Contenu Markdown rendu côté serveur. `html: false` dans markdown.ts
 	     garantit qu'aucune balise brute ne peut être injectée ici. -->
-	<div class="contenu mx-auto mt-8 max-w-2xl">
+	<div class="contenu mx-auto mt-6 max-w-2xl">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html data.corpsHtml}
 	</div>
@@ -122,7 +129,7 @@
 	<!-- Le dossier partagé : ce que les uns et les autres proposent de lire,
 	     voir ou écouter avant la soirée. Volontairement peu formel : un titre,
 	     un lien si on en a un, un mot pour dire pourquoi. -->
-	<section id="sources" class="mx-auto mt-16 max-w-2xl rounded-2xl border border-line bg-surface-alt px-5 py-6 sm:px-8 sm:py-8">
+	<section id="sources" class="mx-auto mt-8 max-w-2xl rounded-2xl border border-line bg-surface-alt px-5 py-5 sm:px-7 sm:py-6">
 		<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Pour préparer la soirée</p>
 		<h2 class="mt-1 text-xl font-extrabold text-ink">Le dossier partagé</h2>
 		<p class="mt-2 text-sm text-ink-soft">
@@ -333,7 +340,7 @@
 	</section>
 {/if}
 
-<section id="commentaires" class="mx-auto mt-16 max-w-2xl border-t border-line pt-10">
+<section id="commentaires" class="mx-auto mt-8 max-w-2xl border-t border-line pt-6">
 	<h2 class="text-xl font-extrabold text-ink">
 		{#if data.commentaires.length === 0}
 			Commentaires
@@ -346,7 +353,7 @@
 	{#if data.commentaires.length}
 		<ul class="mt-6 space-y-6">
 			{#each data.commentaires as commentaire (commentaire.id)}
-				<li class="border-b border-line pb-6 last:border-0">
+				<li class="border-b border-line pb-5 last:border-0">
 					<p class="text-sm font-semibold text-ink">
 						{commentaire.authorName || 'Anonyme'}
 						<span class="ml-2 font-normal text-ink-faint">
@@ -363,7 +370,7 @@
 	{/if}
 
 	{#if data.commentairesOuverts}
-		<h3 class="mt-10 text-lg font-bold text-ink">Réagir</h3>
+		<h3 class="mt-6 text-lg font-bold text-ink">Réagir</h3>
 
 		{#if form?.succes}
 			<p class="mt-4 rounded border border-line bg-surface-alt px-4 py-3 text-sm text-ink">

@@ -11,7 +11,7 @@
 	/>
 </svelte:head>
 
-<header class="border-b border-line pb-6">
+<header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>
 	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Le groupe</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">
@@ -19,7 +19,7 @@
 	</p>
 </header>
 
-<div class="contenu mt-8 max-w-2xl">
+<div class="contenu mt-5 max-w-2xl">
 	<p>
 		Nous sommes des habitantes et habitants du centre de Dijon, réunis pour faire vivre le
 		programme de La France insoumise là où nous vivons : dans les rues, sur les marchés, aux

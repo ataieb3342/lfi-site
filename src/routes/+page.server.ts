@@ -10,9 +10,10 @@ export const load: PageServerLoad = async () => {
 
 	return {
 		articles: articles.map(presentPublication),
+		// `actus` est trié « agenda » : la colonne de droite de l'accueil montre
+		// donc les rendez-vous à venir en tête, avec leur date en étiquette.
 		actus,
-		// Le prochain apéro ouvre le carrousel ; les autres rendez-vous suivent.
-		prochainApero: aperos.find((a) => a.aVenir) ?? null,
-		rendezVous: actus.filter((a) => a.aVenir)
+		// Le prochain apéro ouvre la page, en bandeau.
+		prochainApero: aperos.find((a) => a.aVenir) ?? null
 	};
 };

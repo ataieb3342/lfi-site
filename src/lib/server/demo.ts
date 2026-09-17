@@ -68,7 +68,8 @@ export async function preparerDemoSiNecessaire() {
 	if (countAdmins() > 0) return;
 
 	const adminId = await creerCompteDeTest();
-	remplirContenus(adminId);
+	const imageId = await poserImageDeCouverture(adminId);
+	remplirContenus(adminId, imageId);
 	supprimerJetonInstallation();
 	console.log('[démo] base remplie de contenus fictifs, compte « demo » créé.');
 }
@@ -85,6 +86,41 @@ async function creerCompteDeTest(): Promise<number> {
 	storeTotpSecret(id, generateTotpSecret());
 	confirmTotp(id);
 	return id;
+}
+
+/**
+ * Écrit l'image de démonstration dans le dossier des envois et l'enregistre
+ * comme média, pour que l'article à la une ait une couverture.
+ *
+ * `media.ts` est importé ici et non en tête de fichier : il crée le dossier des
+ * envois à l'import, et `demo.ts` est chargé par toutes les pages pour savoir
+ * si le mode démonstration est actif. Un import dynamique garde cet effet de
+ * bord dans le seul cas où l'on en a besoin.
+ *
+ * Renvoie `null` plutôt que d'interrompre le démarrage si l'écriture échoue :
+ * une démo sans image de couverture reste une démo utilisable.
+ */
+async function poserImageDeCouverture(adminId: number): Promise<number | null> {
+	try {
+		const { UPLOADS_DIR } = await import('./media.ts');
+		const { IMAGE_DEMO, octetsImageDemo } = await import('./demo-image.ts');
+		const { writeFileSync } = await import('node:fs');
+		const { join } = await import('node:path');
+
+		const octets = octetsImageDemo();
+		writeFileSync(join(UPLOADS_DIR, IMAGE_DEMO.filename), octets, { mode: 0o644 });
+
+		const res = db()
+			.prepare(
+				'insert into media (filename, mime, bytes, alt, created_at, uploaded_by) values (?, ?, ?, ?, ?, ?)'
+			)
+			.run(IMAGE_DEMO.filename, IMAGE_DEMO.mime, octets.length, IMAGE_DEMO.alt, now(), adminId);
+
+		return Number(res.lastInsertRowid);
+	} catch (e) {
+		console.warn('[démo] image de couverture non posée :', e);
+		return null;
+	}
 }
 
 /* ------------------------------------------------------------- contenus */
@@ -132,6 +168,8 @@ type Fiche = {
 	publieIlYa: number | (() => number);
 	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
 	actionDans?: number | (() => number);
+	/** Vrai pour la fiche qui reçoit l'image de couverture de la démonstration. */
+	illustree?: true;
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
 	/** Le dossier partagé d'un apéro : un titre, un lien facultatif, un mot. */
 	sources?: { titre: string; lien?: string; note?: string; auteur: string; statut: 'approved' | 'pending' }[];
@@ -409,6 +447,7 @@ Un nouveau rapport sur la desserte ferroviaire de la région est paru. Il confir
 	{
 		kind: 'article',
 		title: 'Pourquoi nous demandons la gratuité des transports pour les moins de 26 ans',
+		illustree: true,
 		summary:
 			'Un abonnement Divia coûte cher à un étudiant ou à un apprenti. Nous proposons une mesure simple, finançable et déjà appliquée ailleurs.',
 		publieIlYa: 4,
@@ -533,7 +572,7 @@ Le plus simple est de venir à une action ou à une permanence. La page [Nous re
 	}
 ];
 
-function remplirContenus(adminId: number) {
+function remplirContenus(adminId: number, imageId: number | null) {
 	const base = db();
 	const auteur = 'Le groupe d’action';
 
@@ -547,7 +586,8 @@ function remplirContenus(adminId: number) {
 				status: 'published',
 				commentsOpen: true,
 				pinned: false,
-				coverMediaId: null,
+				// Une seule fiche est illustrée : celle que `demo-image.ts` désigne.
+				coverMediaId: fiche.illustree ? imageId : null,
 				authorName: auteur,
 				eventAt:
 					fiche.actionDans === undefined

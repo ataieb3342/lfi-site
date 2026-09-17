@@ -363,6 +363,16 @@ h1, h2, h3, h4 {
 }
 .bouton-danger:hover { background: var(--color-accent-soft); }
 
+/* Le premier bloc d'une page ne rajoute jamais sa marge à celle de `<main>`.
+   Sans cette règle, un bandeau posé en tête d'accueil cumulait le `py-6` du
+   conteneur et son propre `mt-6` : quarante-huit pixels de vide sous l'en-tête,
+   alors que les mêmes deux marges sont justes dès qu'il y a quelque chose
+   au-dessus. Les autres pages commencent par un `<header>` sans marge haute,
+   elles ne sont donc pas concernées. */
+main > :first-child {
+	margin-top: 0;
+}
+
 .carte {
 	border: 1px solid var(--color-line);
 	border-radius: 0.625rem;

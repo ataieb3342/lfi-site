@@ -494,15 +494,64 @@ export function detachPendingPdfsFromIpHash(ipHash: string): string[] {
 }
 
 /** Toutes les sources publiées, rassemblées dans la bibliothèque commune. */
-export function listBibliotheque(): SourceForModeration[] {
+/**
+ * Les ressources approuvées de la bibliothèque, paginées.
+ *
+ * La recherche se fait **en SQL** et non dans le navigateur : sans cela elle ne
+ * porterait que sur la page affichée, ce qui est pire que pas de recherche du
+ * tout. `like` sur quelques centaines de lignes est instantané, et le champ
+ * fonctionne alors sans JavaScript.
+ *
+ * `lower()` ne connaît pas les accents en SQLite : « economie » ne trouve donc
+ * pas « économie ». On s'en contente — la seule façon d'y remédier serait
+ * d'ajouter une colonne normalisée et une migration, pour un site dont la
+ * bibliothèque compte quelques dizaines d'entrées.
+ */
+function clauseBibliotheque(recherche: string): { where: string; args: string[] } {
+	const where = [`s.status = 'approved'`, `(s.url != '' or s.pdf_filename is not null)`];
+	const args: string[] = [];
+
+	// Les colonnes fouillées par la recherche : ce qui est affiché sur la ligne,
+	// plus le titre de l'apéro d'où vient la ressource.
+	const colonnes = ['s.title', 's.note', 's.author_name', 's.url', 'p.title'];
+
+	// Chaque mot doit apparaître quelque part : on cherche « boycott vidéo »
+	// comme on le taperait, sans se soucier de l'ordre. Six mots au plus, pour
+	// qu'un copier-coller de paragraphe ne construise pas une requête démesurée.
+	for (const mot of recherche.toLowerCase().split(/\s+/).filter(Boolean).slice(0, 6)) {
+		where.push('(' + colonnes.map((c) => `lower(${c}) like ?`).join(' or ') + ')');
+		// Un paramètre par `?` : le même mot, autant de fois qu'il y a de colonnes.
+		for (const _ of colonnes) args.push(`%${mot}%`);
+	}
+
+	return { where: where.join(' and '), args };
+}
+
+export function countBibliotheque(recherche = ''): number {
+	const { where, args } = clauseBibliotheque(recherche);
+	const ligne = db()
+		.prepare(
+			`select count(*) as n from sources s join publications p on p.id = s.publication_id
+			 where ${where}`
+		)
+		.get(...args) as { n: number };
+	return ligne.n;
+}
+
+export function listBibliotheque({
+	limit = 500,
+	offset = 0,
+	recherche = ''
+}: { limit?: number; offset?: number; recherche?: string } = {}): SourceForModeration[] {
+	const { where, args } = clauseBibliotheque(recherche);
 	return db()
 		.prepare(
 			`select s.*, p.title as publication_title, p.slug as publication_slug, p.kind as publication_kind
 			 from sources s join publications p on p.id = s.publication_id
-			 where s.status = 'approved' and (s.url != '' or s.pdf_filename is not null)
-			 order by s.created_at desc limit 500`
+			 where ${where}
+			 order by s.created_at desc limit ? offset ?`
 		)
-		.all() as SourceForModeration[];
+		.all(...args, limit, offset) as SourceForModeration[];
 }
 
 export function moderateSource(id: number, status: 'approved' | 'rejected', adminId: number) {

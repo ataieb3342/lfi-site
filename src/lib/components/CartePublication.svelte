@@ -14,7 +14,7 @@
 				src={publication.cover.url}
 				alt=""
 				loading="lazy"
-				class="h-32 w-full rounded-lg object-cover sm:h-24 sm:w-36"
+				class="h-24 w-full rounded-lg object-cover sm:w-36"
 			/>
 		</a>
 	{/if}

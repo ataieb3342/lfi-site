@@ -8,11 +8,11 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<header class="border-b border-line pb-6">
+<header class="border-b border-line pb-4">
 	<h1 class="text-3xl font-extrabold text-ink sm:text-4xl">Mentions légales</h1>
 </header>
 
-<div class="contenu mt-8 max-w-2xl">
+<div class="contenu mt-5 max-w-2xl">
 	<p class="rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
 		À COMPLÉTER avant la mise en ligne. La loi pour la confiance dans l'économie numérique
 		(article 6-III) rend ces informations obligatoires, y compris pour un site non commercial.

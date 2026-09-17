@@ -8,14 +8,14 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<header class="border-b border-line pb-6">
+<header class="border-b border-line pb-4">
 	<h1 class="text-3xl font-extrabold text-ink sm:text-4xl">Confidentialité</h1>
 	<p class="mt-2 max-w-2xl text-ink-soft">
 		Ce site est conçu pour en savoir le moins possible sur vous.
 	</p>
 </header>
 
-<div class="contenu mt-8 max-w-2xl">
+<div class="contenu mt-5 max-w-2xl">
 	<h2>Ce que ce site ne fait pas</h2>
 	<ul>
 		<li>Aucun cookie n'est déposé chez les visiteurs.</li>

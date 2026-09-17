@@ -12,6 +12,8 @@ systématiquement la robustesse et la lisibilité sur la sophistication.
 npm run dev      # développement sur http://localhost:5173
 npm run check    # vérification TypeScript + Svelte — À LANCER APRÈS CHAQUE MODIFICATION
 npm run build    # compilation de production
+
+npm run outils:pieds   # regénère le pied de page des outils (voir « La boîte à outils »)
 ```
 
 Il n'y a pas de suite de tests automatisés : `npm run check` et une
@@ -40,7 +42,7 @@ aucun service externe, aucune dépendance native.
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
 | `src/lib/boite-a-outils/` + `src/routes/boite-a-outils/` | Page publique `/boite-a-outils` : les outils interactifs de vulgarisation (voir plus bas) |
-| `src/lib/jeux/` + `src/routes/jeux/` | Les jeux de la bibliothèque, servis tels quels (voir plus bas) |
+| `src/lib/jeux/` + `src/routes/jeux/` | Page publique `/jeux` : les jeux faits maison, servis tels quels (voir plus bas) |
 | `src/lib/fichiers-embarques.ts` | Sert les fichiers des jeux et des modules, avec leur CSP |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
@@ -118,12 +120,63 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 - **Chaque type de publication a sa couleur**, prise aux trois couleurs du
   logo : violet pour les articles, rouge pour les actualités, pourpre pour les
   apéros (`COULEUR_KIND` et `FOND_KIND` dans `format.ts`). Elle sert aux
-  étiquettes des listes et aux surfaces du carrousel : `.fond-degrade`,
+  étiquettes des listes et aux surfaces colorées : `.fond-degrade`,
   `.fond-actu`, `.fond-apero`, construites pareil (fond profond, deux lueurs).
-  Quand la publication a une image de couverture, la diapositive l'affiche en
-  fond, teintée par la surface, pour qu'elle habille sans gêner la lecture.
+  Quand la publication a une image de couverture, le bandeau du prochain apéro
+  l'affiche en fond, teintée par la surface, pour qu'elle habille sans gêner la
+  lecture.
 - `.titre-affiche` est très gras, serré, **en casse normale** : ni italique ni
   majuscules.
+- **Le rythme vertical suit une échelle de quatre valeurs, et pas d'autres.**
+  Chaque page avait les siennes — `mt-8`, `mt-10`, `mt-12`, `mt-14`, `mt-16` —
+  et l'ensemble était à la fois trop aéré et irrégulier : on ne retrouvait pas
+  le même espacement d'une page à l'autre.
+
+  | Usage | Classe |
+  | --- | --- |
+  | Rembourrage de `<main>` | `py-6` |
+  | Sous l'en-tête d'une page | `pb-4` (voir ci-dessous) |
+  | Entre deux sections de premier niveau | `mt-8` |
+  | À l'intérieur d'une section | `mt-5` (ou `mt-6` pour un sous-bloc) |
+
+  Le pied de page n'a **pas** de marge haute : le rembourrage bas de `<main>`
+  fait l'écart, et le passage à une surface sombre marque la rupture à lui seul.
+  Avant d'écrire une cinquième valeur, se demander si l'une des quatre ne
+  conviendrait pas.
+
+  Le principe qui revient partout : **deux marges ne s'additionnent jamais pour
+  un même écart.** Quand un bloc porte déjà sa marge, celui d'à côté n'en met
+  pas — c'est la raison du `main > :first-child` d'`app.css`, du `pt-6` (et non
+  `py-6`) de la grille d'accueil au-dessus du bandeau Action populaire, et du
+  pied de page sans marge.
+- **Quand un bandeau suit l'en-tête, le filet passe dessous.** La surface
+  colorée pose déjà la limite en haut : un trait par-dessus ferait une rayure.
+  C'est en bas qu'il faut détacher le bandeau de la liste qui suit. Les listes
+  de rubrique et la page des apéros n'ont donc pas de `border-b` sur leur
+  `<header>`, mais un conteneur `border-b border-line pb-5` autour du bandeau.
+  Les pages qui commencent par du texte gardent leur filet sous l'en-tête.
+
+  Deux pièges. Le filet va sur un **conteneur**, jamais sur la surface colorée
+  elle-même : elle est arrondie, la bordure s'y dessinerait par-dessus au lieu
+  de faire un trait en dessous. Et sur les actualités, le bandeau Action
+  populaire disparaît quand l'application est désactivée dans les réglages — le
+  filet est donc conditionné par `aBandeau`, sans quoi la page afficherait un
+  trait tout seul. L'accueil, lui, n'a pas de filet : son bandeau ouvre la page
+  et le contenu qui suit a son propre en-tête.
+- **Le premier bloc d'une page n'ajoute pas sa marge haute** à celle de
+  `<main>`. C'est une règle d'`app.css` (`main > :first-child`) et non quelque
+  chose à répéter page par page : sans elle, le bandeau de l'accueil cumulait
+  `py-6` et `mt-6`, soit quarante-huit pixels de vide sous l'en-tête.
+- **Un encart de page est une bande, pas un pavé** (`Encart.svelte`) : une
+  centaine de pixels de haut, un surlignage, un titre de `text-base`, **une
+  seule phrase** et de quoi cliquer. C'est une invitation posée en passant ; à
+  250 pixels de haut, elle repoussait le contenu réel de la page sous la ligne
+  de flottaison et se faisait sauter comme une publicité. Quand on en écrit un,
+  le texte doit tenir sur une ligne à l'écran : trois lignes, c'est déjà trop.
+
+  Le bandeau du prochain apéro (`BandeauApero.svelte`) suit le même gabarit
+  sans passer par `Encart.svelte`, parce que son contenu vient d'une fiche :
+  les retoucher ensemble, sinon l'écart se voit d'une page à l'autre.
 - Boutons en pilule (`rounded-full`), aucun filigrane décoratif, le logo en
   couleur sur fond blanc dans l'en-tête.
 - **Le fond clair n'est pas un blanc pur** (`--color-surface`, un lavande très
@@ -181,9 +234,8 @@ formulaire de publication, le filtre de l'administration et `PAGES_FIXES` du
 plan du site. Le flux RSS et les cartes suivent tout seuls.
 
 La revue de presse **n'est pas dans l'en-tête de bureau** : une cinquième
-rubrique le ferait déborder sur les écrans moyens (même raison que la boîte à
-outils). On y accède par le pied de page, par le menu mobile et par l'encart en
-tête de la liste des articles.
+rubrique le ferait déborder sur les écrans moyens. On y accède par le pied de
+page, par le menu mobile et par l'encart en tête de la liste des articles.
 
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
 actions dont la date n'est pas passée remontent en tête, de la plus proche à la
@@ -217,7 +269,7 @@ l'avance, puis publie un résumé des échanges. Sur le site :
   est dans les réglages (`apero_*`), pas dans le code : changer de bar ne doit
   pas demander de redéploiement. Il est exposé à toutes les pages par
   `+layout.server.ts` sous `data.apero`.
-- Le prochain apéro ouvre le carrousel d'accueil (`prochainApero` dans
+- Le prochain apéro ouvre l'accueil, en bandeau (`prochainApero` dans
   `src/routes/+page.server.ts`), sur la surface pourpre `.fond-apero`. Il est
   aussi dans le flux RSS et dans le plan du site.
 - **Pas de calcul automatique des dates** tous les quinze jours : un apéro
@@ -255,15 +307,36 @@ sont limités à 50 Mo, identifiés par leur signature `%PDF-`, stockés sous un
 aléatoire dans `data/bibliotheque/` et toujours soumis à modération. La personne
 qui propose un PDF doit préciser la licence ou l'autorisation de republication.
 
-La page `/bibliotheque` porte les **ressources** (les sources des apéros) et les
-**jeux**, et s'ouvre sur un encart qui renvoie à la boîte à outils. Les outils
-interactifs ont leur propre page : ils sont appelés à se multiplier, et faire
-tourner un simulateur n'est pas la même chose que consulter un lien. Une version
-antérieure les empilait ici, et la page devenait interminable.
+La page `/bibliotheque` porte **les ressources** — les sources approuvées des
+apéros — et rien d'autre. Les **outils interactifs** (`/boite-a-outils`) et les
+**jeux** (`/jeux`) ont chacun leur page : ils sont appelés à se multiplier, et
+faire tourner un simulateur n'est pas la même chose que consulter un lien. Une
+version antérieure empilait les trois sur la même page, qui devenait
+interminable.
+
+Les deux pages voisines sont atteintes par **deux cartes côte à côte en bas de
+la bibliothèque**, sous « Aussi dans la bibliothèque ». En bas et non en tête :
+on y arrive après avoir parcouru les ressources. C'est pour cela que la
+pagination est courte — voir ci-dessous.
+
+**Les ressources sont paginées**, huit par page (`PAR_PAGE` dans
+`bibliotheque/+page.server.ts`). Le nombre est petit exprès : les deux cartes du
+bas doivent rester visibles sans dérouler la page entière. Le numéro de page est
+**borné aux pages qui existent**, pour que `?page=9` affiche la dernière plutôt
+qu'une liste vide accompagnée d'un « aucune ressource » qui serait faux.
+
+**La recherche se fait en SQL**, pas dans le navigateur (`clauseBibliotheque`
+dans `content.ts`). C'est la pagination qui l'impose : une recherche côté
+navigateur ne porterait que sur les huit lignes affichées, ce qui est pire que
+pas de recherche du tout. Elle passe par l'adresse (`?q=`), donc elle fonctionne
+sans JavaScript et un résultat se partage. Chaque mot doit apparaître quelque
+part, six mots au plus. `lower()` de SQLite ignore les accents : « economie » ne
+trouve pas « économie », et on s'en contente — corriger cela demanderait une
+colonne normalisée et une migration.
 
 **Les ressources sont en liste, pas en cartes** : une ressource est un lien, pas
 un produit en vitrine, et la liste en montre quinze là où la grille en montrait
-quatre. Les jeux, eux, sont en cartes.
+quatre. Les outils et les jeux, eux, sont en cartes.
 
 Les cartes du site — outils comme jeux — **n'ont pas de bouton** : le lien du
 titre est étendu à toute la carte par son `::after`. Un bouton sous chaque carte,
@@ -279,7 +352,7 @@ navigateur**, sur les données déjà chargées — titre, note, auteur, nom du 
 et titre de l'apéro, plus le mot « pdf » pour les documents. La comparaison se
 fait en minuscules et sans accents des deux côtés, sinon « economie » ne
 trouverait pas « économie ». Le champ n'est affiché **que si le script est
-actif** (motif `scriptActif`, comme dans le carrousel) : sans JavaScript, la
+actif** (motif `scriptActif`) : sans JavaScript, la
 liste complète reste visible et aucun champ ne promet ce qu'il ne peut pas
 faire.
 
@@ -290,51 +363,57 @@ la suppression d'un apéro nettoie les PDF de ses sources. Le serveur accepte de
 requêtes de 60 Mo afin de laisser une marge au formulaire, mais le contrôle
 applicatif reste fixé à 50 Mo.
 
-## Le carrousel d'accueil
+## L'accueil
 
-`src/lib/components/CarrouselAccueil.svelte`. Cinq sortes de diapositives,
-dans cet ordre : le prochain apéro thématique (s'il est annoncé, sur la surface
-pourpre `.fond-apero`), l'identité du groupe, les prochaines actions (les
-actualités dont la date n'est pas passée, trois au plus, alimentées
-automatiquement), les ressources (bibliothèque et boîte à outils, deux pages
-absentes de l'en-tête de bureau), et la bulle Action populaire. Les deux
-dernières sont des `Encart` en mode `hauteurPleine`.
+L'accueil s'ouvrait sur un **carrousel** de sept diapositives de 425 pixels :
+un écran entier de surface colorée avant le premier article. Il a été retiré, et
+`CarrouselAccueil.svelte` avec lui. La raison n'était pas seulement sa hauteur :
+six diapositives sur sept répétaient ce qui se trouvait déjà ailleurs sur la même
+page ou dans l'en-tête — l'identité du groupe est dans l'en-tête, le pied de page
+et « Le groupe » ; les prochaines actions sont dans la colonne « Actualités » de
+l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
+`agenda`) ; la bibliothèque est dans l'en-tête.
 
-La diapositive des ressources vient **après** les actions et non juste après
-l'identité : les deux sont sur la surface violette, et deux diapositives de la
-même couleur qui se suivent se confondent. L'apéro passe devant l'identité
-parce que c'est le rendez-vous récurrent, le plus concret pour un visiteur, et
-qu'il change toutes les deux semaines : l'accueil a toujours l'air vivant.
+La page tient donc en quatre blocs, de haut en bas :
 
-Le défilement repose sur `scroll-snap` du navigateur, pas sur du JavaScript :
-sans script, on fait glisser au doigt et tout fonctionne. Le JavaScript n'ajoute
-que les flèches, les pastilles et leur synchronisation.
+1. **Le prochain apéro**, en bandeau (`BandeauApero.svelte`, surface pourpre
+   `.fond-apero`) : c'est la seule chose qui ne figure nulle part ailleurs sur
+   cette page, il change toutes les deux semaines, et c'est le rendez-vous le
+   plus concret pour quelqu'un qui découvre le groupe. Masqué s'il n'y a pas
+   d'apéro annoncé.
+2. **L'article à la une**, puis les articles récents.
+3. **La colonne « Actualités »**, rendez-vous à venir en tête.
+4. **Le bandeau Action populaire**, tout en bas — jamais en tête : on propose
+   d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
+   arrive.
 
-Deux règles à ne pas casser :
+`BandeauApero.svelte` n'est pas construit sur `Encart.svelte` : celui-ci porte un
+texte fixe, alors qu'ici la date, le lieu et l'image de couverture viennent de la
+fiche de l'apéro. Les deux suivent en revanche **le même gabarit** — même
+rembourrage, même taille de titre, même marge — pour qu'un visiteur ne voie
+qu'une seule sorte de bandeau sur tout le site. Retoucher l'un sans l'autre se
+remarque immédiatement.
 
-- **Pas de défilement automatique.** Une diapositive qui bouge seule fait perdre
-  sa place à qui lit lentement, gêne les lecteurs d'écran et provoque des clics
-  involontaires sur mobile.
-- **Une diapositive fait exactement la largeur de la piste**, calée à gauche
-  (`snap-start`, sans `gap`). Avec un espacement ou un calage centré, la position
-  d'arrêt devient ambiguë et le navigateur ouvre la page sur la mauvaise
-  diapositive — c'est arrivé pendant le développement.
-- **`w-full` et non `min-w-full` sur la diapositive.** `min-w-full` n'impose
-  qu'une largeur *minimale* : combinée à `shrink-0`, la diapositive s'élargit
-  jusqu'à la largeur de son contenu (le titre sur une seule ligne) et déborde de
-  l'écran sur mobile. Le défaut est invisible sur grand écran, où le contenu tient
-  déjà dans la largeur disponible.
+Si l'on remet un jour un carrousel, se souvenir de ce qui l'avait rendu pénible :
+il faut alors du `scroll-snap` et non du JavaScript (sans script, on doit pouvoir
+faire glisser au doigt), **pas de défilement automatique** (une diapositive qui
+bouge seule fait perdre sa place à qui lit lentement, gêne les lecteurs d'écran
+et provoque des clics involontaires sur mobile), une diapositive exactement à la
+largeur de la piste et calée à gauche (`snap-start`, sans `gap`, sinon le
+navigateur ouvre la page sur la mauvaise diapositive), et `w-full` plutôt que
+`min-w-full` (qui, avec `shrink-0`, laisse la diapositive s'élargir jusqu'à son
+contenu et déborder sur mobile).
 
 ## Le bandeau Action populaire
 
-Affiché en tête de la liste des actualités et au bas de chaque actualité — pas
-ailleurs : c'est là que le visiteur cherche les prochains rendez-vous, donc le
-moment où proposer l'application a du sens. Pour l'étendre à tout le site,
-déplacer le composant dans `src/routes/+layout.svelte`, juste avant le
-`<footer>`.
+Affiché en tête de la liste des actualités, au bas de chaque actualité et au bas
+de l'accueil — pas ailleurs : c'est là que le visiteur cherche les prochains
+rendez-vous, donc le moment où proposer l'application a du sens. Sur l'accueil il
+est **tout en bas**, jamais en tête. Pour l'étendre à tout le site, déplacer le
+composant dans `src/routes/+layout.svelte`, juste avant le `<footer>`.
 
-C'est un `Encart` ordinaire, au même gabarit que ceux de la bibliothèque, des
-articles et de la revue de presse — mais il porte les couleurs de l'application
+C'est un `Encart` ordinaire, au même gabarit que ceux des articles et de la revue
+de presse — mais il porte les couleurs de l'application
 (jaune `#f0e80d`, bleu nuit `#0b0b33`) et non celles du site, écrites en dur
 plutôt que prises dans les jetons : elles ne doivent bouger ni avec le thème
 sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu — c'est ce qui
@@ -352,11 +431,17 @@ plutôt que d'afficher des boutons morts.
 ## Les encarts d'appel
 
 `src/lib/components/Encart.svelte` est le gabarit **unique** des invitations
-posées en tête d'une page : la boîte à outils depuis la bibliothèque, la
-bibliothèque depuis la revue de presse, la revue de presse depuis les articles,
-Action populaire depuis les actualités, et deux diapositives du carrousel. Ils
-avaient chacun leur mise en page ; d'une page à l'autre, le visiteur ne
-reconnaissait pas qu'il s'agissait de la même chose.
+posées en tête d'une page : la bibliothèque depuis la revue de presse, la revue
+de presse depuis les articles, Action populaire depuis les actualités et le bas
+de l'accueil. Ils avaient chacun leur mise en page ; d'une page à l'autre, le
+visiteur ne reconnaissait pas qu'il s'agissait de la même chose.
+
+**Un encart annonce toujours une autre page.** Posé en tête d'une page pour
+vanter une section de cette même page, il a le gabarit du bandeau Action
+populaire : le visiteur le lit comme une publicité et le saute, et le contenu
+réel de la page part sous la ligne de flottaison. C'est ce qui arrivait à la
+boîte à outils annoncée depuis la bibliothèque, avant qu'elle n'y devienne une
+section ordinaire.
 
 Un encart est une surface colorée (`.fond-degrade`, `.fond-actu`, `.fond-apero`,
 ou un `style` en dur pour Action populaire), un surlignage en petites capitales,
@@ -375,8 +460,7 @@ publication précise, sinon il faut le modifier à chaque publication.
 
 **Une page n'a qu'un seul pavé coloré.** La page des apéros en a déjà un en tête
 (le prochain apéro) : son renvoi vers la bibliothèque est donc un simple lien en
-fin de page, comme celui de la boîte à outils vers la bibliothèque. Deux
-surfaces colorées sur la même page se font concurrence.
+fin de page. Deux surfaces colorées sur la même page se font concurrence.
 
 ## Le logo
 
@@ -409,19 +493,23 @@ texte tapé restent en place.
 ## L'en-tête
 
 La navigation de bureau se limite à quatre rubriques de contenu (Actualités,
-Articles, Apéros, Bibliothèque) et un bouton « Nous rejoindre ». Le logo ramène
+Articles, Apéros, Bibliothèque — qui couvre les outils, les lectures et les
+jeux) et un bouton « Nous rejoindre ». Le logo ramène
 à l'accueil ; « Le groupe » est dans le pied de page. Le menu mobile, lui,
 liste tout (`liensMobile` dans `src/routes/+layout.svelte`). Ajouter un lien
 dans l'en-tête de bureau le fait déborder sur les écrans moyens : préférer le
 pied de page ou le menu mobile.
 
-## Les jeux de la bibliothèque
+## Les jeux
 
-La page `/bibliotheque` montre, sous les sources approuvées, quelques jeux faits
-maison. Chaque jeu est un dossier de `src/lib/jeux/` (un `index.html`, un
-`game.js`, un `style.css`, en JavaScript simple, sans dépendance), et une ligne
-dans `src/lib/jeux.ts` (dossier, titre, description). Un dossier absent de cette
-liste n'est pas servi.
+`/jeux` montre quelques jeux faits maison. Chaque jeu est un dossier de
+`src/lib/jeux/` (un `index.html`, un `game.js`, un `style.css`, en JavaScript
+simple, sans dépendance), et une ligne dans `src/lib/jeux.ts` (dossier, titre,
+description). Un dossier absent de cette liste n'est pas servi.
+
+Même mécanique et même place dans le site que la boîte à outils : une page à
+part, hors de l'en-tête de bureau, atteinte par la carte en bas de la
+bibliothèque, par le pied de page et par le menu mobile.
 
 Les fichiers sont lus **à la compilation** (`import.meta.glob` avec `?raw` dans
 `src/lib/fichiers-embarques.ts`, partagé avec la boîte à outils) et
@@ -446,12 +534,12 @@ Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
 
 ## La boîte à outils
 
-`/boite-a-outils` rassemble des outils interactifs de vulgarisation : le visiteur
-entre son salaire ou son patrimoine, et voit ce que les chiffres publics disent
-de sa situation. Même mécanique que les jeux, mais dans `src/lib/boite-a-outils/`
-et listés dans `src/lib/boite-a-outils.ts`. Chaque outil vit à
-`/boite-a-outils/<dossier>/` et son script s'appelle `outil.js` (et non
-`game.js`).
+La boîte à outils rassemble des outils interactifs de vulgarisation : le
+visiteur entre son salaire ou son patrimoine, et voit ce que les chiffres publics
+disent de sa situation. Même mécanique que les jeux, mais dans
+`src/lib/boite-a-outils/` et listés dans `src/lib/boite-a-outils.ts`. Chaque
+outil vit à `/boite-a-outils/<dossier>/` et son script s'appelle `outil.js` (et
+non `game.js`).
 
 C'est **une page à part entière**, pas une section de la bibliothèque : ils sont
 appelés à devenir nombreux, et ce sont des outils d'argumentation pour la
@@ -459,17 +547,54 @@ campagne, pas des distractions. C'est aussi pourquoi ils ne sont pas servis sous
 `/jeux/` : l'adresse d'une page se partage, et `/jeux/qui-paie-vraiment`
 décrédibiliserait l'outil avant même qu'on l'ouvre.
 
-La page **n'est pas dans l'en-tête de bureau** — une cinquième rubrique le ferait
-déborder sur les écrans moyens. On y accède par le pied de page, par le menu
-mobile (qui liste tout) et par l'encart en tête de la bibliothèque.
+### Le parcours
+
+Les trois maillons — comment on entre, comment on choisit, ce qu'on fait ensuite
+— ont été repris ensemble ; les traiter séparément avait produit un annuaire
+sans entrée ni sortie.
+
+- **On entre** par la carte en bas de la bibliothèque, par le pied de page ou
+  par le menu mobile. La page n'est pas dans l'en-tête de bureau : une cinquième
+  rubrique le ferait déborder sur les écrans moyens.
+- **On choisit** : deux outils sont mis en avant sous « Pour commencer »
+  (`enAvant: true` dans `OUTILS`, avec une `accroche` plus longue que la
+  description). Onze cartes égales ne disent pas par où entrer. Ils sont
+  choisis pour être les plus contre-intuitifs — un sur soi, un sur le pays — et
+  `rubriquesGarnies()` les **retire de leur rubrique** : les revoir dix
+  centimètres plus bas se lit comme un bug.
+- **On ressort** par le pied de page de l'outil (voir plus bas). Avant, la page
+  s'arrêtait sur ses sources : on avait fait le calcul, on était convaincu, et
+  on fermait l'onglet.
 
 Les outils sont groupés en **rubriques** (`RUBRIQUES` dans `boite-a-outils.ts`,
-chaque outil portant un champ `rubrique`). Elles existent pour que la page reste
-lisible quand il y en aura vingt : une liste de vingt cartes ne se lit pas. Une
-rubrique sans outil n'est pas affichée, on peut donc en déclarer une à l'avance.
-Le `satisfies` sur `OUTILS` fait échouer `npm run check` si un outil pointe vers
-une rubrique qui n'existe pas — une faute de frappe est attrapée à la
-compilation, pas par un trou dans la page.
+chaque outil portant un champ `rubrique`). Elles sont **deux** et ne doivent pas
+se multiplier : la première version en comptait cinq pour onze outils, dont
+trois n'avaient qu'un seul outil, si bien que la page affichait plus de titres de
+rubrique que de contenu. Le partage retenu est celui que fait le visiteur
+lui-même — « est-ce que ça parle de moi, ou du pays ? ». Une rubrique sans outil
+n'est pas affichée, on peut donc en déclarer une à l'avance. Le `satisfies` sur
+`OUTILS` fait échouer `npm run check` si un outil pointe vers une rubrique qui
+n'existe pas — une faute de frappe est attrapée à la compilation, pas par un trou
+dans la page.
+
+### Le pied de page d'un outil
+
+Sous les sources, chaque outil porte un `<nav class="suite">` : une phrase qui
+invite à se servir du calcul, **deux outils pour enchaîner**, et une ligne de
+liens vers la bibliothèque, les apéros et « Nous rejoindre ».
+
+Ces pages sont du HTML statique servi tel quel : elles ne peuvent rien calculer
+à l'affichage et n'ont pas accès à `boite-a-outils.ts`. Le pied est donc **écrit
+par un script**, entre deux marqueurs `<!-- pied -->` / `<!-- /pied -->` :
+
+```bash
+npm run outils:pieds   # après tout ajout, retrait ou renommage d'un outil
+```
+
+Il est idempotent et ne touche à rien d'autre dans le fichier. Les outils
+proposés viennent d'`outilsSuivants()`, qui tourne sur la rubrique : après le
+dernier on revient au premier, donc personne ne tombe sur une fin. **Ne pas
+modifier un pied à la main** : la prochaine exécution du script l'écrasera.
 
 Quatre règles, dont la première n'est pas négociable :
 
@@ -546,6 +671,16 @@ Render (`render.yaml`, `DEMO.md`) et ne doit jamais être activé en production.
 Les contenus fictifs sont dans le tableau `FICHES` de ce fichier ; les dates
 d'action sont relatives au jour du démarrage, pour qu'il y ait toujours des
 actions « à venir ».
+
+La fiche portant `illustree: true` reçoit une **image de couverture**, encodée
+en base64 dans `demo-image.ts`. Elle est dans le code et non dans
+`data/uploads/` parce que ce dossier est le stockage du site en fonctionnement :
+il est dans `.gitignore` et n'existe pas au démarrage d'un conteneur neuf. Sur
+Render, la démo repart d'une base vide à chaque déploiement — sans cette copie,
+l'article à la une y serait sans illustration. Même raisonnement que pour les
+jeux et les outils : ce qui doit survivre au déploiement vit dans le dépôt, pas
+dans les données. **Le vrai site n'a rien à faire ici** : il reçoit ses images
+par Administration → Médias.
 
 ## Déploiement
 

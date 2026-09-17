@@ -32,7 +32,7 @@
 	/>
 </svelte:head>
 
-<header class="border-b border-line pb-6">
+<header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>
 	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Nous rejoindre</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">
@@ -41,7 +41,7 @@
 	</p>
 </header>
 
-<ol class="mt-8 grid gap-5 sm:grid-cols-3">
+<ol class="mt-5 grid gap-4 sm:grid-cols-3">
 	{#each etapes as etape, i (etape.titre)}
 		<li class="flex flex-col rounded-2xl border border-line bg-carte p-6">
 			<span
@@ -62,7 +62,7 @@
 	{/each}
 </ol>
 
-<div class="contenu mt-12 max-w-2xl">
+<div class="contenu mt-8 max-w-2xl">
 	<h2>Ce que ça implique — et ce que ça n'implique pas</h2>
 	<p>
 		Militer dans un groupe d'action, c'est venir quand on peut. Certains membres sont là chaque

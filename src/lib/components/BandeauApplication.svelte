@@ -3,15 +3,18 @@
 
 	/**
 	 * Invitation à installer Action populaire, la plateforme de mobilisation du
-	 * mouvement, affichée en tête de la liste des actualités et au bas de chaque
-	 * actualité : c'est là que le visiteur vient chercher les prochains
-	 * rendez-vous, donc le moment où lui proposer l'application a du sens.
+	 * mouvement, affichée en tête de la liste des actualités, au bas de chaque
+	 * actualité et au bas de l'accueil : c'est là que le visiteur vient chercher
+	 * les prochains rendez-vous, donc le moment où lui proposer l'application a
+	 * du sens. Sur l'accueil il est tout en bas, jamais en tête : on propose
+	 * d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
+	 * arrive.
 	 *
-	 * C'est un encart ordinaire (voir Encart.svelte), au même gabarit que ceux
-	 * de la bibliothèque, des articles et de la revue de presse — mais il garde les couleurs
-	 * de l'application (jaune et bleu nuit) et non celles du site. C'est
-	 * délibéré : il renvoie vers un autre produit, et ce contraste avec le reste
-	 * de la page le fait remarquer.
+	 * C'est un encart ordinaire (voir Encart.svelte), au même gabarit que ceux des
+	 * articles et de la revue de presse — mais il garde les couleurs de
+	 * l'application (jaune et bleu nuit) et non celles du site. C'est délibéré :
+	 * il renvoie vers un autre produit, et ce contraste avec le reste de la page
+	 * le fait remarquer.
 	 *
 	 * Ces deux couleurs sont écrites en dur plutôt que prises dans les jetons du
 	 * site : elles ne doivent changer ni avec le thème sombre, ni si l'on
@@ -24,11 +27,8 @@
 	let {
 		actif = true,
 		android = '',
-		ios = '',
-		/** Faux quand le bandeau sert de diapositive : il perd sa marge et remplit
-		    la hauteur de la diapositive. */
-		autonome = true
-	}: { actif?: boolean; android?: string; ios?: string; autonome?: boolean } = $props();
+		ios = ''
+	}: { actif?: boolean; android?: string; ios?: string } = $props();
 
 	const SITE = 'https://actionpopulaire.fr';
 
@@ -44,11 +44,9 @@
 	<Encart
 		sureligne="Action populaire"
 		titre="Toutes nos actions dans votre poche"
-		texte="La plateforme du mouvement rassemble les événements près de chez vous et les groupes d'action de votre ville. De quoi participer sans dépendre des réseaux sociaux."
+		texte="Les événements et les groupes d'action près de chez vous, sans passer par les réseaux sociaux."
 		surface=""
 		style="background-color: #f0e80d; color: #0b0b33;"
-		{autonome}
-		hauteurPleine={!autonome}
 	>
 		{#snippet icone()}
 			<!-- L'épingle de l'application, en petit et en pleines couleurs : c'est

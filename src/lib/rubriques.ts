@@ -35,7 +35,7 @@ export const CHAPO_RUBRIQUE: Record<Rubrique, string> = {
 /**
  * Petites capitales affichées au-dessus du titre d'une rubrique, dans la
  * couleur du type de publication (`COULEUR_KIND` de format.ts). Les pages
- * fixes — bibliothèque, boîte à outils, apéros — en ont une depuis toujours ;
+ * fixes — bibliothèque, apéros — en ont une depuis toujours ;
  * les rubriques la reprennent pour que toutes les en-têtes se ressemblent et
  * que chaque rubrique porte sa couleur dès le premier coup d'œil.
  */
