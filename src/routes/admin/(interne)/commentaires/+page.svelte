@@ -87,7 +87,7 @@
 {/if}
 
 {#if data.bloquees.length}
-	<section class="mt-12">
+	<section class="mt-10">
 		<h2 class="text-lg font-extrabold text-ink">Origines bloquées</h2>
 		<p class="mt-1 text-sm text-ink-soft">
 			Ces empreintes ne peuvent plus déposer de commentaire. Une empreinte correspond à une adresse

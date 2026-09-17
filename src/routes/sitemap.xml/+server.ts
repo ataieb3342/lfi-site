@@ -12,6 +12,7 @@ const PAGES_FIXES = [
 	'/revue-de-presse',
 	'/bibliotheque',
 	'/boite-a-outils',
+	'/jeux',
 	'/le-groupe',
 	'/nous-rejoindre',
 	'/mentions-legales',

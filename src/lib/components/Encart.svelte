@@ -3,9 +3,13 @@
 
 	/**
 	 * Encart d'appel : le gabarit unique des invitations posées en tête ou en bas
-	 * d'une page — la boîte à outils depuis la bibliothèque, la bibliothèque
-	 * depuis les apéros, la revue de presse depuis les articles, Action populaire
-	 * depuis les actualités.
+	 * d'une page — la bibliothèque depuis les apéros, la revue de presse depuis
+	 * les articles, Action populaire depuis les actualités.
+	 *
+	 * Il annonce toujours une **autre** page. Un encart posé en tête d'une page
+	 * pour vanter une section de cette même page se lit comme une publicité, et
+	 * se saute : c'est ce qui arrivait à la boîte à outils, qui est aujourd'hui
+	 * une section ordinaire de la bibliothèque.
 	 *
 	 * Ils avaient chacun leur mise en page ; d'une page à l'autre, le visiteur ne
 	 * reconnaissait pas qu'il s'agissait de la même chose. Le gabarit est donc
@@ -30,10 +34,6 @@
 		href = '',
 		surface = 'fond-degrade',
 		style = '',
-		/** Faux quand l'encart est déjà placé par sa page : il perd sa marge haute. */
-		autonome = true,
-		/** Vrai quand il sert de diapositive de carrousel : il remplit la hauteur. */
-		hauteurPleine = false,
 		/** Petit logo affiché devant le surlignage. */
 		icone,
 		/** Boutons, à droite sur grand écran. */
@@ -45,28 +45,22 @@
 		href?: string;
 		surface?: string;
 		style?: string;
-		autonome?: boolean;
-		hauteurPleine?: boolean;
 		icone?: Snippet;
 		actions?: Snippet;
 	} = $props();
 </script>
 
 <section
-	class="{surface} relative overflow-hidden rounded-2xl px-6 py-8 sm:px-10 sm:py-10
-		{autonome ? 'mt-12' : ''}
-		{hauteurPleine ? 'flex h-full flex-col justify-center' : ''}"
+	class="{surface} relative mt-6 overflow-hidden rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4"
 	{style}
 >
-	<div class="relative grid gap-6 sm:items-center {actions ? 'sm:grid-cols-[1fr_auto]' : ''}">
+	<div class="relative grid gap-3 sm:items-center {actions ? 'sm:grid-cols-[1fr_auto]' : ''}">
 		<div>
-			<p class="flex items-center gap-2.5 text-xs font-bold tracking-[0.2em] uppercase opacity-80">
+			<p class="flex items-center gap-2 text-[0.6875rem] font-bold tracking-[0.18em] uppercase opacity-75">
 				{#if icone}{@render icone()}{/if}
 				{sureligne}
 			</p>
-			<!-- En diapositive de carrousel, le titre est monté d'un cran : à côté
-			     des autres diapositives, il paraissait sinon timide. -->
-			<h2 class="titre-affiche mt-2 {hauteurPleine ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}">
+			<h2 class="titre-affiche mt-1 text-base sm:text-lg">
 				{#if href}
 					<!-- Le lien du titre est étendu à tout l'encart par son ::after :
 					     toute la surface est cliquable, sans bouton supplémentaire. -->
@@ -75,14 +69,17 @@
 					{titre}
 				{/if}
 			</h2>
+			<!-- Une seule phrase, en petit : l'encart doit tenir en trois lignes.
+			     Un paragraphe de quatre lignes en faisait un pavé que le visiteur
+			     sautait pour aller au contenu réel de la page. -->
 			{#if texte}
-				<p class="mt-3 max-w-xl leading-relaxed opacity-85">{texte}</p>
+				<p class="mt-1 max-w-2xl text-sm leading-snug opacity-85">{texte}</p>
 			{/if}
 		</div>
 
 		{#if actions}
 			<!-- `relative` pour passer devant le ::after d'un éventuel lien étendu. -->
-			<div class="relative flex flex-wrap gap-3">
+			<div class="relative flex flex-wrap gap-2">
 				{@render actions()}
 			</div>
 		{/if}

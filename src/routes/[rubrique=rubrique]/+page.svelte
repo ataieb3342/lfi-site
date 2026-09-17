@@ -11,6 +11,16 @@
 	const titre = $derived(TITRE_RUBRIQUE[data.rubrique]);
 	// La couleur du type de publication, portée par le surlignage de l'en-tête.
 	const couleur = $derived(COULEUR_KIND[KIND_PAR_RUBRIQUE[data.rubrique]]);
+
+	// Les trois rubriques listées ici ont un bandeau, sauf les actualités quand
+	// l'application est désactivée dans les réglages. Le filet qui ferme le
+	// bandeau est donc conditionnel : sans cela, la page des actualités
+	// afficherait un trait tout seul sous son en-tête.
+	const aBandeau = $derived(
+		data.rubrique === 'articles' ||
+			data.rubrique === 'revue-de-presse' ||
+			(data.rubrique === 'actualites' && data.app.actif)
+	);
 </script>
 
 <svelte:head>
@@ -18,49 +28,54 @@
 	<meta name="description" content={CHAPO_RUBRIQUE[data.rubrique]} />
 </svelte:head>
 
-<header class="border-b border-line pb-6">
+<!-- Pas de filet sous cet en-tête : le bandeau qui suit est une surface
+     colorée, il pose déjà la limite. Deux traits l'un sur l'autre font une
+     rayure. Les pages qui commencent par du texte, elles, gardent leur filet. -->
+<header>
 	<p class="text-xs font-bold tracking-[0.2em] uppercase {couleur}">{SURLIGNE_RUBRIQUE[data.rubrique]}</p>
 	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">{titre}</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">{CHAPO_RUBRIQUE[data.rubrique]}</p>
 </header>
 
-<!-- L'encart de la rubrique est en tête, comme celui de la bibliothèque : c'est
-     une invitation, et une invitation placée après quinze publications et une
-     pagination n'est jamais vue. Tous au même gabarit (voir Encart.svelte) : le
-     bandeau Action populaire en jaune sur les actualités, la revue de presse
-     sur les articles, la bibliothèque sur la revue de presse. -->
-{#if data.rubrique === 'actualites'}
-	<BandeauApplication
-		actif={data.app.actif}
-		android={data.app.android}
-		ios={data.app.ios}
-	/>
-{:else if data.rubrique === 'articles'}
-	<Encart
-		sureligne="Ce que nous lisons ailleurs"
-		titre="La revue de presse"
-		texte="Les articles de la semaine que nous avons retenus, avec ce que nous en pensons et pourquoi ils comptent pour Dijon. Une sélection commentée, pas un agrégateur."
-		href="/revue-de-presse"
-	/>
-{:else if data.rubrique === 'revue-de-presse'}
-	<Encart
-		sureligne="Aller plus loin"
-		titre="La bibliothèque"
-		texte="Livres, vidéos et documents partagés autour de nos apéros, relus avant publication — de quoi creuser un sujet au-delà de l'actualité de la semaine."
-		href="/bibliotheque"
-		surface="fond-apero"
-	/>
-{/if}
+<!-- L'encart de la rubrique est en tête : c'est une invitation, et une
+     invitation placée après quinze publications et une pagination n'est jamais
+     vue. Tous au même gabarit (voir Encart.svelte) : le bandeau Action
+     populaire en jaune sur les actualités, la revue de presse sur les articles,
+     la bibliothèque sur la revue de presse.
+
+     Le filet est en dessous et non au-dessus : le bandeau est une surface
+     colorée, il n'a pas besoin qu'on le sépare de l'en-tête, mais il faut le
+     détacher de la liste qui suit. -->
+<div class={aBandeau ? 'border-b border-line pb-5' : ''}>
+	{#if data.rubrique === 'actualites'}
+		<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />
+	{:else if data.rubrique === 'articles'}
+		<Encart
+			sureligne="Ce que nous lisons ailleurs"
+			titre="La revue de presse"
+			texte="Ce que nous avons lu ailleurs cette semaine, et ce que nous en retenons."
+			href="/revue-de-presse"
+		/>
+	{:else if data.rubrique === 'revue-de-presse'}
+		<Encart
+			sureligne="Aller plus loin"
+			titre="La bibliothèque"
+			texte="Des outils pour comprendre les chiffres, et les lectures partagées autour de nos apéros."
+			href="/bibliotheque"
+			surface="fond-apero"
+		/>
+	{/if}
+</div>
 
 {#if data.publications.length}
-	<div class="mt-8 space-y-6">
+	<div class="mt-5 space-y-5">
 		{#each data.publications as publication (publication.id)}
 			<CartePublication {publication} avecImage={data.rubrique === 'articles'} />
 		{/each}
 	</div>
 
 	{#if data.pages > 1}
-		<nav class="mt-10 flex items-center justify-between" aria-label="Pagination">
+		<nav class="mt-6 flex items-center justify-between" aria-label="Pagination">
 			{#if data.page > 1}
 				<a
 					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
@@ -81,5 +96,5 @@
 		</nav>
 	{/if}
 {:else}
-	<p class="mt-8 text-ink-soft">Rien à afficher pour le moment.</p>
+	<p class="mt-5 text-ink-soft">Rien à afficher pour le moment.</p>
 {/if}

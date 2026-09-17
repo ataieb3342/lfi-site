@@ -395,3 +395,100 @@ button.bouton {
 	margin-top: 1.5rem;
 	font-size: 0.95rem;
 }
+
+/*
+ * Le pied de page : de quoi enchaîner sur un autre outil, et de quoi faire
+ * quelque chose de ce qu'on vient de lire. Il est écrit par
+ * `scripts/pieds-outils.js` — voir la note dans `src/lib/boite-a-outils.ts`.
+ *
+ * Il est volontairement sobre : après les sources et les avertissements, une
+ * grande surface colorée ferait publicité. Un filet, deux liens en cartes, une
+ * ligne de liens.
+ */
+.suite {
+	margin-top: 2.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--line);
+}
+
+.suite h2 {
+	margin: 0;
+	font-size: 1.15rem;
+}
+
+.suite-intro {
+	margin: 0.5rem 0 0;
+	max-width: 44rem;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	color: var(--ink-soft);
+}
+
+.suite-liste {
+	display: grid;
+	gap: 0.75rem;
+	margin: 1.25rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+@media (min-width: 40rem) {
+	.suite-liste {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.suite-liste a {
+	display: block;
+	height: 100%;
+	padding: 0.9rem 1rem;
+	border: 1px solid var(--line);
+	border-radius: 0.625rem;
+	background: var(--carte);
+	text-decoration: none;
+	color: inherit;
+}
+
+.suite-liste a:hover {
+	border-color: var(--accent);
+}
+
+.suite-titre {
+	display: block;
+	font-weight: 800;
+	color: var(--ink);
+}
+
+.suite-note {
+	display: block;
+	margin-top: 0.2rem;
+	font-size: 0.85rem;
+	color: var(--ink-soft);
+}
+
+/* Les liens vers le reste du site, séparés par un point médian tracé en CSS :
+   rien à écrire dans le HTML généré, et rien à lire pour un lecteur d'écran. */
+.suite-liens {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 0.9rem;
+	margin: 1.25rem 0 0;
+	font-size: 0.9rem;
+}
+
+.suite-liens a {
+	color: var(--rubrique);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.suite-liens a:hover {
+	text-decoration: underline;
+}
+
+.suite-liens a + a::before {
+	content: '·';
+	margin-right: 0.9rem;
+	color: var(--ink-faint);
+	font-weight: 400;
+}

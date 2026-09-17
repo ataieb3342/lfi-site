@@ -1,5 +1,6 @@
 <script lang="ts">
-	import CarrouselAccueil from '$lib/components/CarrouselAccueil.svelte';
+	import BandeauApero from '$lib/components/BandeauApero.svelte';
+	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import { formatDate, formatDateCourte } from '$lib/format';
 	import type { PageData } from './$types';
@@ -15,29 +16,57 @@
 	<meta name="description" content={data.settings.description} />
 </svelte:head>
 
-<CarrouselAccueil
-	siteName={data.settings.siteName}
-	tagline={data.settings.tagline}
-	description={data.settings.description}
-	actions={data.rendezVous}
-	apero={data.prochainApero}
-	cadreApero={data.apero}
-	app={data.app}
-/>
+<!--
+	L'accueil s'ouvrait sur un carrousel de sept diapositives de 425 pixels : un
+	écran entier avant le premier article. Six de ces sept diapositives
+	répétaient ce qui était déjà ailleurs — l'identité du groupe est dans
+	l'en-tête et le pied de page, les prochaines actions sont dans la colonne
+	« Actualités » ci-dessous, la bibliothèque est dans l'en-tête.
+
+	Reste ce qui ne figure nulle part ailleurs sur cette page : le prochain
+	apéro, en bandeau tout en haut parce qu'il change toutes les deux semaines et
+	que c'est le rendez-vous le plus concret pour un visiteur, et l'application,
+	en bandeau tout en bas — on propose d'installer quelque chose à quelqu'un qui
+	a lu la page, pas à quelqu'un qui arrive.
+-->
+{#if data.prochainApero}
+	<BandeauApero apero={data.prochainApero} cadre={data.apero} />
+{/if}
 
 {#if une}
-	<section class="border-b border-line py-10">
+	<section class="border-b border-line py-6">
 		<h2 class="sr-only">À la une</h2>
 		<a href="/articles/{une.slug}" class="group grid gap-6 sm:grid-cols-2 sm:items-center">
+			<!-- Format plus large sur téléphone : là, la grille passe en une seule
+			     colonne et l'image occupe toute la largeur. En 16/10 elle mangeait
+			     un quart de l'écran avant même le titre ; en 21/9 elle fait une
+			     bande, qui illustre sans repousser le texte hors de vue. -->
 			{#if une.cover}
-				<img src={une.cover.url} alt={une.cover.alt} class="aspect-[16/10] w-full rounded-lg object-cover" />
+				<img
+					src={une.cover.url}
+					alt={une.cover.alt}
+					class="aspect-[21/9] w-full rounded-lg object-cover sm:aspect-[16/10]"
+				/>
 			{/if}
+			<!-- Sans image de couverture, le titre monte de deux crans et prend le
+			     style d'affiche : c'est la seule chose qui distingue « à la une »
+			     des titres de la liste juste en dessous, et sans elle l'accueil
+			     n'a plus de point d'entrée. Avec une image, celle-ci porte déjà
+			     le poids. -->
 			<div class={une.cover ? '' : 'sm:col-span-2'}>
 				<p class="text-xs font-semibold tracking-wide text-brand uppercase">À la une</p>
-				<h3 class="mt-2 text-2xl font-extrabold text-ink group-hover:text-brand sm:text-3xl">
+				<h3
+					class="titre-affiche mt-2 text-ink group-hover:text-brand
+						{une.cover ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'}"
+				>
 					{une.title}
 				</h3>
-				{#if une.summary}<p class="mt-3 text-ink-soft">{une.summary}</p>{/if}
+				{#if une.summary}
+					<!-- Le résumé ne grossit qu'à partir de `sm` : sur téléphone, le
+					     titre occupe déjà quatre lignes, un chapeau en 18 px par-dessus
+					     alourdit au lieu de hiérarchiser. -->
+					<p class="mt-3 text-ink-soft {une.cover ? '' : 'max-w-2xl sm:text-lg'}">{une.summary}</p>
+				{/if}
 				<p class="mt-3 text-xs text-ink-faint">
 					{formatDate(une.publishedAt)}{une.authorName ? ` · ${une.authorName}` : ''}
 				</p>
@@ -46,7 +75,9 @@
 	</section>
 {/if}
 
-<div class="grid gap-12 py-10 lg:grid-cols-[1fr_20rem]">
+<!-- `pt-6` et non `py-6` : le bandeau qui suit apporte sa propre marge haute,
+     les deux s'ajoutaient. -->
+<div class="grid gap-8 pt-6 lg:grid-cols-[1fr_20rem]">
 	<!-- Masquée quand le seul article existant est déjà « à la une » :
 	     un titre de section suivi du vide fait plus négligé qu'utile. -->
 	{#if suite.length || !une}
@@ -104,3 +135,5 @@
 		{/if}
 	</aside>
 </div>
+
+<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />

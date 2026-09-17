@@ -11,7 +11,11 @@
 	// L'en-tête ne montre que les rubriques de contenu : quatre liens et un
 	// bouton « Nous rejoindre ». Le logo ramène à l'accueil ; « Le groupe » et
 	// « Boîte à outils » sont dans le pied de page, un cinquième lien ici ferait
-	// déborder l'en-tête sur les écrans moyens. Le menu mobile, lui, liste tout.
+	// déborder l'en-tête sur les écrans moyens.
+	//
+	// Le menu mobile, lui, liste tout : il n'a pas de contrainte de largeur, et
+	// c'est le seul endroit où quelqu'un sur téléphone peut atteindre la boîte à
+	// outils et les jeux sans passer par la bibliothèque.
 	const liens = [
 		{ href: '/actualites', label: 'Actualités' },
 		{ href: '/articles', label: 'Articles' },
@@ -24,6 +28,7 @@
 		...liens,
 		{ href: '/revue-de-presse', label: 'Revue de presse' },
 		{ href: '/boite-a-outils', label: 'Boîte à outils' },
+		{ href: '/jeux', label: 'Jeux' },
 		{ href: '/le-groupe', label: 'Le groupe' },
 		rejoindre
 	];
@@ -142,12 +147,14 @@
 	</div>
 </header>
 
-<main id="contenu-principal" class="mx-auto min-h-[60vh] max-w-5xl px-4 py-10">
+<main id="contenu-principal" class="mx-auto min-h-[60vh] max-w-5xl px-4 py-6">
 	{@render children()}
 </main>
 
-<footer class="fond-degrade-sombre mt-16">
-	<div class="mx-auto grid max-w-5xl gap-8 px-4 py-12 sm:grid-cols-3">
+<!-- Pas de marge haute : le rembourrage bas de `<main>` fait déjà l'écart, et
+     le passage à une surface sombre marque la rupture à lui seul. -->
+<footer class="fond-degrade-sombre">
+	<div class="mx-auto grid max-w-5xl gap-8 px-4 py-8 sm:grid-cols-3">
 		<div class="sm:col-span-2">
 			<div class="flex items-center gap-3">
 				<Logo variante="mono" class="h-10 w-auto shrink-0 text-white" />
@@ -172,6 +179,7 @@
 				<li><a class="hover:text-white hover:underline" href="/revue-de-presse">Revue de presse</a></li>
 				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
 				<li><a class="hover:text-white hover:underline" href="/boite-a-outils">Boîte à outils</a></li>
+				<li><a class="hover:text-white hover:underline" href="/jeux">Jeux</a></li>
 				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>
 				<li><a class="hover:text-white hover:underline" href="/mentions-legales">Mentions légales</a></li>
 				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>

@@ -67,7 +67,7 @@
 	</label>
 </form>
 
-<section class="mt-12 rounded-lg border border-brand p-5">
+<section class="mt-10 rounded-lg border border-brand p-5">
 	<h2 class="font-bold text-brand">Supprimer cette publication</h2>
 	<p class="mt-1 text-sm text-ink-soft">
 		La publication et ses {data.publication.commentCount} commentaire{data.publication.commentCount > 1
