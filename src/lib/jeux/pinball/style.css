@@ -211,21 +211,3 @@ canvas {
         margin-right: 5px;
     }
 }
-
-/* Lien de retour vers le site, ajouté par-dessus le jeu. */
-.retour-site {
-    position: fixed;
-    top: 10px;
-    left: 12px;
-    margin: 0;
-    z-index: 10;
-    font-size: 14px;
-}
-.retour-site a {
-    color: inherit;
-    opacity: 0.8;
-}
-.retour-site a:hover {
-    opacity: 1;
-    text-decoration: underline;
-}

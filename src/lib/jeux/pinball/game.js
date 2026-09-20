@@ -1,4 +1,3 @@
-// @ts-nocheck — jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -11,6 +10,11 @@ const HEIGHT = canvas.height;
 const GRAVITY = 750;
 const SUBSTEPS = 8;
 
+const vortexImage = new Image();
+const vortexSize = 34;
+
+vortexImage.src =
+    "vortex.png";
 let score = 0;
 let lives = 3;
 
@@ -33,15 +37,43 @@ const ball = {
     x: 715,
     y: 780,
 
-    radius: 11,
+    radius: 10,
 
     vx: 0,
     vy: 0,
 
     ready: true,
-    inLaunchLane: true
+    inLaunchLane: true,
+
+    lastTunnelUse: 0
 };
 
+function drawVortex(
+    x,
+    y,
+    size,
+    rotation = 0
+) {
+
+    if (!vortexImage.complete) {
+        return;
+    }
+
+    ctx.save();
+
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+
+    ctx.drawImage(
+        vortexImage,
+        -size / 2,
+        -size / 2,
+        size,
+        size
+    );
+
+    ctx.restore();
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +132,106 @@ function createArcSegments(
     return segments;
 }
 
+function pointOnEllipse(
+    cx,
+    cy,
+    radiusX,
+    radiusY,
+    angle
+) {
+
+    return {
+        x: cx + Math.cos(angle) * radiusX,
+        y: cy + Math.sin(angle) * radiusY
+    };
+}
+
+
+function createSemicircleBetweenPoints(
+    pointA,
+    pointB,
+    bulge = -1,
+    steps = 14
+) {
+
+    const segments = [];
+
+    const mx =
+        (pointA.x + pointB.x) / 2;
+
+    const my =
+        (pointA.y + pointB.y) / 2;
+
+
+    const hx =
+        (pointB.x - pointA.x) / 2;
+
+    const hy =
+        (pointB.y - pointA.y) / 2;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vecteur perpendiculaire
+    |--------------------------------------------------------------------------
+    |
+    | bulge = -1 : demi-cercle vers l'extérieur du plateau
+    | bulge =  1 : demi-cercle vers l'intérieur
+    |
+    */
+
+    const px =
+        -hy * bulge;
+
+    const py =
+        hx * bulge;
+
+
+    let previousX =
+        pointA.x;
+
+    let previousY =
+        pointA.y;
+
+
+    for (
+        let i = 1;
+        i <= steps;
+        i++
+    ) {
+
+        const angle =
+            Math.PI -
+            (Math.PI * i / steps);
+
+
+        const x =
+            mx +
+            hx * Math.cos(angle) +
+            px * Math.sin(angle);
+
+
+        const y =
+            my +
+            hy * Math.cos(angle) +
+            py * Math.sin(angle);
+
+
+        segments.push({
+            x1: previousX,
+            y1: previousY,
+            x2: x,
+            y2: y
+        });
+
+
+        previousX = x;
+        previousY = y;
+    }
+
+
+    return segments;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -136,16 +268,89 @@ const walls = [
 ];
 
 
-const topArcWalls =
-    createArcSegments(
+/*
+|--------------------------------------------------------------------------
+| Alcôve en haut à gauche
+|--------------------------------------------------------------------------
+*/
+
+const pocketStartAngle =
+    Math.PI * 1.12;
+
+const pocketEndAngle =
+    Math.PI * 1.30;
+
+
+const pocketStart =
+    pointOnEllipse(
+        350,
+        190,
+        300,
+        125,
+        pocketStartAngle
+    );
+
+
+const pocketEnd =
+    pointOnEllipse(
+        350,
+        190,
+        300,
+        125,
+        pocketEndAngle
+    );
+
+
+/*
+|--------------------------------------------------------------------------
+| Nouveau contour supérieur
+|--------------------------------------------------------------------------
+*/
+
+const topArcWalls = [
+
+    /*
+    | Partie gauche avant l'alcôve
+    */
+
+    ...createArcSegments(
         350,
         190,
         300,
         125,
         Math.PI,
+        pocketStartAngle,
+        8
+    ),
+
+
+    /*
+    | Demi-cercle de l'alcôve
+    */
+
+    ...createSemicircleBetweenPoints(
+        pocketStart,
+        pocketEnd,
+        -1,
+        14
+    ),
+
+
+    /*
+    | Reste du haut du plateau
+    */
+
+    ...createArcSegments(
+        350,
+        190,
+        300,
+        125,
+        pocketEndAngle,
         Math.PI * 2,
-        24
-    );
+        18
+    )
+
+];
 
 
 const playfieldWalls = [
@@ -166,7 +371,7 @@ const bumpers = [
     {
         x: 285,
         y: 280,
-        radius: 24,
+        radius: 26,
         value: 150,
         lastHit: 0
     },
@@ -175,7 +380,7 @@ const bumpers = [
     {
         x: 350,
         y: 390,
-        radius: 24,
+        radius: 26,
         value: 200,
         lastHit: 0
     },
@@ -184,10 +389,21 @@ const bumpers = [
     {
         x: 405,
         y: 240,
-        radius: 24,
+        radius: 26,
         value: 200,
         lastHit: 0
-    }
+    },
+
+    {
+    // Bumper dans l'alcôve supérieure gauche
+    x: 110,
+    y: 95,
+
+    radius: 16,
+
+    value: 400,
+    lastHit: 0
+},
 
 ];
 
@@ -249,19 +465,6 @@ const lowerWalls = [
 
 /*
 |--------------------------------------------------------------------------
-| Petit obstacle central
-|--------------------------------------------------------------------------
-*/
-
-const centerObstacle = {
-    x: 350,
-    y: 600,
-    radius: 5
-};
-
-
-/*
-|--------------------------------------------------------------------------
 | Triangles
 |--------------------------------------------------------------------------
 */
@@ -270,6 +473,7 @@ const triangleBumpers = [
 
     {
         side: "left",
+        wallOnly: true,
 
         points: [
             { x: 170, y: 660 },
@@ -309,9 +513,9 @@ const upperTriangleBumpers = [
     {
         side: "left",
         points: [
-            { x: 50, y: 500 },
-            { x: 50, y: 570 },
-            { x: 130, y: 570 }
+            { x: 50, y: 420 },
+            { x: 50, y: 520 },
+            { x: 90, y: 590 }
         ]
     },
 
@@ -337,6 +541,47 @@ const upperTriangleBumpers = [
 | Couloir entre x = 650 et x = 750
 |
 */
+
+const oneWayTunnel = {
+
+    entry: {
+        x: 620,
+        y: 495,
+        radius: 28
+    },
+
+    // Sortie vers l'alcôve en haut à gauche
+    exit: {
+        x: 180,
+        y: 160,
+        radius: 18
+    },
+
+    cooldown: 300
+};
+
+const rescueVortices = [
+
+    {
+        x: 80,
+        y: 820,
+        radius: 15,
+        inside: false
+    },
+
+    {
+        x: 620,
+        y: 820,
+        radius: 15,
+        inside: false
+    }
+
+];
+
+const rescueVortexSize = 30;
+
+// 35 % de chance d'être sauvé
+const RESCUE_CHANCE = 1;
 
 const launchLaneWall = {
 
@@ -526,8 +771,8 @@ class Flipper {
 const leftFlipper =
     new Flipper(
         220,
-        875,
-        110,
+        880,
+        105,
         "left"
     );
 
@@ -535,8 +780,8 @@ const leftFlipper =
 const rightFlipper =
     new Flipper(
         480,
-        875,
-        110,
+        880,
+        105,
         "right"
     );
 
@@ -1028,6 +1273,40 @@ function collideWithTriangleBumper(
     }
 }
 
+function collideWithTriangleWall(
+    ball,
+    triangle
+) {
+
+    const p1 = triangle.points[0];
+    const p2 = triangle.points[1];
+    const p3 = triangle.points[2];
+
+    collideWithSegment(
+        ball,
+        p1.x, p1.y,
+        p2.x, p2.y,
+        3,
+        0.88
+    );
+
+    collideWithSegment(
+        ball,
+        p2.x, p2.y,
+        p3.x, p3.y,
+        3,
+        0.88
+    );
+
+    collideWithSegment(
+        ball,
+        p3.x, p3.y,
+        p1.x, p1.y,
+        3,
+        0.88
+    );
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1186,6 +1465,69 @@ function addScore(points) {
 |--------------------------------------------------------------------------
 */
 
+function useOneWayTunnel(ball) {
+
+    const now = performance.now();
+
+    if (
+        now - ball.lastTunnelUse <
+        oneWayTunnel.cooldown
+    ) {
+        return;
+    }
+
+    const dx =
+        ball.x - oneWayTunnel.entry.x;
+
+    const dy =
+        ball.y - oneWayTunnel.entry.y;
+
+    const distance =
+        Math.hypot(dx, dy);
+
+    const entryRadius =
+        ball.radius +
+        oneWayTunnel.entry.radius;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Entrée autorisée uniquement en 1
+    |--------------------------------------------------------------------------
+    |
+    | On demande que la bille arrive globalement
+    | vers la gauche / vers l'entrée.
+    |
+    */
+
+    const correctDirection =
+        ball.vx < -30;
+
+    if (
+        distance < entryRadius &&
+        correctDirection
+    ) {
+
+       ball.x =
+    oneWayTunnel.exit.x;
+
+ball.y =
+    oneWayTunnel.exit.y;
+
+
+/*
+|--------------------------------------------------------------------------
+| Projection vers l'alcôve
+|--------------------------------------------------------------------------
+*/
+
+ball.vx = -680;
+ball.vy = -420;
+
+ball.lastTunnelUse =
+    now;
+    }
+}
+
 function update(dt) {
      if (
         gameOver
@@ -1252,6 +1594,9 @@ function update(dt) {
         ball.vy *=
             0.9995;
 
+            useOneWayTunnel(ball);
+            checkRescueVortices(ball);
+
 
         /*
         |--------------------------------------------------------------------------
@@ -1261,11 +1606,11 @@ function update(dt) {
 
         if (
             ball.inLaunchLane &&
-            ball.y < 250
+            ball.y < 230
         ) {
 
             ball.vx = -700;
-            ball.vy = 20;
+            ball.vy = -340;
         }
 
 
@@ -1416,29 +1761,130 @@ function update(dt) {
     upperLeftGuideTriangle
 );
 
-        for (
+       for (
     const triangle
     of upperTriangleBumpers
 ) {
 
-    collideWithTriangleBumper(
-        ball,
-        triangle
-    );
+    if (
+        triangle.wallOnly
+    ) {
+
+        collideWithTriangleWall(
+            ball,
+            triangle
+        );
+
+    } else {
+
+        collideWithTriangleBumper(
+            ball,
+            triangle
+        );
+    }
 }
+
+function checkRescueVortices(ball) {
+
+    for (const vortex of rescueVortices) {
+
+        const dx =
+            ball.x - vortex.x;
+
+        const dy =
+            ball.y - vortex.y;
+
+        const distance =
+            Math.hypot(dx, dy);
+
+        const touching =
+            distance <
+            ball.radius +
+            vortex.radius;
 
 
         /*
         |--------------------------------------------------------------------------
-        | Petit obstacle central
+        | La bille vient d'entrer dans le vortex
         |--------------------------------------------------------------------------
         */
 
-        collideWithPost(
-            ball,
-            centerObstacle
-        );
+        if (
+            touching &&
+            !vortex.inside
+        ) {
 
+            vortex.inside = true;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Tirage aléatoire du sauvetage
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                Math.random() <
+                RESCUE_CHANCE
+            ) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Réapparition à la sortie du tunnel principal
+                |--------------------------------------------------------------------------
+                */
+
+                ball.x =
+                    oneWayTunnel.exit.x;
+
+                ball.y =
+                    oneWayTunnel.exit.y;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Petite impulsion de sortie
+                |--------------------------------------------------------------------------
+                */
+
+                ball.vx = -100;
+                ball.vy = -70;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Réinitialisation des vortex
+                |--------------------------------------------------------------------------
+                */
+
+                for (
+                    const rescue
+                    of rescueVortices
+                ) {
+
+                    rescue.inside =
+                        false;
+                }
+
+
+                return;
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | La bille est sortie de la zone
+        |--------------------------------------------------------------------------
+        */
+
+        if (!touching) {
+
+            vortex.inside =
+                false;
+        }
+    }
+}
 
         /*
         |--------------------------------------------------------------------------
@@ -1642,6 +2088,7 @@ function resetBall() {
 
     ball.ready = true;
     ball.inLaunchLane = true;
+    ball.lastTunnelUse = 0;
 }
 
 
@@ -1669,6 +2116,145 @@ function restartGame() {
 | Dessin du plateau
 |--------------------------------------------------------------------------
 */
+
+function drawOneWayTunnel() {
+
+    const spin =
+        performance.now() * 0.002;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vortex d'entrée
+    |--------------------------------------------------------------------------
+    */
+
+    drawVortex(
+        oneWayTunnel.entry.x,
+        oneWayTunnel.entry.y,
+        vortexSize,
+        spin
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vortex de sortie
+    |--------------------------------------------------------------------------
+    */
+
+    drawVortex(
+        oneWayTunnel.exit.x,
+        oneWayTunnel.exit.y,
+        vortexSize,
+        -spin
+    );
+}
+
+function drawRescueVortices() {
+
+    const spin =
+        performance.now() * 0.002;
+
+    drawVortex(
+        rescueVortices[0].x,
+        rescueVortices[0].y,
+        rescueVortexSize,
+        spin
+    );
+
+    drawVortex(
+        rescueVortices[1].x,
+        rescueVortices[1].y,
+        rescueVortexSize,
+        -spin
+    );
+}
+
+function drawArrow(
+    x1,
+    y1,
+    x2,
+    y2
+) {
+
+    const headLength = 14;
+
+    const angle =
+        Math.atan2(
+            y2 - y1,
+            x2 - x1
+        );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ligne
+    |--------------------------------------------------------------------------
+    */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x1,
+        y1
+    );
+
+    ctx.lineTo(
+        x2,
+        y2
+    );
+
+    ctx.stroke();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pointe
+    |--------------------------------------------------------------------------
+    */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x2,
+        y2
+    );
+
+    ctx.lineTo(
+        x2 -
+        headLength *
+        Math.cos(
+            angle -
+            Math.PI / 6
+        ),
+
+        y2 -
+        headLength *
+        Math.sin(
+            angle -
+            Math.PI / 6
+        )
+    );
+
+    ctx.lineTo(
+        x2 -
+        headLength *
+        Math.cos(
+            angle +
+            Math.PI / 6
+        ),
+
+        y2 -
+        headLength *
+        Math.sin(
+            angle +
+            Math.PI / 6
+        )
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+}
 
 function drawTable() {
 
@@ -1995,41 +2581,6 @@ function drawLowerWalls() {
         ctx.stroke();
     }
 
-
-    ctx.shadowBlur =
-        0;
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Petit obstacle central
-|--------------------------------------------------------------------------
-*/
-
-function drawCenterObstacle() {
-
-    ctx.beginPath();
-
-    ctx.arc(
-        centerObstacle.x,
-        centerObstacle.y,
-        centerObstacle.radius,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.fillStyle =
-        "#39d9ff";
-
-    ctx.shadowColor =
-        "#24bfff";
-
-    ctx.shadowBlur =
-        8;
-
-    ctx.fill();
 
     ctx.shadowBlur =
         0;
@@ -2549,26 +3100,27 @@ function draw() {
 
     drawUpperLeftGuideTriangle();
 
-    drawCenterObstacle();
-
     drawBumpers();
 
-    drawLowerArcBumper();
+   drawLowerArcBumper();
 
-    leftFlipper.draw();
-    rightFlipper.draw();
+leftFlipper.draw();
+rightFlipper.draw();
 
-    drawBall();
+drawOneWayTunnel();
+drawRescueVortices();
 
-    drawReadyMessage();
+drawBall();
 
-    /*
-    |--------------------------------------------------------------------------
-    | Toujours en dernier
-    |--------------------------------------------------------------------------
-    */
+drawReadyMessage();
 
-    drawGameOver();
+/*
+|--------------------------------------------------------------------------
+| Toujours en dernier
+|--------------------------------------------------------------------------
+*/
+
+drawGameOver();
 }
 
 
