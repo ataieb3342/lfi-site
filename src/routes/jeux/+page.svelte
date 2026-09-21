@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	import { JEUX, urlJeu } from '$lib/jeux';
 	import Encart from '$lib/components/Encart.svelte';
@@ -6,13 +9,14 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>Jeux — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Des jeux faits par des militants, sans publicité et sans traçage."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Jeux — {data.settings.siteName}"
+	description="Des jeux faits par des militants, sans publicité et sans traçage."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Jeux', chemin: '/jeux' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Ressources partagées</p>

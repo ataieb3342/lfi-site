@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import BandeauApero from '$lib/components/BandeauApero.svelte';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import CartePublication from '$lib/components/CartePublication.svelte';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { organisation } from '$lib/donnees-structurees';
 	import { formatDate, formatDateCourte } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -11,10 +14,14 @@
 	const suite = $derived(data.articles.slice(1));
 </script>
 
-<svelte:head>
-	<title>{data.settings.siteName}</title>
-	<meta name="description" content={data.settings.description} />
-</svelte:head>
+<!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
+     Google affiche, et « LFI Dijon Centre » seul ne dit pas ce qu'on y trouve. -->
+<Metadonnees
+	titre="{data.settings.siteName} — {data.settings.tagline}"
+	description={data.settings.description}
+	image={une?.cover?.url ?? null}
+	donnees={organisation(page.url.origin, data.settings, data.apero)}
+/>
 
 <!--
 	L'accueil s'ouvrait sur un carrousel de sept diapositives de 425 pixels : un

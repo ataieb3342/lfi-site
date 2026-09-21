@@ -1,15 +1,19 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>Le groupe — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Le groupe — {data.settings.siteName}"
+	description="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Le groupe', chemin: '/le-groupe' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>

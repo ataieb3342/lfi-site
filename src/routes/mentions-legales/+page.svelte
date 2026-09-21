@@ -1,12 +1,15 @@
 <script lang="ts">
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>Mentions légales — {data.settings.siteName}</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
+<Metadonnees
+	titre="Mentions légales — {data.settings.siteName}"
+	description="Éditeur, hébergeur et contact du site du groupe d'action de La France insoumise du centre de Dijon."
+	indexable={false}
+/>
 
 <header class="border-b border-line pb-4">
 	<h1 class="text-3xl font-extrabold text-ink sm:text-4xl">Mentions légales</h1>

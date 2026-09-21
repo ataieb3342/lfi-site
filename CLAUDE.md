@@ -13,7 +13,7 @@ npm run dev      # développement sur http://localhost:5173
 npm run check    # vérification TypeScript + Svelte — À LANCER APRÈS CHAQUE MODIFICATION
 npm run build    # compilation de production
 
-npm run outils:pieds   # regénère le pied de page des outils (voir « La boîte à outils »)
+npm run outils:pages   # regénère la tête et le pied des pages d'outils (voir « La boîte à outils »)
 ```
 
 Il n'y a pas de suite de tests automatisés : `npm run check` et une
@@ -37,6 +37,8 @@ aucun service externe, aucune dépendance native.
 | `src/lib/components/Logo.svelte` | Le phi officiel, en dégradé ou en monochrome |
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
 | `src/lib/components/Encart.svelte` | Le gabarit unique des encarts d'appel |
+| `src/lib/components/Metadonnees.svelte` | Titre, description, adresse canonique et aperçus — sur **toutes** les pages publiques |
+| `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
 | `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites`, `/revue-de-presse` et la fiche d'un apéro |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
@@ -607,24 +609,35 @@ n'est pas affichée, on peut donc en déclarer une à l'avance. Le `satisfies` s
 n'existe pas — une faute de frappe est attrapée à la compilation, pas par un trou
 dans la page.
 
-### Le pied de page d'un outil
+### La tête et le pied de page d'un outil
 
 Sous les sources, chaque outil porte un `<nav class="suite">` : une phrase qui
 invite à se servir du calcul, **deux outils pour enchaîner**, et une ligne de
-liens vers la bibliothèque, les apéros et « Nous rejoindre ».
+liens vers la bibliothèque, les apéros et « Nous rejoindre ». Dans son `<head>`,
+il porte son titre et sa description pour les moteurs de recherche.
 
 Ces pages sont du HTML statique servi tel quel : elles ne peuvent rien calculer
-à l'affichage et n'ont pas accès à `boite-a-outils.ts`. Le pied est donc **écrit
-par un script**, entre deux marqueurs `<!-- pied -->` / `<!-- /pied -->` :
+à l'affichage et n'ont pas accès à `boite-a-outils.ts`. Les deux blocs sont donc
+**écrits par un script**, chacun entre ses marqueurs (`<!-- tête -->` et
+`<!-- pied -->`) :
 
 ```bash
-npm run outils:pieds   # après tout ajout, retrait ou renommage d'un outil
+npm run outils:pages   # après tout ajout, retrait ou renommage d'un outil
 ```
 
 Il est idempotent et ne touche à rien d'autre dans le fichier. Les outils
 proposés viennent d'`outilsSuivants()`, qui tourne sur la rubrique : après le
 dernier on revient au premier, donc personne ne tombe sur une fin. **Ne pas
-modifier un pied à la main** : la prochaine exécution du script l'écrasera.
+modifier une tête ni un pied à la main** : la prochaine exécution du script les
+écrasera.
+
+La description reprise dans la tête est l'`accroche` de l'outil quand elle
+existe, sa `description` sinon. C'est une raison de plus d'écrire une accroche
+pour chaque outil et pas seulement pour les deux mis en avant : ces pages sont
+celles que quelqu'un qui ne connaît pas le groupe a le plus de chances de
+trouver — on ne cherche pas « LFI Dijon », on cherche « combien d'impôts je
+paie ». Le nom du site y est écrit en dur, repris de `DEFAULTS` : le renommer
+dans l'administration demande de relancer le script.
 
 Quatre règles, dont la première n'est pas négociable :
 
@@ -684,6 +697,75 @@ Deux sujets demandent une vigilance particulière :
   donné une cinquantaine de sièges de plus au RN en 2024. Un argument qui ne
   tient que lorsqu'il nous arrange n'est pas un argument, et une seule erreur
   trouvée discrédite les dix autres outils.
+
+## Le référencement
+
+Le site n'a aucun outil de mesure d'audience et n'en aura pas (règle n° 2 des
+règles de sécurité). Tout ce qui suit se joue donc dans le HTML, sans script et
+sans service tiers.
+
+**Toute page publique passe par `Metadonnees.svelte`.** Une page qui écrit son
+propre `<svelte:head>` perd l'adresse canonique et les aperçus, et personne ne
+s'en aperçoit avant des mois. Le composant écrit, en une fois : le titre, la
+description, `rel="canonical"`, les balises Open Graph, et les données
+structurées qu'on lui passe.
+
+- **L'adresse canonique est la balise la plus importante.** Elle dit « cette
+  page, c'est cette adresse-là ». Sans elle, `/articles`, `/articles?page=1` et
+  la même page atteinte depuis un lien portant une étiquette de campagne
+  comptent pour trois pages qui se font concurrence, et aucune ne ressort.
+- **Une page paginée se désigne elle-même**, avec son numéro dans le titre et
+  dans son adresse canonique. Renvoyer toutes les pages vers la première ferait
+  sortir de l'index les publications anciennes, qui ne sont listées nulle part
+  ailleurs.
+- **Les pages de résultats de recherche portent `noindex, follow`** : il y en a
+  autant que de mots qu'on peut taper, elles ne contiennent rien d'original, et
+  elles diluent la page qu'elles filtrent. `follow` est essentiel : sans lui,
+  les ressources listées deviendraient invisibles.
+- **Ce qu'on tient hors de l'index porte un `noindex`, on ne l'interdit pas
+  dans `robots.txt`.** Une adresse interdite au robot n'est jamais lue, donc son
+  `noindex` n'est jamais vu, et une adresse déjà connue de Google y reste
+  indéfiniment. Seule l'administration est interdite dans `robots.txt`.
+- **`/media` n'est pas interdit au robot.** Ce sont les images des
+  publications, celles-là mêmes qu'on annonce en aperçu quand un lien est
+  partagé : interdites, la vignette d'un partage est vide et le lien est moins
+  cliqué.
+
+### Les données structurées
+
+`donnees-structurees.ts` construit les fiches schema.org que le composant écrit
+dans la page, au format JSON-LD. C'est un **bloc de données, pas un script** :
+le navigateur ne l'exécute pas, et la politique de sécurité n'a donc rien à
+assouplir.
+
+- Un **apéro est un `Event`**, pas un article : une date, une heure, l'adresse
+  du bar. C'est ce qui permet à Google de l'afficher comme un rendez-vous, et
+  c'est le seul endroit du site où l'adresse physique du groupe est déclarée
+  au moteur.
+- L'accueil porte l'**`Organization`**, avec `areaServed: Dijon` : c'est ce qui
+  rattache le site aux recherches locales.
+- Toute page qui se réfère à l'organisation (`publisher`, `organizer`) doit
+  aussi porter le bloc `editeur()`. Un renvoi par identifiant n'est résolu qu'à
+  l'intérieur d'une même page : sans ce bloc, l'article pointerait dans le vide
+  et le moteur écarterait la fiche entière.
+- **Une fiche ne doit jamais annoncer autre chose que ce que la page affiche.**
+  C'est traité comme une tromperie, et cela fait perdre le bénéfice de
+  l'ensemble — pas seulement de la page fautive.
+
+### Ce que le code ne peut pas faire
+
+Ces quatre points-là ne sont pas dans le dépôt et doivent être faits à la main,
+une fois :
+
+1. Déclarer le site dans la **Search Console** de Google et y envoyer
+   `/sitemap.xml`. Sans cela, l'indexation d'un site neuf prend des semaines.
+2. Créer une **fiche d'établissement Google** pour le groupe. C'est le premier
+   levier des recherches locales, loin devant tout le reste.
+3. Obtenir des **liens entrants** : annuaire des groupes d'action sur
+   `actionpopulaire.fr`, sites des groupes voisins, presse locale. C'est le
+   facteur que Google pondère le plus, et le seul qui ne se code pas.
+4. **Publier régulièrement.** Un site qui ne bouge pas est recrawlé de moins en
+   moins souvent.
 
 ## Ajouter une page fixe
 

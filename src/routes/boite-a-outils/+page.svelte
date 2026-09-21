@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	import { outilsEnAvant, rubriquesGarnies, urlOutil } from '$lib/boite-a-outils';
 
@@ -8,13 +11,14 @@
 	const rubriques = rubriquesGarnies();
 </script>
 
-<svelte:head>
-	<title>Boîte à outils — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Des outils interactifs pour comprendre l’économie française à partir des chiffres officiels : impôts, budget de l’État, patrimoine, budget des ménages."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Boîte à outils — {data.settings.siteName}"
+	description="Des outils interactifs pour comprendre l’économie française à partir des chiffres officiels : impôts, budget de l’État, patrimoine, budget des ménages."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Boîte à outils', chemin: '/boite-a-outils' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Comprendre et argumenter</p>

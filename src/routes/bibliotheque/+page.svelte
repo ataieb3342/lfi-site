@@ -1,26 +1,41 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { PageData } from './$types';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import { formatTailleFichier } from '$lib/format';
 
 	let { data }: { data: PageData } = $props();
 
 	/** Le lien d'une page de résultats, en gardant la recherche en cours. */
-	function lienPage(page: number): string {
+	function lienPage(numero: number): string {
 		const params = new URLSearchParams();
 		if (data.recherche) params.set('q', data.recherche);
-		if (page > 1) params.set('page', String(page));
+		if (numero > 1) params.set('page', String(numero));
 		const suite = params.toString();
 		return suite ? `?${suite}` : '/bibliotheque';
 	}
+
+	// Le numéro de page entre dans le titre et dans l'adresse canonique : sans
+	// lui, les pages 2 et 3 se présenteraient à Google comme des copies de la
+	// première, et il n'en garderait qu'une.
+	const suffixe = $derived(data.page > 1 ? ` (page ${data.page})` : '');
+	const chemin = $derived(`/bibliotheque${data.page > 1 ? `?page=${data.page}` : ''}`);
 </script>
 
-<svelte:head>
-	<title>Bibliothèque — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Les liens et documents PDF partagés autour des apéros thématiques."
-	/>
-</svelte:head>
+<!-- Une page de résultats de recherche n'entre pas dans l'index : il y en a
+     autant que de mots qu'on peut taper, elles ne contiennent rien d'original,
+     et elles diluent la bibliothèque elle-même. Les liens restent suivis. -->
+<Metadonnees
+	titre="Bibliothèque{suffixe} — {data.settings.siteName}"
+	description="Les liens et documents PDF partagés autour des apéros thématiques du groupe."
+	indexable={!data.recherche}
+	canonique={chemin}
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Bibliothèque', chemin: '/bibliotheque' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Ressources partagées</p>

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
@@ -24,13 +27,14 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Nous rejoindre — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Rejoindre le groupe d'action de La France insoumise du centre de Dijon : inscription gratuite, aucune expérience nécessaire."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Nous rejoindre — {data.settings.siteName}"
+	description="Rejoindre le groupe d'action de La France insoumise du centre de Dijon : inscription gratuite, aucune expérience nécessaire."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Nous rejoindre', chemin: '/nous-rejoindre' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>
