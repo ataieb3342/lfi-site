@@ -1,10 +1,17 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
+
+	const membres = [
+		{ nom: 'Zaza', role: 'Co-animatrice du groupe', emoji: '🌻', fond: '#f7d8a7' },
+		{ nom: 'Robin', role: 'Co-animateur du groupe', emoji: '🦊', fond: '#d9cff7' },
+		{ nom: 'Dorian', role: 'Codeur', emoji: '💾', fond: '#bfe6d5' },
+		{ nom: 'Adam', role: 'Codeur', emoji: '🛠️', fond: '#f3c8d5' }
+	];
 </script>
 
 <svelte:head>
-	<title>Le groupe — {data.settings.siteName}</title>
+	<title>Qui sommes-nous ? — {data.settings.siteName}</title>
 	<meta
 		name="description"
 		content="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
@@ -13,20 +20,66 @@
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>
-	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Le groupe</h1>
+	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Qui sommes-nous ?</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">
-		Un groupe d'action de La France insoumise, ancré dans le centre de Dijon.
+		Des habitantes et habitants du centre de Dijon, des idées à défendre et, heureusement,
+		plusieurs paires de bras pour les faire vivre.
 	</p>
 </header>
 
-<div class="contenu mt-5 max-w-2xl">
+<div class="mt-5 max-w-3xl text-lg leading-relaxed text-ink-soft">
 	<p>
-		Nous sommes des habitantes et habitants du centre de Dijon, réunis pour faire vivre le
-		programme de La France insoumise là où nous vivons : dans les rues, sur les marchés, aux
-		portes des immeubles et dans les réunions publiques. Pas de carte, pas de cotisation, pas de
-		hiérarchie : un collectif de quartier qui décide ensemble de ce qu'il fait.
+		Nous faisons vivre le programme de La France insoumise là où nous habitons : dans les rues,
+		sur les marchés, aux portes des immeubles et dans les réunions publiques. Pas besoin d'avoir
+		un CV militant long comme le bras : la curiosité et l'envie de faire ensemble suffisent largement.
 	</p>
+</div>
 
+<section class="mt-7" aria-labelledby="equipe-groupe">
+	<div class="mb-4">
+		<p class="text-xs font-bold tracking-[0.18em] text-brand uppercase">Les membres du groupe</p>
+		<h2 id="equipe-groupe" class="mt-2 text-2xl font-extrabold tracking-tight text-ink">Une équipe, plusieurs casquettes</h2>
+		<p class="mt-2 max-w-2xl text-ink-soft">Des petits noms, quelques emojis en attendant les portraits, et les personnes qui font vivre le collectif.</p>
+	</div>
+
+	<article class="rounded-2xl border border-line bg-carte p-5 sm:p-6">
+		<div class="grid items-center gap-6 sm:grid-cols-[12rem_1fr]">
+			<img
+				src="/equipe/la-jdd-one-dessin-epaules.png"
+				alt="Portrait dessiné à la main de JDD"
+				class="aspect-square w-full rounded-[2rem] border-2 border-ink object-cover shadow-[5px_5px_0_var(--color-accent)] -rotate-2"
+			/>
+			<div>
+				<h3 class="text-2xl font-extrabold tracking-tight text-ink">JDD 🌱</h3>
+				<p class="mt-1 text-sm font-bold text-brand">Co-codeuse du site</p>
+				<p class="mt-3 max-w-xl leading-relaxed text-ink-soft">
+					Militante LFI depuis peu, passionnée d’écologie, de féminisme et de nouvelles technologies.
+					J’essaie d’aider au mieux sur le site — avec beaucoup d’idées, beaucoup d’onglets ouverts et,
+					parfois, un bouton qui refuse obstinément d’aller là où on lui dit.
+				</p>
+				<p class="mt-2 text-sm italic text-ink-faint">Portrait croqué pendant une réunion du groupe.</p>
+			</div>
+		</div>
+	</article>
+
+	<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+		{#each membres as membre (membre.nom)}
+			<article class="rounded-2xl border border-line bg-carte p-4">
+				<div
+					class="grid aspect-square w-full place-items-center rounded-xl text-6xl"
+					style="background-color: {membre.fond};"
+					role="img"
+					aria-label="Emoji provisoire de {membre.nom}"
+				>{membre.emoji}</div>
+				<h3 class="mt-4 text-lg font-extrabold text-ink">{membre.nom}</h3>
+				<p class="mt-1 text-sm font-semibold text-brand">{membre.role}</p>
+			</article>
+		{/each}
+	</div>
+	<p class="mt-3 text-xs italic text-ink-faint">Les emojis sont provisoires et pourront être remplacés plus tard.</p>
+</section>
+
+<div class="contenu mt-5 max-w-2xl">
 	<h2>Un groupe d'action, c'est quoi ?</h2>
 	<p>
 		La France insoumise n'est pas organisée en sections mais en <strong>groupes d'action</strong>,
@@ -84,8 +137,9 @@
 		page <a href="/aperos">Les apéros</a>.
 	</p>
 	<p>
-		<strong>À COMPLÉTER</strong> : indiquez ici la fréquence, le jour et le lieu habituel de vos
-		réunions, ainsi que la marche à suivre pour venir une première fois.
+		Les prochaines dates sont annoncées dans <a href="/agenda">l'agenda</a>. Pour venir une première
+		fois, consultez la page <a href="/nous-rejoindre">Nous rejoindre</a> ou contactez-nous : on vous
+		indiquera simplement le prochain rendez-vous.
 	</p>
 
 	<h2>Nous contacter</h2>

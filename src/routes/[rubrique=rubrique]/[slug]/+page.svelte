@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
-	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatTailleFichier, LIBELLE_KIND } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatTailleFichier, LIBELLE_EVENEMENT, LIBELLE_KIND } from '$lib/format';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -82,14 +82,17 @@
 				{#if lieuComplet}<span class="hidden sm:inline" aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
 			</p>
 		{:else if p.eventAt}
+			<p class="mt-5 text-xs font-bold tracking-wide text-brand uppercase">
+				{LIBELLE_EVENEMENT[p.eventCategory]}
+			</p>
 			<p
-				class="mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
+				class="mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
 					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
 			>
 				{#if p.aVenir}
 					Rendez-vous le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
 				{:else}
-					Cette action a eu lieu le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
+					Ce rendez-vous a eu lieu le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
 				{/if}
 			</p>
 		{/if}

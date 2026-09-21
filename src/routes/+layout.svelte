@@ -8,30 +8,29 @@
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
-	// L'en-tête ne montre que les rubriques de contenu et un
-	// bouton « Nous rejoindre ». Le logo ramène à l'accueil ; « Le groupe » et
-	// « Boîte à outils » restent dans le pied de page pour ne pas surcharger
-	// l'en-tête sur les écrans moyens.
-	//
-	// Le menu mobile, lui, liste tout : il n'a pas de contrainte de largeur, et
-	// c'est le seul endroit où quelqu'un sur téléphone peut atteindre la boîte à
-	// outils et les jeux sans passer par la bibliothèque.
-	const liens = [
-		{ href: '/actualites', label: 'Actualités' },
-		{ href: '/articles', label: 'Articles' },
-		{ href: '/agenda', label: 'Agenda' },
-		{ href: '/aperos', label: 'Apéros' },
-		{ href: '/bibliotheque', label: 'Bibliothèque' }
-	];
-	const rejoindre = { href: '/nous-rejoindre', label: 'Nous rejoindre' };
-	const liensMobile = [
-		{ href: '/', label: 'Accueil' },
-		...liens,
-		{ href: '/revue-de-presse', label: 'Revue de presse' },
-		{ href: '/boite-a-outils', label: 'Boîte à outils' },
-		{ href: '/jeux', label: 'Jeux' },
-		{ href: '/le-groupe', label: 'Le groupe' },
-		rejoindre
+	const groupesNavigation = [
+		{
+			href: '/actualites',
+			label: 'Actualités',
+			liens: [
+				{ href: '/agenda', label: 'Agenda' },
+				{ href: '/aperos', label: 'Apéros' },
+				{ href: '/actualites?categorie=action', label: 'Actions' },
+				{ href: '/actualites?categorie=reunion', label: 'Événements' },
+				{ href: '/actualites?categorie=formation', label: 'Formations' },
+				{ href: '/articles', label: 'Articles' },
+				{ href: '/revue-de-presse', label: 'Revue de presse' }
+			]
+		},
+		{
+			href: '/bibliotheque',
+			label: 'Ressources',
+			liens: [
+				{ href: '/bibliotheque', label: 'Bibliothèque' },
+				{ href: '/boite-a-outils', label: 'Boîte à outils' },
+				{ href: '/jeux', label: 'Jeux' }
+			]
+		}
 	];
 
 	function actif(href: string): boolean {
@@ -44,9 +43,27 @@
 	// pas. Comme le site navigue sans recharger la page, on le referme nous-mêmes
 	// une fois arrivé sur la page choisie.
 	let menu = $state<HTMLDetailsElement | null>(null);
+	let menusBureau = $state<HTMLDetailsElement[]>([]);
 	afterNavigate(() => {
 		if (menu) menu.open = false;
+		for (const menuBureau of menusBureau) menuBureau.open = false;
 	});
+
+	function enregistrerMenu(element: HTMLDetailsElement, index: number) {
+		menusBureau[index] = element;
+		return {
+			destroy() {
+				menusBureau = menusBureau.filter((menuBureau) => menuBureau !== element);
+			}
+		};
+	}
+
+	function fermerAutres(index: number) {
+		if (!menusBureau[index]?.open) return;
+		menusBureau.forEach((element, autreIndex) => {
+			if (autreIndex !== index) element.open = false;
+		});
+	}
 
 	const affichages = [
 		{ valeur: 'auto', label: 'Automatique' },
@@ -99,24 +116,60 @@
 		<!-- Navigation bureau -->
 		<nav class="ml-auto hidden md:block" aria-label="Navigation principale">
 			<ul class="flex items-center gap-1">
-				{#each liens as lien (lien.href)}
+				<li>
+					<a
+						href="/"
+						aria-current={actif('/') ? 'page' : undefined}
+						class="block rounded-full px-3 py-1.5 text-sm font-semibold transition-colors
+							{actif('/') ? 'bg-brand-soft text-brand' : 'text-ink-soft hover:bg-surface-alt hover:text-ink'}"
+						>Accueil</a
+					>
+				</li>
+				{#each groupesNavigation as groupe, index (groupe.href)}
 					<li>
-						<a
-							href={lien.href}
-							aria-current={actif(lien.href) ? 'page' : undefined}
-							class="block rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors
-								{actif(lien.href)
-								? 'bg-brand-soft text-brand'
-								: 'text-ink-soft hover:bg-surface-alt hover:text-ink'}">{lien.label}</a
-						>
+						<div class="flex items-center rounded-full {actif(groupe.href) ? 'bg-brand-soft text-brand' : ''}">
+							<a
+								href={groupe.href}
+								aria-current={actif(groupe.href) ? 'page' : undefined}
+								class="rounded-l-full py-1.5 pr-1 pl-3 text-sm font-semibold
+									{actif(groupe.href) ? '' : 'text-ink-soft hover:text-ink'}">{groupe.label}</a
+							>
+							<details
+								class="navigation-deroulante relative"
+								use:enregistrerMenu={index}
+								ontoggle={() => fermerAutres(index)}
+							>
+								<summary
+									class="grid cursor-pointer list-none place-items-center rounded-r-full py-2 pr-3 pl-1
+										{actif(groupe.href) ? '' : 'text-ink-soft hover:text-ink'}"
+									aria-label="Ouvrir le menu {groupe.label}"
+								>
+									<svg class="h-3.5 w-3.5 transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+										<path d="m5 7 5 5 5-5" />
+									</svg>
+								</summary>
+								<ul class="absolute right-0 z-30 mt-2 w-56 rounded-xl border border-line bg-carte p-2 shadow-lg">
+									{#each groupe.liens as lien (lien.href)}
+										<li>
+											<a class="block rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-surface-alt hover:text-ink" href={lien.href}>{lien.label}</a>
+										</li>
+									{/each}
+								</ul>
+							</details>
+						</div>
 					</li>
 				{/each}
-				<li class="ml-2">
+				<li>
 					<a
-						href={rejoindre.href}
-						aria-current={actif(rejoindre.href) ? 'page' : undefined}
-						class="bouton px-4 py-1.5 text-sm">{rejoindre.label}</a
+						href="/le-groupe"
+						aria-current={actif('/le-groupe') ? 'page' : undefined}
+						class="block rounded-full px-3 py-1.5 text-sm font-semibold transition-colors
+							{actif('/le-groupe') ? 'bg-brand-soft text-brand' : 'text-ink-soft hover:bg-surface-alt hover:text-ink'}"
+						>Qui sommes-nous ?</a
 					>
+				</li>
+				<li class="ml-1">
+					<a href="/nous-rejoindre" class="bouton px-4 py-1.5 text-sm">Nous rejoindre</a>
 				</li>
 			</ul>
 		</nav>
@@ -131,17 +184,20 @@
 				class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-line bg-carte p-2 shadow-lg"
 				aria-label="Navigation principale"
 			>
-				<ul>
-					{#each liensMobile as lien (lien.href)}
-						<li>
-							<a
-								href={lien.href}
-								aria-current={actif(lien.href) ? 'page' : undefined}
-								class="block rounded px-3 py-2 text-sm font-semibold
-									{actif(lien.href) ? 'bg-brand-soft text-brand' : 'text-ink-soft'}">{lien.label}</a
-							>
+				<ul class="space-y-2">
+					<li><a class="block rounded px-3 py-2 text-sm font-semibold text-ink-soft" href="/">Accueil</a></li>
+					{#each groupesNavigation as groupe (groupe.href)}
+						<li class="border-t border-line pt-2">
+							<a class="block rounded px-3 py-2 font-bold text-ink" href={groupe.href}>{groupe.label}</a>
+							<ul class="ml-3 border-l border-line pl-2">
+								{#each groupe.liens as lien (lien.href)}
+									<li><a class="block rounded px-3 py-1.5 text-sm text-ink-soft" href={lien.href}>{lien.label}</a></li>
+								{/each}
+							</ul>
 						</li>
 					{/each}
+					<li class="border-t border-line pt-2"><a class="block rounded px-3 py-2 font-bold text-ink" href="/le-groupe">Qui sommes-nous ?</a></li>
+					<li><a class="bouton mt-1 w-full justify-center" href="/nous-rejoindre">Nous rejoindre</a></li>
 				</ul>
 			</nav>
 		</details>
@@ -175,7 +231,7 @@
 		</div>
 		<nav aria-label="Pied de page">
 			<ul class="space-y-2 text-sm text-white/80">
-				<li><a class="hover:text-white hover:underline" href="/le-groupe">Le groupe</a></li>
+				<li><a class="hover:text-white hover:underline" href="/le-groupe">Qui sommes-nous ?</a></li>
 				<li><a class="hover:text-white hover:underline" href="/nous-rejoindre">Nous rejoindre</a></li>
 				<li><a class="hover:text-white hover:underline" href="/revue-de-presse">Revue de presse</a></li>
 				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>

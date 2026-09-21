@@ -8,13 +8,14 @@
 	type Categorie = PublicationVue['eventCategory'];
 	const categories: { valeur: Categorie; libelle: string; classe: string }[] = [
 		{ valeur: 'action', libelle: 'Actions', classe: 'agenda-action' },
-		{ valeur: 'reunion', libelle: 'Réunions', classe: 'agenda-reunion' },
+		{ valeur: 'reunion', libelle: 'Événements', classe: 'agenda-reunion' },
 		{ valeur: 'apero', libelle: 'Apéros', classe: 'agenda-apero' },
 		{ valeur: 'formation', libelle: 'Formations', classe: 'agenda-formation' },
 		{ valeur: 'autre', libelle: 'Autres', classe: 'agenda-autre' }
 	];
 
 	let visibles = $state(new Set<Categorie>(categories.map((c) => c.valeur)));
+	const evenementsVisibles = $derived(data.evenements.filter((e) => visibles.has(e.eventCategory)));
 
 	// Le calendrier commence le lundi. Les cases nulles complètent la première
 	// et la dernière semaine afin de toujours conserver une grille de sept jours.
@@ -55,6 +56,14 @@
 		visibles = suivants;
 	}
 
+	function toutAfficher() {
+		visibles = new Set(categories.map((c) => c.valeur));
+	}
+
+	function nombreEvenements(categorie: Categorie): number {
+		return data.evenements.filter((e) => e.eventCategory === categorie).length;
+	}
+
 	function classeCategorie(categorie: Categorie): string {
 		return categories.find((c) => c.valeur === categorie)?.classe ?? 'agenda-autre';
 	}
@@ -62,7 +71,7 @@
 
 <svelte:head>
 	<title>Agenda</title>
-	<meta name="description" content="Le calendrier des actions, réunions, apéros et formations du groupe." />
+	<meta name="description" content="Le calendrier des actions, événements, apéros et formations du groupe." />
 </svelte:head>
 
 <header class="max-w-2xl">
@@ -78,17 +87,34 @@
 		<a class="bouton-secondaire" href="?mois={data.moisSuivant}" aria-label="Mois suivant">Suivant →</a>
 	</div>
 
-	<div class="mt-4 flex flex-wrap gap-2" aria-label="Filtrer les événements">
-		{#each categories as categorie (categorie.valeur)}
-			<button
-				type="button"
-				aria-pressed={visibles.has(categorie.valeur)}
-				onclick={() => basculer(categorie.valeur)}
-				class="agenda-filtre {categorie.classe} {visibles.has(categorie.valeur) ? '' : 'agenda-filtre-inactif'}"
-			>
-				<span aria-hidden="true"></span>{categorie.libelle}
-			</button>
-		{/each}
+	<div class="mt-4 rounded-xl border border-line bg-surface-alt p-4">
+		<div class="flex flex-wrap items-center justify-between gap-2">
+			<div>
+				<h3 class="text-sm font-extrabold text-ink">Filtrer ce mois</h3>
+				<p class="mt-0.5 text-xs text-ink-soft">
+					{evenementsVisibles.length} rendez-vous affiché{evenementsVisibles.length > 1 ? 's' : ''}
+				</p>
+			</div>
+			{#if visibles.size < categories.length}
+				<button type="button" class="text-sm font-semibold text-brand hover:underline" onclick={toutAfficher}>
+					Tout afficher
+				</button>
+			{/if}
+		</div>
+
+		<div class="mt-3 flex flex-wrap gap-2" aria-label="Filtrer les événements">
+			{#each categories as categorie (categorie.valeur)}
+				<button
+					type="button"
+					aria-pressed={visibles.has(categorie.valeur)}
+					onclick={() => basculer(categorie.valeur)}
+					class="agenda-filtre {categorie.classe} {visibles.has(categorie.valeur) ? '' : 'agenda-filtre-inactif'}"
+				>
+					<span aria-hidden="true"></span>{categorie.libelle}
+					<strong aria-label="{nombreEvenements(categorie.valeur)} rendez-vous">{nombreEvenements(categorie.valeur)}</strong>
+				</button>
+			{/each}
+		</div>
 	</div>
 
 	<div class="agenda-calendrier mt-5" role="grid" aria-labelledby="mois-courant">
@@ -116,5 +142,10 @@
 
 	{#if data.evenements.length === 0}
 		<p class="carte mt-6 text-center text-ink-soft">Aucun rendez-vous annoncé pour ce mois.</p>
+	{:else if evenementsVisibles.length === 0}
+		<p class="carte mt-6 text-center text-ink-soft">
+			Aucun rendez-vous ne correspond aux catégories choisies.
+			<button type="button" class="ml-1 font-semibold text-brand hover:underline" onclick={toutAfficher}>Tout afficher</button>
+		</p>
 	{/if}
 </section>

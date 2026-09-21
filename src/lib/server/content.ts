@@ -95,27 +95,29 @@ const ORDRE = {
 export type Ordre = keyof typeof ORDRE;
 
 export function listPublished(
-	opts: { kind?: Kind; limit?: number; offset?: number; ordre?: Ordre } = {}
+	opts: { kind?: Kind; eventCategory?: CategorieEvenement; limit?: number; offset?: number; ordre?: Ordre } = {}
 ) {
-	const { kind, limit = 20, offset = 0, ordre = 'chronologique' } = opts;
+	const { kind, eventCategory, limit = 20, offset = 0, ordre = 'chronologique' } = opts;
 	return db()
 		.prepare(
 			`${PUBLIC_SELECT}
 			 where p.status = 'published' and (? is null or p.kind = ?)
+			   and (? is null or p.event_category = ?)
 			 ${ORDRE[ordre]}
 			 limit ? offset ?`
 		)
-		.all(kind ?? null, kind ?? null, limit, offset) as PublicationListItem[];
+		.all(kind ?? null, kind ?? null, eventCategory ?? null, eventCategory ?? null, limit, offset) as PublicationListItem[];
 }
 
-export function countPublished(kind?: Kind): number {
+export function countPublished(kind?: Kind, eventCategory?: CategorieEvenement): number {
 	return (
 		db()
 			.prepare(
 				`select count(*) as n from publications
-				 where status = 'published' and (? is null or kind = ?)`
+				 where status = 'published' and (? is null or kind = ?)
+				   and (? is null or event_category = ?)`
 			)
-			.get(kind ?? null, kind ?? null) as { n: number }
+			.get(kind ?? null, kind ?? null, eventCategory ?? null, eventCategory ?? null) as { n: number }
 	).n;
 }
 

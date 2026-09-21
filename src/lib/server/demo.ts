@@ -168,6 +168,8 @@ type Fiche = {
 	publieIlYa: number | (() => number);
 	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
 	actionDans?: number | (() => number);
+	/** Pastille affichée dans l'agenda et sur les rendez-vous. */
+	categorieEvenement?: 'action' | 'reunion' | 'formation';
 	/** Vrai pour la fiche qui reçoit l'image de couverture de la démonstration. */
 	illustree?: true;
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
@@ -182,6 +184,7 @@ const FICHES: Fiche[] = [
 		summary:
 			'Rendez-vous à 9 h 30 devant l’entrée principale des Halles pour distribuer notre tract sur les transports.',
 		actionDans: prochainSamedi,
+		categorieEvenement: 'action',
 		publieIlYa: 2,
 		body: `Nous serons au marché des Halles **samedi de 9 h 30 à 12 h** pour distribuer le tract du groupe sur la gratuité des transports pour les moins de 26 ans.
 
@@ -209,6 +212,7 @@ Prévenez-nous par courriel si vous venez, pour que l’on prévoie assez de tra
 		summary:
 			'Soirée ouverte à toutes et tous pour discuter de la gratuité des transports, du vélo et du dernier tram.',
 		actionDans: 9,
+		categorieEvenement: 'reunion',
 		publieIlYa: 5,
 		body: `Le groupe organise une **réunion publique** sur les transports dans la métropole. Entrée libre, sans inscription.
 
@@ -231,6 +235,7 @@ La réunion se termine au plus tard à 21 h. Un pot est prévu ensuite pour cont
 		title: 'Formation : prendre la parole en réunion',
 		summary: 'Un atelier de deux heures pour celles et ceux qui n’osent pas encore parler en public.',
 		actionDans: 16,
+		categorieEvenement: 'formation',
 		publieIlYa: 8,
 		body: `Beaucoup d’entre nous hésitent à prendre la parole en réunion ou en porte-à-porte. Cet atelier est fait pour ça.
 
@@ -259,10 +264,9 @@ Ce que l’on peut y faire :
 Le lieu est indiqué dans la lettre d’information du groupe.`
 	},
 	{
-		kind: 'actu',
+		kind: 'article',
 		title: 'Retour sur la marche pour le climat',
 		summary: 'Plusieurs centaines de personnes ont défilé de la place de la République à la place Darcy.',
-		actionDans: -12,
 		publieIlYa: 11,
 		body: `Merci à toutes celles et ceux qui ont marché avec nous samedi dernier. Le cortège a rassemblé plusieurs centaines de personnes malgré la pluie.
 
@@ -593,7 +597,8 @@ function remplirContenus(adminId: number, imageId: number | null) {
 					fiche.actionDans === undefined
 						? null
 						: dansNJours(typeof fiche.actionDans === 'function' ? fiche.actionDans() : fiche.actionDans),
-				eventCategory: fiche.kind === 'apero' ? 'apero' : fiche.actionDans === undefined ? 'autre' : 'action'
+				eventCategory:
+					fiche.kind === 'apero' ? 'apero' : (fiche.categorieEvenement ?? 'autre')
 			},
 			adminId
 		);

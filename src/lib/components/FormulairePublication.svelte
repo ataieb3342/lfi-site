@@ -198,7 +198,7 @@
 				<label class="etiquette" for="eventCategory">Catégorie dans l'agenda</label>
 				<select id="eventCategory" name="eventCategory" class="champ">
 					<option value="action" selected={v.eventCategory === 'action'}>Action</option>
-					<option value="reunion" selected={v.eventCategory === 'reunion'}>Réunion</option>
+					<option value="reunion" selected={v.eventCategory === 'reunion'}>Événement</option>
 					<option value="apero" selected={v.eventCategory === 'apero'}>Apéro</option>
 					<option value="formation" selected={v.eventCategory === 'formation'}>Formation</option>
 					<option value="autre" selected={v.eventCategory === 'autre'}>Autre</option>

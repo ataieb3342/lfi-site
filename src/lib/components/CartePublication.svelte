@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { COULEUR_KIND, formatDate, formatDateCourte, LIBELLE_KIND, lienPublication } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateCourte, LIBELLE_EVENEMENT, LIBELLE_KIND, lienPublication } from '$lib/format';
 	import type { PublicationVue } from '$lib/types';
 
 	let { publication, avecImage = true }: { publication: PublicationVue; avecImage?: boolean } = $props();
@@ -28,12 +28,18 @@
 				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">Épinglé</span>
 			{/if}
 			{#if publication.eventAt && publication.aVenir}
+				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">
+					{LIBELLE_EVENEMENT[publication.eventCategory]}
+				</span>
 				<span class="rounded bg-accent-soft px-1.5 py-0.5 font-semibold text-accent-dark">
 					{formatDateCourte(publication.eventAt)}
 				</span>
 			{:else if publication.eventAt}
+				<span class="rounded bg-surface-alt px-1.5 py-0.5 font-semibold text-ink-soft">
+					{LIBELLE_EVENEMENT[publication.eventCategory]}
+				</span>
 				<span class="rounded bg-surface-alt px-1.5 py-0.5 font-semibold text-ink-faint">
-					Action passée
+					Rendez-vous passé
 				</span>
 			{/if}
 			{#if publication.status === 'draft'}

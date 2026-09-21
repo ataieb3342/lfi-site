@@ -9,6 +9,18 @@
 	let { data }: { data: PageData } = $props();
 
 	const titre = $derived(TITRE_RUBRIQUE[data.rubrique]);
+	const filtresActualites = {
+		action: { titre: 'Actions', chapo: 'Les tractages, distributions, porte-à-porte et mobilisations du groupe.' },
+		reunion: { titre: 'Événements', chapo: 'Les réunions publiques et rendez-vous ouverts à toutes et tous.' },
+		formation: { titre: 'Formations', chapo: 'Les ateliers pour apprendre, partager des pratiques et gagner en confiance.' }
+	} as const;
+	const filtre = $derived(
+		data.rubrique === 'actualites' && data.categorie && data.categorie in filtresActualites
+			? filtresActualites[data.categorie as keyof typeof filtresActualites]
+			: null
+	);
+	const titreAffiche = $derived(filtre?.titre ?? titre);
+	const chapoAffiche = $derived(filtre?.chapo ?? CHAPO_RUBRIQUE[data.rubrique]);
 	// La couleur du type de publication, portée par le surlignage de l'en-tête.
 	const couleur = $derived(COULEUR_KIND[KIND_PAR_RUBRIQUE[data.rubrique]]);
 
@@ -24,8 +36,8 @@
 </script>
 
 <svelte:head>
-	<title>{titre} — {data.settings.siteName}</title>
-	<meta name="description" content={CHAPO_RUBRIQUE[data.rubrique]} />
+	<title>{titreAffiche} — {data.settings.siteName}</title>
+	<meta name="description" content={chapoAffiche} />
 </svelte:head>
 
 <!-- Pas de filet sous cet en-tête : le bandeau qui suit est une surface
@@ -33,9 +45,29 @@
      rayure. Les pages qui commencent par du texte, elles, gardent leur filet. -->
 <header>
 	<p class="text-xs font-bold tracking-[0.2em] uppercase {couleur}">{SURLIGNE_RUBRIQUE[data.rubrique]}</p>
-	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">{titre}</h1>
-	<p class="mt-3 max-w-2xl text-lg text-ink-soft">{CHAPO_RUBRIQUE[data.rubrique]}</p>
+	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">{titreAffiche}</h1>
+	<p class="mt-3 max-w-2xl text-lg text-ink-soft">{chapoAffiche}</p>
 </header>
+
+{#if data.rubrique === 'actualites' && !filtre}
+	<section class="mt-5 rounded-2xl border border-line bg-carte p-5 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+		<div>
+			<p class="text-xs font-bold tracking-[0.18em] text-brand uppercase">Prochains rendez-vous</p>
+			<h2 class="mt-2 text-2xl font-extrabold tracking-tight text-ink">L’agenda du groupe</h2>
+			<p class="mt-2 max-w-xl text-sm leading-relaxed text-ink-soft">
+				Actions, événements, apéros et formations : toutes les dates sont réunies dans un calendrier.
+			</p>
+		</div>
+		<a class="bouton mt-4 shrink-0 sm:mt-0" href="/agenda">Voir l’agenda →</a>
+	</section>
+
+	<nav class="mt-3 flex flex-wrap gap-2" aria-label="Catégories de l’agenda">
+		<a class="pastille" href="/actualites?categorie=action">Actions</a>
+		<a class="pastille" href="/actualites?categorie=reunion">Événements</a>
+		<a class="pastille" href="/aperos">Apéros</a>
+		<a class="pastille" href="/actualites?categorie=formation">Formations</a>
+	</nav>
+{/if}
 
 <!-- L'encart de la rubrique est en tête : c'est une invitation, et une
      invitation placée après quinze publications et une pagination n'est jamais
@@ -79,7 +111,7 @@
 			{#if data.page > 1}
 				<a
 					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
-					href="?page={data.page - 1}">← Page précédente</a
+				href="?page={data.page - 1}{data.categorie ? `&categorie=${data.categorie}` : ''}">← Page précédente</a
 				>
 			{:else}
 				<span></span>
@@ -88,7 +120,7 @@
 			{#if data.page < data.pages}
 				<a
 					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
-					href="?page={data.page + 1}">Page suivante →</a
+					href="?page={data.page + 1}{data.categorie ? `&categorie=${data.categorie}` : ''}">Page suivante →</a
 				>
 			{:else}
 				<span></span>

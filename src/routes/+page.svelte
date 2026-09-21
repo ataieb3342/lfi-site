@@ -9,6 +9,7 @@
 
 	const une = $derived(data.articles[0] ?? null);
 	const suite = $derived(data.articles.slice(1));
+	const prochainRendezVous = $derived(data.actus.find((actu) => actu.aVenir) ?? null);
 </script>
 
 <svelte:head>
@@ -16,19 +17,56 @@
 	<meta name="description" content={data.settings.description} />
 </svelte:head>
 
-<!--
-	L'accueil s'ouvrait sur un carrousel de sept diapositives de 425 pixels : un
-	écran entier avant le premier article. Six de ces sept diapositives
-	répétaient ce qui était déjà ailleurs — l'identité du groupe est dans
-	l'en-tête et le pied de page, les prochaines actions sont dans la colonne
-	« Actualités » ci-dessous, la bibliothèque est dans l'en-tête.
+<section class="overflow-hidden rounded-2xl bg-brand text-sur-brand">
+	<div class="grid lg:grid-cols-[1.35fr_0.65fr]">
+		<div class="p-7 sm:p-10 lg:p-12">
+			<p class="text-sm font-bold tracking-[0.2em] uppercase opacity-80">Groupe d’action · Dijon Centre</p>
+			<h1 class="titre-affiche mt-4 max-w-3xl text-4xl leading-tight sm:text-6xl">
+				Agir ici, discuter ensemble, changer les choses.
+			</h1>
+			<p class="mt-5 max-w-2xl text-lg leading-relaxed opacity-90">{data.settings.description}</p>
+			<div class="mt-7 flex flex-wrap gap-3">
+				<a class="rounded-full bg-surface px-5 py-3 font-bold text-ink hover:bg-surface-alt" href="/agenda">
+					Voir l’agenda
+				</a>
+				<a class="rounded-full border border-current px-5 py-3 font-bold hover:bg-white/10" href="/nous-rejoindre">
+					Nous rejoindre
+				</a>
+			</div>
+		</div>
 
-	Reste ce qui ne figure nulle part ailleurs sur cette page : le prochain
-	apéro, en bandeau tout en haut parce qu'il change toutes les deux semaines et
-	que c'est le rendez-vous le plus concret pour un visiteur, et l'application,
-	en bandeau tout en bas — on propose d'installer quelque chose à quelqu'un qui
-	a lu la page, pas à quelqu'un qui arrive.
--->
+		{#if prochainRendezVous}
+			<a
+				href="/actualites/{prochainRendezVous.slug}"
+				class="group flex flex-col justify-end border-t border-white/20 bg-black/10 p-7 hover:bg-black/15 lg:border-t-0 lg:border-l sm:p-8"
+			>
+				<p class="text-xs font-bold tracking-[0.18em] uppercase opacity-75">Prochain rendez-vous</p>
+				<p class="mt-3 text-3xl font-extrabold">{formatDateCourte(prochainRendezVous.eventAt)}</p>
+				<h2 class="mt-2 text-xl font-bold leading-snug group-hover:underline">{prochainRendezVous.title}</h2>
+				<span class="mt-5 text-sm font-bold">En savoir plus →</span>
+			</a>
+		{/if}
+	</div>
+</section>
+
+<nav class="mt-4 grid gap-3 sm:grid-cols-3" aria-label="Découvrir le site">
+	<a class="carte group block p-5 hover:border-brand" href="/agenda">
+		<span class="text-xs font-bold tracking-wide text-brand uppercase">Quand ?</span>
+		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">L’agenda</strong>
+		<span class="mt-1 block text-sm text-ink-soft">Actions, événements, apéros et formations.</span>
+	</a>
+	<a class="carte group block p-5 hover:border-brand" href="/actualites?categorie=action">
+		<span class="text-xs font-bold tracking-wide text-brand uppercase">Sur le terrain</span>
+		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Nos actions</strong>
+		<span class="mt-1 block text-sm text-ink-soft">Ce que le groupe organise près de chez vous.</span>
+	</a>
+	<a class="carte group block p-5 hover:border-brand" href="/le-groupe">
+		<span class="text-xs font-bold tracking-wide text-brand uppercase">Avec qui ?</span>
+		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Qui sommes-nous ?</strong>
+		<span class="mt-1 block text-sm text-ink-soft">Le groupe, son fonctionnement et ses membres.</span>
+	</a>
+</nav>
+
 {#if data.prochainApero}
 	<BandeauApero apero={data.prochainApero} cadre={data.apero} />
 {/if}

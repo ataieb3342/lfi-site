@@ -44,7 +44,7 @@
 	<Encart
 		sureligne="Action populaire"
 		titre="Toutes nos actions dans votre poche"
-		texte="Les événements et les groupes d'action près de chez vous, sans passer par les réseaux sociaux."
+		texte="Les événements et les groupes d'action près de chez vous, sans passer par les réseaux sociaux. Pensez à vous inscrire sur Action populaire pour nous prévenir de votre présence !"
 		surface=""
 		style="background-color: #f0e80d; color: #0b0b33;"
 	>

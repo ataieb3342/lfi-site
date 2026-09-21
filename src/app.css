@@ -151,6 +151,11 @@ body {
 	text-wrap: pretty;
 }
 
+/* La flèche pivote quand son sous-menu est ouvert. Le libellé voisin reste un
+   lien ordinaire vers la page principale de la rubrique. */
+.navigation-deroulante[open] > summary svg { transform: rotate(180deg); }
+.navigation-deroulante > summary::-webkit-details-marker { display: none; }
+
 h1, h2, h3, h4 {
 	text-wrap: balance;
 	letter-spacing: -0.02em;
@@ -446,6 +451,15 @@ main > :first-child {
 	cursor: pointer;
 }
 .agenda-filtre span { width: 0.65rem; height: 0.65rem; border-radius: 9999px; background: currentColor; }
+.agenda-filtre strong {
+	display: grid;
+	place-items: center;
+	min-width: 1.35rem;
+	height: 1.35rem;
+	border-radius: 9999px;
+	background: color-mix(in srgb, currentColor 12%, var(--color-surface));
+	font-size: 0.7rem;
+}
 .agenda-filtre-inactif { color: var(--color-ink-faint) !important; opacity: 0.65; text-decoration: line-through; }
 .agenda-action { color: var(--color-accent); }
 .agenda-reunion { color: var(--color-brand); }

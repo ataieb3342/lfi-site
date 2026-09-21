@@ -83,8 +83,9 @@
 		</p>
 	{:else}
 		<p>
-			<strong>À COMPLÉTER</strong> : renseignez une adresse de contact dans
-			<em>Administration → Réglages</em>, elle s'affichera automatiquement ici et en pied de page.
+			Retrouvez le groupe sur
+			<a href="https://actionpopulaire.fr" rel="noopener noreferrer" target="_blank">Action populaire</a>
+			ou consultez <a href="/agenda">l'agenda</a> pour connaître le prochain rendez-vous.
 		</p>
 	{/if}
 

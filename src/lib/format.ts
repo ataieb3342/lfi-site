@@ -55,6 +55,15 @@ export const LIBELLE_KIND: Record<string, string> = {
 	revue: 'Revue de presse'
 };
 
+/** Libellé court de la pastille d'un rendez-vous. */
+export const LIBELLE_EVENEMENT: Record<string, string> = {
+	action: 'Action',
+	reunion: 'Événement',
+	apero: 'Apéro',
+	formation: 'Formation',
+	autre: 'Rendez-vous'
+};
+
 /**
  * Couleur de chaque type de publication, prise aux trois couleurs du logo :
  * violet pour les articles, rouge pour les actualités, pourpre pour les apéros.
