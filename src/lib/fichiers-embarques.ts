@@ -10,8 +10,24 @@ import { dev } from '$app/environment';
  * ne doit pas être importé par un script de maintenance. C'est aussi pourquoi
  * il n'est pas dans `src/lib/server/`.
  */
-const FICHIERS = import.meta.glob('/src/lib/{jeux,boite-a-outils}/*/*', {
+const FICHIERS = import.meta.glob('/src/lib/{jeux,boite-a-outils}/*/*.{html,js,css}', {
 	query: '?raw',
+	import: 'default',
+	eager: true
+}) as Record<string, string>;
+
+/**
+ * Les images, lues séparément : `?raw` les rendrait en texte et les
+ * abîmerait. `?inline` les embarque en base64, qu'on redécode ici pour
+ * renvoyer les octets d'origine. Elles restent donc dans `build/`, comme le
+ * reste, sans rien à copier au déploiement.
+ *
+ * Le SVG n'est pas dans la liste, et ne doit pas y entrer : c'est du XML qui
+ * peut porter du JavaScript. Les SVG du site (le logo, le favicon) sont
+ * écrits dans les composants, pas servis par ici.
+ */
+const IMAGES = import.meta.glob('/src/lib/{jeux,boite-a-outils}/*/*.{png,jpg,jpeg,webp,gif}', {
+	query: '?inline',
 	import: 'default',
 	eager: true
 }) as Record<string, string>;
@@ -20,8 +36,16 @@ const FICHIERS = import.meta.glob('/src/lib/{jeux,boite-a-outils}/*/*', {
 const TYPES: Record<string, string> = {
 	html: 'text/html; charset=utf-8',
 	js: 'text/javascript; charset=utf-8',
-	css: 'text/css; charset=utf-8'
+	css: 'text/css; charset=utf-8',
+	png: 'image/png',
+	jpg: 'image/jpeg',
+	jpeg: 'image/jpeg',
+	webp: 'image/webp',
+	gif: 'image/gif'
 };
+
+/** Vrai pour les extensions servies en binaire plutôt qu'en texte. */
+const EST_IMAGE = (extension: string) => extension in TYPES && !['html', 'js', 'css'].includes(extension);
 
 /**
  * Politique de sécurité de ces pages. Comme pour le reste du site, tout est
@@ -59,7 +83,9 @@ export function servirFichierEmbarque(
 
 	const extension = fichier.split('.').pop() ?? '';
 	const type = TYPES[extension];
-	const contenu = FICHIERS[`/src/lib/${racine}/${dossier}/${fichier}`];
+	const chemin = `/src/lib/${racine}/${dossier}/${fichier}`;
+	const image = EST_IMAGE(extension);
+	const contenu = image ? IMAGES[chemin] : FICHIERS[chemin];
 	if (!type || contenu === undefined) error(404, 'Page introuvable');
 
 	const headers: Record<string, string> = {
@@ -72,5 +98,7 @@ export function servirFichierEmbarque(
 	};
 	if (extension === 'html') headers['Content-Security-Policy'] = CSP;
 
-	return new Response(contenu, { headers });
+	// `contenu` est ici une adresse « data: » ; on ne renvoie que les octets.
+	const corps = image ? Buffer.from(contenu.split(',')[1] ?? '', 'base64') : contenu;
+	return new Response(corps, { headers });
 }
