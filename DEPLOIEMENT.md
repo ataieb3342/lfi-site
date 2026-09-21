@@ -8,11 +8,21 @@ pas des piratages.
 
 ## 1. Préparer le serveur
 
-Debian 12 ou Ubuntu 24.04, en root :
+**Debian 13**, en root. Sur une image OVH, on se connecte d'abord avec
+l'utilisateur `debian`, puis `sudo -i` — le mot de passe initial est envoyé par
+courriel et le système impose de le changer à la première connexion.
+
+Le nom du paquet Compose change d'une distribution à l'autre : c'est
+`docker-compose` sur Debian 13 (Compose v2, greffon `docker compose`),
+`docker-compose-v2` sur Ubuntu 24.04. **Debian 12 ne convient pas** : elle n'a
+que Compose v1, abandonné depuis 2023.
 
 ```bash
-apt update && apt upgrade -y
-apt install -y docker.io docker-compose-v2 git ufw unattended-upgrades
+apt update && DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt upgrade -y
+apt install -y docker.io docker-compose git ufw unattended-upgrades
+
+# Vérification : doit afficher « Docker Compose version v2.… »
+docker compose version
 
 # Mises à jour de sécurité automatiques
 dpkg-reconfigure -plow unattended-upgrades

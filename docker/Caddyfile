@@ -3,6 +3,14 @@
 	# Caddy obtient et renouvelle le certificat HTTPS automatiquement.
 }
 
+# Le site ne se sert qu'à une seule adresse : « www » y renvoie, pour que le
+# lien partagé avec un « www » devant fonctionne au lieu d'afficher une erreur
+# de certificat. Sans ce bloc, Caddy ne connaît pas ce nom et ne demande pas
+# de certificat pour lui.
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
 {$SITE_DOMAIN} {
 	encode zstd gzip
 
