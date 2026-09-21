@@ -18,6 +18,11 @@ export const JEUX = [
 		dossier: 'pinball',
 		titre: 'Space DSN',
 		description: 'Un flipper dans l’espace, au clavier.'
+	},
+	{
+		dossier: 'space-invaders',
+		titre: 'Space Invaders',
+		description: 'Le classique : détruire les vagues d’envahisseurs avant qu’elles ne descendent.'
 	}
 ] as const;
 
