@@ -51,7 +51,7 @@
 </section>
 
 <section class="mt-8 border-t border-line pt-6" aria-labelledby="fonctionnement-groupe">
-	<h2 id="fonctionnement-groupe" class="text-2xl font-extrabold tracking-tight text-ink">Comment on fonctionne</h2>
+	<h2 id="fonctionnement-groupe" class="text-2xl font-extrabold tracking-tight text-ink">Comment on fonctionne ?</h2>
 	<div class="mt-4 grid gap-3 sm:grid-cols-3">
 		<div class="rounded-xl bg-surface-alt p-4">
 			<p class="font-bold text-ink">On décide ensemble</p>
@@ -81,6 +81,15 @@
 		<a href="https://actionpopulaire.fr" rel="noopener noreferrer" target="_blank">Action populaire</a>.
 		En Côte-d’Or, retrouvez aussi
 		<a href="https://lafranceinsoumise21.fr" rel="noopener noreferrer" target="_blank">La France insoumise 21</a>.
+	</p>
+	<p class="mt-3">
+		<a
+			class="font-bold text-brand"
+			href="https://melenchon2027.fr"
+			rel="noopener noreferrer"
+			target="_blank"
+			>Site de la candidature de Jean-Luc Mélenchon pour 2027 ↗</a
+		>
 	</p>
 </section>
 
