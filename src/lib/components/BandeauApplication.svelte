@@ -27,8 +27,9 @@
 	let {
 		actif = true,
 		android = '',
-		ios = ''
-	}: { actif?: boolean; android?: string; ios?: string } = $props();
+		ios = '',
+		compact = false
+	}: { actif?: boolean; android?: string; ios?: string; compact?: boolean } = $props();
 
 	const SITE = 'https://actionpopulaire.fr';
 
@@ -41,6 +42,26 @@
 </script>
 
 {#if actif}
+	{#if compact}
+		<aside
+			class="mt-5 flex flex-col gap-3 rounded-xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+			style="background-color: #f0e80d; color: #0b0b33;"
+			aria-label="Action populaire"
+		>
+			<p class="text-sm leading-snug">
+				<strong>Vous participez à un rendez-vous ?</strong>
+				Pensez à vous inscrire sur Action populaire pour nous prévenir de votre présence.
+			</p>
+			<a
+				href={SITE}
+				rel="noopener noreferrer"
+				target="_blank"
+				class="shrink-0 self-start rounded-full px-4 py-2 text-sm font-bold sm:self-auto"
+				style="background-color: #0b0b33; color: #f0e80d;"
+				>Action populaire ↗</a
+			>
+		</aside>
+	{:else}
 	<Encart
 		sureligne="Action populaire"
 		titre="Toutes nos actions dans votre poche"
@@ -106,4 +127,5 @@
 			{/each}
 		{/snippet}
 	</Encart>
+	{/if}
 {/if}

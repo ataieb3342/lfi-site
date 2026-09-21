@@ -47,27 +47,22 @@
 	<p class="text-xs font-bold tracking-[0.2em] uppercase {couleur}">{SURLIGNE_RUBRIQUE[data.rubrique]}</p>
 	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">{titreAffiche}</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">{chapoAffiche}</p>
+	{#if data.rubrique === 'actualites' && !filtre}
+		<a
+			class="group mt-5 inline-flex items-center gap-3 rounded-full border border-brand/30 bg-brand-soft py-2 pr-3 pl-2 text-sm font-extrabold text-brand no-underline shadow-sm transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
+			href="/agenda"
+		>
+			<span class="grid h-8 w-8 place-items-center rounded-full bg-brand text-sur-brand" aria-hidden="true">
+				<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="5" width="18" height="16" rx="2" />
+					<path d="M16 3v4M8 3v4M3 10h18" />
+				</svg>
+			</span>
+			Voir l’agenda
+			<span class="ml-1 transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
+		</a>
+	{/if}
 </header>
-
-{#if data.rubrique === 'actualites' && !filtre}
-	<section class="mt-5 rounded-2xl border border-line bg-carte p-5 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-6">
-		<div>
-			<p class="text-xs font-bold tracking-[0.18em] text-brand uppercase">Prochains rendez-vous</p>
-			<h2 class="mt-2 text-2xl font-extrabold tracking-tight text-ink">L’agenda du groupe</h2>
-			<p class="mt-2 max-w-xl text-sm leading-relaxed text-ink-soft">
-				Actions, événements, apéros et formations : toutes les dates sont réunies dans un calendrier.
-			</p>
-		</div>
-		<a class="bouton mt-4 shrink-0 sm:mt-0" href="/agenda">Voir l’agenda →</a>
-	</section>
-
-	<nav class="mt-3 flex flex-wrap gap-2" aria-label="Catégories de l’agenda">
-		<a class="pastille" href="/actualites?categorie=action">Actions</a>
-		<a class="pastille" href="/actualites?categorie=reunion">Événements</a>
-		<a class="pastille" href="/aperos">Apéros</a>
-		<a class="pastille" href="/actualites?categorie=formation">Formations</a>
-	</nav>
-{/if}
 
 <!-- L'encart de la rubrique est en tête : c'est une invitation, et une
      invitation placée après quinze publications et une pagination n'est jamais
@@ -80,7 +75,7 @@
      détacher de la liste qui suit. -->
 <div class={aBandeau ? 'border-b border-line pb-5' : ''}>
 	{#if data.rubrique === 'actualites'}
-		<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />
+		<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} compact />
 	{:else if data.rubrique === 'articles'}
 		<Encart
 			sureligne="Ce que nous lisons ailleurs"
