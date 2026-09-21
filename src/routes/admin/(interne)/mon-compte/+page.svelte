@@ -17,6 +17,47 @@
 
 <div class="mt-6 max-w-lg space-y-6">
 	<section class="carte">
+		<h2 class="font-bold text-ink">Ma fiche publique</h2>
+		<p class="mt-1 text-sm text-ink-soft">
+			Elle reste invisible tant que vous ne choisissez pas de l'afficher sur la page « Qui sommes-nous ? ».
+		</p>
+		<form method="POST" action="?/enregistrerProfil" enctype="multipart/form-data" class="mt-4 space-y-3">
+			<div>
+				<label class="etiquette" for="nom">Nom ou pseudo public</label>
+				<input id="nom" name="nom" class="champ" maxlength="80" value={data.profil.nom} />
+			</div>
+			<div>
+				<label class="etiquette" for="role">Rôle dans le groupe</label>
+				<input id="role" name="role" class="champ" maxlength="120" value={data.profil.role} />
+			</div>
+			<div>
+				<label class="etiquette" for="emoji">Emoji</label>
+				<input id="emoji" name="emoji" class="champ max-w-24" maxlength="16" value={data.profil.emoji} placeholder="🌱" />
+			</div>
+			<div>
+				<label class="etiquette" for="bio">Courte présentation</label>
+				<textarea id="bio" name="bio" class="champ" rows="5" maxlength="1200">{data.profil.bio}</textarea>
+			</div>
+			<div>
+				<label class="etiquette" for="image">Image</label>
+				{#if data.profil.image}
+					<img src={data.profil.image} alt="Aperçu du portrait" class="mb-2 h-28 w-28 rounded-xl border border-line object-cover" />
+					<label class="mb-2 flex items-center gap-2 text-sm text-ink-soft">
+						<input type="checkbox" name="supprimer_image" value="1" /> Supprimer l'image actuelle
+					</label>
+				{/if}
+				<input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" class="champ" />
+				<p class="aide">JPEG, PNG, WebP, GIF ou AVIF, 5 Mo maximum.</p>
+			</div>
+			<label class="flex items-start gap-2 text-sm text-ink">
+				<input type="checkbox" name="visible" value="1" checked={data.profil.visible} class="mt-0.5" />
+				<span>Afficher ma fiche sur la page « Qui sommes-nous ? »</span>
+			</label>
+			<button class="bouton" type="submit">Enregistrer ma fiche</button>
+		</form>
+	</section>
+
+	<section class="carte">
 		<h2 class="font-bold text-ink">Changer de mot de passe</h2>
 		<form method="POST" action="?/changerMotDePasse" class="mt-3 space-y-3">
 			<div>

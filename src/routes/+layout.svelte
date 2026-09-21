@@ -116,15 +116,6 @@
 		<!-- Navigation bureau -->
 		<nav class="ml-auto hidden md:block" aria-label="Navigation principale">
 			<ul class="flex items-center gap-1">
-				<li>
-					<a
-						href="/"
-						aria-current={actif('/') ? 'page' : undefined}
-						class="block rounded-full px-3 py-1.5 text-sm font-semibold transition-colors
-							{actif('/') ? 'bg-brand-soft text-brand' : 'text-ink-soft hover:bg-surface-alt hover:text-ink'}"
-						>Accueil</a
-					>
-				</li>
 				{#each groupesNavigation as groupe, index (groupe.href)}
 					<li>
 						<div class="flex items-center rounded-full {actif(groupe.href) ? 'bg-brand-soft text-brand' : ''}">
@@ -185,7 +176,6 @@
 				aria-label="Navigation principale"
 			>
 				<ul class="space-y-2">
-					<li><a class="block rounded px-3 py-2 text-sm font-semibold text-ink-soft" href="/">Accueil</a></li>
 					{#each groupesNavigation as groupe (groupe.href)}
 						<li class="border-t border-line pt-2">
 							<a class="block rounded px-3 py-2 font-bold text-ink" href={groupe.href}>{groupe.label}</a>

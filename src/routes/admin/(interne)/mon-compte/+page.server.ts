@@ -8,14 +8,26 @@ import {
 	listSessions,
 	resetTotp,
 	setPassword,
-	setSessionCookie
+	setSessionCookie,
+	updateProfile
 } from '$lib/server/auth';
 import { verifyPassword } from '$lib/server/crypto';
 import { rateLimit, rateLimitPeek } from '$lib/server/ratelimit';
+import { getMedia, storeUpload } from '$lib/server/media';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const admin = locals.admin!;
+	const compte = findAdminByUsername(admin.username)!;
+	const image = compte.profile_media_id ? getMedia(compte.profile_media_id) : undefined;
 	return {
+		profil: {
+			nom: compte.profile_name,
+			role: compte.profile_role,
+			bio: compte.profile_bio,
+			emoji: compte.profile_emoji,
+			image: image ? `/media/${image.filename}` : null,
+			visible: compte.profile_visible === 1
+		},
 		sessions: listSessions(admin.id).map((s) => ({
 			courante: s.id === admin.sessionId,
 			creeLe: s.created_at,
@@ -27,6 +39,33 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
+	enregistrerProfil: async ({ request, locals }) => {
+		const admin = locals.admin!;
+		const actuel = findAdminByUsername(admin.username)!;
+		const form = await request.formData();
+		const fichier = form.get('image');
+		let mediaId = form.get('supprimer_image') === '1' ? null : actuel.profile_media_id;
+
+		if (fichier instanceof File && fichier.size > 0) {
+			try {
+				mediaId = (await storeUpload(fichier, `Portrait de ${String(form.get('nom') ?? '')}`, admin.id)).id;
+			} catch (err) {
+				return fail(400, { erreur: (err as Error).message });
+			}
+		}
+
+		updateProfile(admin.id, {
+			name: String(form.get('nom') ?? '').trim(),
+			role: String(form.get('role') ?? '').trim(),
+			bio: String(form.get('bio') ?? '').trim(),
+			emoji: String(form.get('emoji') ?? '').trim(),
+			mediaId,
+			visible: form.get('visible') === '1'
+		});
+		audit(admin, 'compte.profil', admin.username, '', locals.ipHash);
+		redirect(303, '/admin/mon-compte?enregistre=1');
+	},
+
 	changerMotDePasse: async ({ request, locals, cookies, url }) => {
 		const admin = locals.admin!;
 		const seau = `mdp:${admin.id}`;

@@ -25,6 +25,12 @@ export type AdminRow = {
 	created_at: string;
 	last_login_at: string | null;
 	disabled_at: string | null;
+	profile_name: string;
+	profile_role: string;
+	profile_bio: string;
+	profile_emoji: string;
+	profile_media_id: number | null;
+	profile_visible: number;
 };
 
 export type AdminSession = {
@@ -77,6 +83,44 @@ export async function createAdmin(opts: {
 export async function setPassword(adminId: number, password: string) {
 	if (password.length < 12) throw new Error('Le mot de passe doit faire au moins 12 caractères.');
 	db().prepare('update admins set password_hash = ? where id = ?').run(await hashPassword(password), adminId);
+}
+
+export function updateProfile(
+	adminId: number,
+	profile: {
+		name: string;
+		role: string;
+		bio: string;
+		emoji: string;
+		mediaId: number | null;
+		visible: boolean;
+	}
+) {
+	db().prepare(
+		`update admins
+		 set profile_name = ?, profile_role = ?, profile_bio = ?, profile_emoji = ?,
+		     profile_media_id = ?, profile_visible = ?
+		 where id = ?`
+	).run(
+		profile.name.slice(0, 80),
+		profile.role.slice(0, 120),
+		profile.bio.slice(0, 1200),
+		profile.emoji.slice(0, 16),
+		profile.mediaId,
+		profile.visible ? 1 : 0,
+		adminId
+	);
+}
+
+export function listPublicProfiles() {
+	return db().prepare(
+		`select a.profile_name as name, a.profile_role as role, a.profile_bio as bio,
+		        a.profile_emoji as emoji, m.filename as image
+		 from admins a
+		 left join media m on m.id = a.profile_media_id
+		 where a.profile_visible = 1 and a.disabled_at is null and a.profile_name != ''
+		 order by a.created_at`
+	).all() as { name: string; role: string; bio: string; emoji: string; image: string | null }[];
 }
 
 /* -------------------------------------------------------------------- TOTP */

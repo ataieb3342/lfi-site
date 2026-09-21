@@ -48,7 +48,7 @@
 
 				{#if m.utilisations > 0}
 					<p class="mt-2 text-xs font-semibold text-ink-soft">
-						Utilisée comme couverture de {m.utilisations} publication{m.utilisations > 1 ? 's' : ''}.
+						Utilisée à {m.utilisations} endroit{m.utilisations > 1 ? 's' : ''} sur le site.
 					</p>
 				{:else}
 					<form method="POST" action="?/supprimer" class="mt-2">

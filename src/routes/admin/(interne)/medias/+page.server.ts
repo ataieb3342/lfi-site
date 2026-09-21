@@ -13,9 +13,9 @@ export const load: PageServerLoad = async () => {
 			poids: Math.round(m.bytes / 1024),
 			creeLe: m.created_at,
 			// Une image utilisée en couverture ne doit pas être supprimée par mégarde.
-			utilisations: (
-				db().prepare('select count(*) as n from publications where cover_media_id = ?').get(m.id) as { n: number }
-			).n
+			utilisations:
+				(db().prepare('select count(*) as n from publications where cover_media_id = ?').get(m.id) as { n: number }).n +
+				(db().prepare('select count(*) as n from admins where profile_media_id = ?').get(m.id) as { n: number }).n
 		}))
 	};
 };
@@ -44,6 +44,10 @@ export const actions: Actions = {
 		const id = Number((await request.formData()).get('id'));
 		const media = getMedia(id);
 		if (!media) return fail(404, { erreur: 'Image introuvable.' });
+		const utilisations =
+			(db().prepare('select count(*) as n from publications where cover_media_id = ?').get(id) as { n: number }).n +
+			(db().prepare('select count(*) as n from admins where profile_media_id = ?').get(id) as { n: number }).n;
+		if (utilisations > 0) return fail(400, { erreur: 'Cette image est encore utilisée sur le site.' });
 
 		deleteMedia(id);
 		audit(admin, 'image.suppression', media.filename, '', locals.ipHash);

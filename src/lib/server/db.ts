@@ -321,6 +321,16 @@ const MIGRATIONS: string[] = [
 	update publications set event_category = 'apero' where kind = 'apero';
 	update publications set event_category = 'action' where kind = 'actu' and event_at is not null;
 	create index publications_calendrier on publications(status, event_at, event_category);
+	`,
+	// 009 — fiche publique facultative des comptes administrateurs
+	`
+	alter table admins add column profile_name text not null default '';
+	alter table admins add column profile_role text not null default '';
+	alter table admins add column profile_bio text not null default '';
+	alter table admins add column profile_emoji text not null default '';
+	alter table admins add column profile_media_id integer references media(id) on delete set null;
+	alter table admins add column profile_visible integer not null default 0 check (profile_visible in (0, 1));
+	create index admins_profiles_publics on admins(profile_visible, created_at);
 	`
 ];
 

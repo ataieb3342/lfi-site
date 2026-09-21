@@ -2,12 +2,7 @@
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
-	const membres = [
-		{ nom: 'Zaza', role: 'Co-animatrice du groupe', emoji: '🌻', fond: '#f7d8a7' },
-		{ nom: 'Robin', role: 'Co-animateur du groupe', emoji: '🦊', fond: '#d9cff7' },
-		{ nom: 'Dorian', role: 'Codeur', emoji: '💾', fond: '#bfe6d5' },
-		{ nom: 'Adam', role: 'Codeur', emoji: '🛠️', fond: '#f3c8d5' }
-	];
+	const fonds = ['#f7d8a7', '#d9cff7', '#bfe6d5', '#f3c8d5', '#cce2f5'];
 </script>
 
 <svelte:head>
@@ -42,41 +37,26 @@
 		<p class="mt-2 max-w-2xl text-ink-soft">Des petits noms, quelques emojis en attendant les portraits, et les personnes qui font vivre le collectif.</p>
 	</div>
 
-	<article class="rounded-2xl border border-line bg-carte p-5 sm:p-6">
-		<div class="grid items-center gap-6 sm:grid-cols-[12rem_1fr]">
-			<img
-				src="/equipe/la-jdd-one-dessin-epaules.png"
-				alt="Portrait dessiné à la main de JDD"
-				class="aspect-square w-full rounded-[2rem] border-2 border-ink object-cover shadow-[5px_5px_0_var(--color-accent)] -rotate-2"
-			/>
-			<div>
-				<h3 class="text-2xl font-extrabold tracking-tight text-ink">JDD 🌱</h3>
-				<p class="mt-1 text-sm font-bold text-brand">Co-codeuse du site</p>
-				<p class="mt-3 max-w-xl leading-relaxed text-ink-soft">
-					Militante LFI depuis peu, passionnée d’écologie, de féminisme et de nouvelles technologies.
-					J’essaie d’aider au mieux sur le site — avec beaucoup d’idées, beaucoup d’onglets ouverts et,
-					parfois, un bouton qui refuse obstinément d’aller là où on lui dit.
-				</p>
-				<p class="mt-2 text-sm italic text-ink-faint">Portrait croqué pendant une réunion du groupe.</p>
-			</div>
-		</div>
-	</article>
-
-	<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-		{#each membres as membre (membre.nom)}
+	{#if data.profils.length}
+	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		{#each data.profils as membre, index (membre.name)}
 			<article class="rounded-2xl border border-line bg-carte p-4">
-				<div
-					class="grid aspect-square w-full place-items-center rounded-xl text-6xl"
-					style="background-color: {membre.fond};"
-					role="img"
-					aria-label="Emoji provisoire de {membre.nom}"
-				>{membre.emoji}</div>
-				<h3 class="mt-4 text-lg font-extrabold text-ink">{membre.nom}</h3>
+				{#if membre.image}
+					<img src={membre.image} alt="Portrait de {membre.name}" class="aspect-square w-full rounded-xl object-cover" />
+				{:else}
+					<div class="grid aspect-square w-full place-items-center rounded-xl text-6xl" style="background-color: {fonds[index % fonds.length]};" role="img" aria-label="Emoji de {membre.name}">{membre.emoji || '👤'}</div>
+				{/if}
+				<h3 class="mt-4 text-lg font-extrabold text-ink">{membre.name} {membre.emoji}</h3>
 				<p class="mt-1 text-sm font-semibold text-brand">{membre.role}</p>
+				{#if membre.bio}<p class="mt-3 text-sm leading-relaxed text-ink-soft">{membre.bio}</p>{/if}
 			</article>
 		{/each}
 	</div>
-	<p class="mt-3 text-xs italic text-ink-faint">Les emojis sont provisoires et pourront être remplacés plus tard.</p>
+	{:else}
+		<p class="rounded-xl border border-dashed border-line-forte p-5 text-sm text-ink-soft">
+			Les membres du groupe pourront bientôt se présenter ici.
+		</p>
+	{/if}
 </section>
 
 <div class="contenu mt-5 max-w-2xl">
