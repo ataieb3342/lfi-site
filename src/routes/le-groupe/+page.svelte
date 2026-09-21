@@ -68,6 +68,18 @@
 	</div>
 </section>
 
+<section class="mt-6 rounded-2xl border border-line bg-carte p-5" aria-labelledby="mouvement-lfi">
+	<p class="text-xs font-bold tracking-[0.18em] text-brand uppercase">Le mouvement</p>
+	<h2 id="mouvement-lfi" class="mt-2 text-2xl font-extrabold tracking-tight text-ink">La France insoumise</h2>
+	<p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">
+		Notre groupe fait partie de La France insoumise et agit localement autour de son programme,
+		<em>L’Avenir en commun</em>. Les groupes, actions et événements sont reliés sur
+		<a href="https://actionpopulaire.fr" rel="noopener noreferrer" target="_blank">Action populaire</a>.
+		En Côte-d’Or, retrouvez aussi
+		<a href="https://lafranceinsoumise21.fr" rel="noopener noreferrer" target="_blank">La France insoumise 21</a>.
+	</p>
+</section>
+
 <section class="mt-6 flex flex-col gap-3 rounded-2xl bg-brand-soft p-5 sm:flex-row sm:items-center sm:justify-between">
 	<div>
 		<h2 class="text-xl font-extrabold text-ink">Envie de nous rencontrer ?</h2>
