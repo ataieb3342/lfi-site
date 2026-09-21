@@ -72,8 +72,12 @@
 	<p class="text-xs font-bold tracking-[0.18em] text-brand uppercase">Le mouvement</p>
 	<h2 id="mouvement-lfi" class="mt-2 text-2xl font-extrabold tracking-tight text-ink">La France insoumise</h2>
 	<p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">
-		Notre groupe fait partie de La France insoumise et agit localement autour de son programme,
-		<em>L’Avenir en commun</em>. Les groupes, actions et événements sont reliés sur
+		La France insoumise a été lancée le 10 février 2016 par Jean-Luc Mélenchon. Son programme,
+		<em>L’Avenir en commun</em>, a été rédigé de façon participative à partir de plusieurs milliers
+		de contributions et est régulièrement mis à jour.
+	</p>
+	<p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">
+		Notre groupe agit localement autour de ce programme. Les groupes, actions et événements sont reliés sur
 		<a href="https://actionpopulaire.fr" rel="noopener noreferrer" target="_blank">Action populaire</a>.
 		En Côte-d’Or, retrouvez aussi
 		<a href="https://lafranceinsoumise21.fr" rel="noopener noreferrer" target="_blank">La France insoumise 21</a>.
