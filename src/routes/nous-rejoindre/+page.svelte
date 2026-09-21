@@ -75,19 +75,6 @@
 		populaire, aux formations et aux informations du mouvement.
 	</p>
 
-	<h2>Nous écrire</h2>
-	{#if data.settings.contactEmail}
-		<p>
-			<a href="mailto:{data.settings.contactEmail}">{data.settings.contactEmail}</a> — nous répondons
-			sous quelques jours.
-		</p>
-	{:else}
-		<p>
-			<strong>À COMPLÉTER</strong> : renseignez une adresse de contact dans
-			<em>Administration → Réglages</em>, elle s'affichera automatiquement ici et en pied de page.
-		</p>
-	{/if}
-
 	<h2>Un autre quartier, une autre ville ?</h2>
 	<p>
 		Il existe d'autres groupes d'action à Dijon et dans toute la Côte-d'Or. La
