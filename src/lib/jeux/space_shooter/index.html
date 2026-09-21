@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Shooter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="game-shell">
+    <header class="hud">
+      <div>PV : <span id="hp">3</span>/<span id="maxHp">3</span></div>
+      <div>Bouclier : <span id="shield">0</span></div>
+      <div>XP : <span id="xp">0</span>/<span id="xpNeed">6</span></div>
+      <div>Niveau : <span id="level">1</span></div>
+      <div>Score : <span id="score">0</span></div>
+    </header>
+
+    <canvas id="gameCanvas" width="760" height="520"></canvas>
+
+    <div id="upgradePanel" class="overlay hidden">
+      <div class="panel">
+        <h2>Choisis une amélioration</h2>
+        <div class="upgrade-grid">
+          <button id="upgradeHp" class="upgrade-card">
+            <strong>+1 PV max</strong>
+            <span>Augmente la vie maximale jusqu’à 5 PV et soigne aussi de 1 PV.</span>
+          </button>
+
+          <button id="upgradeHeal" class="upgrade-card">
+            <strong>Soin +1 PV</strong>
+            <span>Récupère 1 PV sans augmenter la vie maximale.</span>
+          </button>
+
+          <button id="upgradeShot" class="upgrade-card">
+            <strong id="shotUpgradeTitle">+1 projectile</strong>
+            <span id="shotUpgradeText">Ajoute des projectiles, puis augmente leurs dégâts, puis débloque des drones.</span>
+          </button>
+
+          <button id="upgradeShield" class="upgrade-card">
+            <strong>+1 bouclier</strong>
+            <span id="shieldUpgradeText">Ajoute 1 PV de bouclier, jusqu’à un maximum de 5.</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="gameOverPanel" class="overlay hidden">
+      <div class="panel">
+        <h2>Partie terminée</h2>
+        <p>Score : <span id="finalScore">0</span></p>
+        <button id="restartButton">Rejouer</button>
+      </div>
+    </div>
+
+    <p class="controls">
+      Déplacement : ZQSD / WASD / flèches — Tir : Espace
+    </p>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
