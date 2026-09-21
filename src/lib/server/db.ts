@@ -338,7 +338,26 @@ function migrer(base: DatabaseSync) {
 	for (let v = actuelle; v < MIGRATIONS.length; v++) {
 		base.exec('begin');
 		try {
-			base.exec(MIGRATIONS[v]);
+			// Une interruption juste après l'ALTER TABLE de la migration 008 peut
+			// laisser la colonne en place sans avoir avancé user_version. Dans ce cas,
+			// terminer la migration au lieu d'essayer de recréer la colonne.
+			const eventCategoryExiste =
+				v === 7 &&
+				(base.prepare('pragma table_info(publications)').all() as { name: string }[]).some(
+					(colonne) => colonne.name === 'event_category'
+				);
+
+			if (eventCategoryExiste) {
+				base.exec(`
+					update publications set event_category = 'apero' where kind = 'apero';
+					update publications set event_category = 'action'
+						where kind = 'actu' and event_at is not null and event_category = 'autre';
+					create index if not exists publications_calendrier
+						on publications(status, event_at, event_category);
+				`);
+			} else {
+				base.exec(MIGRATIONS[v]);
+			}
 			base.exec(`pragma user_version = ${v + 1}`);
 			base.exec('commit');
 			console.log(`[db] migration ${v + 1} appliquée`);
