@@ -478,6 +478,36 @@ Le fichier d'origine récupéré sur Wikimedia pesait 61 Ko dont 52 Ko d'aperçu
 masqué et un tracé en `display:none`, restes du recadrage. Ils ont été retirés.
 Les couleurs du dégradé de `app.css` sont celles, exactes, de ce fichier.
 
+## Les vidéos
+
+Un paragraphe qui ne contient **que** le lien d'une vidéo YouTube devient un
+bloc cliquable — règle `bloc_video` de `src/lib/server/markdown.ts` :
+
+    https://youtu.be/cW1Yay_1XaQ                 → « Regarder la vidéo »
+    [Le titre de la vidéo](https://youtu.be/…)   → « Le titre de la vidéo »
+
+Il faut une ligne vide avant et après : c'est ce qui en fait un paragraphe à
+lui seul. Un lien au fil d'une phrase, ou un lien en gras, reste un lien
+ordinaire. C'est voulu : la liste des sources en fin d'article ne doit pas se
+transformer en une pile de pavés.
+
+**La vidéo n'est pas jouée dans la page, et ce n'est pas un oubli.** Une iframe
+YouTube obligerait à inscrire un domaine de Google dans la CSP (règle n° 2 des
+règles de sécurité), donc à annoncer à Google chaque visiteur d'un article
+avant même qu'il ait cliqué — sur un site dont le pied de page promet de
+n'utiliser aucun service tiers. Le bloc ne charge rien de l'extérieur : c'est
+du texte et un triangle dessiné en SVG. La lecture se fait sur YouTube, après
+un clic délibéré.
+
+L'adresse du lien est **reconstruite** à partir des onze caractères de
+l'identifiant validés par la regex, jamais recopiée telle quelle : rien de ce
+qu'a écrit l'auteur ne se retrouve dans le `href`. C'est ce qui permet de
+générer ce HTML sans rouvrir la porte que `html: false` ferme.
+
+Pour ajouter une plateforme (PeerTube, Vimeo), étendre `VIDEO` et la
+construction de l'URL dans le moteur de rendu. `linkify` doit d'abord avoir
+reconnu l'adresse comme un lien, sans quoi la règle ne voit rien.
+
 ## Le formulaire de publication
 
 `src/lib/components/FormulairePublication.svelte` offre une barre d'outils
