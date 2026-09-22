@@ -31,3 +31,6 @@ vite.config.ts.timestamp-*
 
 # Archives de sauvegarde
 /sauvegardes
+
+# Réglages Claude Code propres à cette machine
+.claude/settings.local.json

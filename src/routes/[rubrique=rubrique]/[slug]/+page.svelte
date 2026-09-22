@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
+	import { articleStructure, editeur, evenementApero, filAriane } from '$lib/donnees-structurees';
 	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatTailleFichier, LIBELLE_EVENEMENT, LIBELLE_KIND } from '$lib/format';
+	import { RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,16 +25,34 @@
 	// Cadre des apéros (heure, lieu), affiché sous le titre d'un apéro.
 	const cadre = $derived(data.apero);
 	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
+
+	// Un apéro est un rendez-vous avec une date et une adresse, pas un article :
+	// annoncé comme un événement, il peut apparaître comme tel dans Google.
+	const rubrique = $derived(RUBRIQUE_PAR_KIND[p.kind]);
+	const adresse = $derived(`${page.url.origin}/${rubrique}/${p.slug}`);
+	const fiche = $derived(
+		p.kind === 'apero'
+			? evenementApero(page.url.origin, adresse, p, data.resume, cadre, data.settings)
+			: articleStructure(page.url.origin, adresse, p, data.resume, data.settings)
+	);
 </script>
 
-<svelte:head>
-	<title>{p.title} — {data.settings.siteName}</title>
-	<meta name="description" content={data.resume} />
-	<meta property="og:title" content={p.title} />
-	<meta property="og:description" content={data.resume} />
-	<meta property="og:type" content="article" />
-	{#if p.cover}<meta property="og:image" content={p.cover.url} />{/if}
-</svelte:head>
+<Metadonnees
+	titre="{p.title} — {data.settings.siteName}"
+	description={data.resume}
+	type="article"
+	image={p.cover?.url ?? null}
+	indexable={!data.apercu}
+	donnees={[
+		fiche,
+		editeur(page.url.origin, data.settings),
+		filAriane(page.url.origin, [
+			{ nom: 'Accueil', chemin: '/' },
+			{ nom: TITRE_RUBRIQUE[rubrique], chemin: `/${rubrique}` },
+			{ nom: p.title, chemin: `/${rubrique}/${p.slug}` }
+		])
+	]}
+/>
 
 <!-- Toute la fiche partage la même colonne de lecture : en-tête, image,
      texte, dossier partagé et commentaires ont ainsi le même bord gauche. -->

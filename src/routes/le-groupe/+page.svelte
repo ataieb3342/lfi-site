@@ -1,17 +1,21 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
 	const fonds = ['#f7d8a7', '#d9cff7', '#bfe6d5', '#f3c8d5', '#cce2f5'];
 </script>
 
-<svelte:head>
-	<title>Qui sommes-nous ? — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Qui sommes-nous ? — {data.settings.siteName}"
+	description="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Qui sommes-nous ?', chemin: '/le-groupe' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>

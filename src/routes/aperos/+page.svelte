@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import { formatDateCourte, formatDateLongue } from '$lib/format';
 	import { CHAPO_RUBRIQUE, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { PageData } from './$types';
@@ -13,10 +16,17 @@
 	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
 </script>
 
-<svelte:head>
-	<title>{TITRE_RUBRIQUE.aperos} — {data.settings.siteName}</title>
-	<meta name="description" content={CHAPO_RUBRIQUE.aperos} />
-</svelte:head>
+<!-- « à Dijon » dans le titre : c'est ce que les gens tapent, et « Les apéros »
+     seul ne rattache la page à aucun lieu. -->
+<Metadonnees
+	titre="Les apéros thématiques à Dijon — {data.settings.siteName}"
+	description={CHAPO_RUBRIQUE.aperos}
+	image={prochain?.cover?.url ?? null}
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: TITRE_RUBRIQUE.aperos, chemin: '/aperos' }
+	])}
+/>
 
 <!-- Pas de filet : le bandeau du prochain apéro pose déjà la limite. -->
 <header>

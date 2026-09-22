@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
@@ -24,13 +27,14 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Nous rejoindre — {data.settings.siteName}</title>
-	<meta
-		name="description"
-		content="Rejoindre le groupe d'action de La France insoumise du centre de Dijon : inscription gratuite, aucune expérience nécessaire."
-	/>
-</svelte:head>
+<Metadonnees
+	titre="Nous rejoindre — {data.settings.siteName}"
+	description="Rejoindre le groupe d'action de La France insoumise du centre de Dijon : inscription gratuite, aucune expérience nécessaire."
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Nous rejoindre', chemin: '/nous-rejoindre' }
+	])}
+/>
 
 <header class="border-b border-line pb-4">
 	<p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Dijon Centre</p>
@@ -74,20 +78,6 @@
 		peut militer avec nous sans être inscrit, et inversement. L'inscription donne accès à Action
 		populaire, aux formations et aux informations du mouvement.
 	</p>
-
-	<h2>Nous écrire</h2>
-	{#if data.settings.contactEmail}
-		<p>
-			<a href="mailto:{data.settings.contactEmail}">{data.settings.contactEmail}</a> — nous répondons
-			sous quelques jours.
-		</p>
-	{:else}
-		<p>
-			Retrouvez le groupe sur
-			<a href="https://actionpopulaire.fr" rel="noopener noreferrer" target="_blank">Action populaire</a>
-			ou consultez <a href="/agenda">l'agenda</a> pour connaître le prochain rendez-vous.
-		</p>
-	{/if}
 
 	<h2>Un autre quartier, une autre ville ?</h2>
 	<p>

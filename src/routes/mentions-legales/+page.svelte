@@ -1,40 +1,48 @@
 <script lang="ts">
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>Mentions légales — {data.settings.siteName}</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
+<Metadonnees
+	titre="Mentions légales — {data.settings.siteName}"
+	description="Éditeur, hébergeur et contact du site du groupe d'action de La France insoumise du centre de Dijon."
+	indexable={false}
+/>
 
 <header class="border-b border-line pb-4">
 	<h1 class="text-3xl font-extrabold text-ink sm:text-4xl">Mentions légales</h1>
 </header>
 
+<!--
+	Ces informations sont écrites ici et non dans les réglages : l'article 6-III
+	de la loi pour la confiance dans l'économie numérique les rend obligatoires,
+	et une mention légale qui dépend d'un champ d'administration disparaît le
+	jour où quelqu'un vide le champ sans savoir ce qu'il tient.
+-->
 <div class="contenu mt-5 max-w-2xl">
-	<p class="rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
-		À COMPLÉTER avant la mise en ligne. La loi pour la confiance dans l'économie numérique
-		(article 6-III) rend ces informations obligatoires, y compris pour un site non commercial.
-	</p>
-
 	<h2>Éditeur du site</h2>
 	<p>
 		{data.settings.siteName}<br />
-		Directeur ou directrice de la publication : <strong>À COMPLÉTER (nom et prénom)</strong><br />
-		Contact : <strong>{data.settings.contactEmail || 'À COMPLÉTER'}</strong>
+		Directeur de la publication : <strong>Adam Taieb</strong><br />
+		Contact : <a href="mailto:contact@ataieb-dev.fr">contact@ataieb-dev.fr</a>
 	</p>
 	<p>
-		Un site édité à titre non professionnel par une personne physique peut se limiter, en
-		affichage public, au nom du directeur de la publication et aux coordonnées de l'hébergeur,
-		à condition d'avoir communiqué son identité à l'hébergeur.
+		Ce site est édité à titre non professionnel par une personne physique. La loi l'autorise
+		alors à ne pas afficher publiquement son adresse postale, à condition d'avoir communiqué
+		son identité à l'hébergeur — ce qui est le cas. L'adresse est communiquée à l'autorité
+		judiciaire sur réquisition.
 	</p>
 
 	<h2>Hébergement</h2>
 	<p>
-		<strong>À COMPLÉTER : raison sociale de l'hébergeur, adresse postale, téléphone.</strong><br />
-		Les données de ce site sont hébergées en France.
+		OVH SAS<br />
+		2 rue Kellermann, 59100 Roubaix, France<br />
+		Téléphone : 1007 (depuis la France) ou +33 9 72 10 10 07<br />
+		<a href="https://www.ovhcloud.com">ovhcloud.com</a>
 	</p>
+	<p>Les serveurs et les sauvegardes de ce site sont situés en France.</p>
 
 	<h2>Propriété intellectuelle</h2>
 	<p>
@@ -44,7 +52,14 @@
 
 	<h2>Signaler un contenu</h2>
 	<p>
-		Pour signaler un contenu que vous estimez illicite, écrivez à l'adresse de contact ci-dessus en
-		précisant l'adresse de la page concernée et le motif du signalement.
+		Pour signaler un contenu que vous estimez illicite, écrivez à
+		<a href="mailto:contact@ataieb-dev.fr">contact@ataieb-dev.fr</a> en précisant l'adresse de la
+		page concernée et le motif du signalement.
+	</p>
+
+	<h2>Données personnelles</h2>
+	<p>
+		Ce site ne dépose aucun traceur publicitaire, n'utilise aucun service tiers et ne conserve
+		aucune adresse IP en clair. Le détail est sur la page <a href="/confidentialite">Confidentialité</a>.
 	</p>
 </div>

@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import BandeauApero from '$lib/components/BandeauApero.svelte';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import CartePublication from '$lib/components/CartePublication.svelte';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { organisation } from '$lib/donnees-structurees';
 	import { formatDate, formatDateCourte } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -12,10 +15,14 @@
 	const prochainRendezVous = $derived(data.actus.find((actu) => actu.aVenir) ?? null);
 </script>
 
-<svelte:head>
-	<title>{data.settings.siteName}</title>
-	<meta name="description" content={data.settings.description} />
-</svelte:head>
+<!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
+     Google affiche, et « LFI Dijon Centre » seul ne dit pas ce qu'on y trouve. -->
+<Metadonnees
+	titre="{data.settings.siteName} — {data.settings.tagline}"
+	description={data.settings.description}
+	image={une?.cover?.url ?? null}
+	donnees={organisation(page.url.origin, data.settings, data.apero)}
+/>
 
 <section class="overflow-hidden rounded-2xl bg-brand text-sur-brand">
 	<div class="grid lg:grid-cols-[1.35fr_0.65fr]">

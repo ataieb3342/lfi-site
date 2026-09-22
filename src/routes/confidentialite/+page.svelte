@@ -1,12 +1,15 @@
 <script lang="ts">
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>Confidentialité — {data.settings.siteName}</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
+<Metadonnees
+	titre="Confidentialité — {data.settings.siteName}"
+	description="Ce site n'utilise aucun traceur, aucun service tiers et ne conserve aucune adresse IP en clair."
+	indexable={false}
+/>
 
 <header class="border-b border-line pb-4">
 	<h1 class="text-3xl font-extrabold text-ink sm:text-4xl">Confidentialité</h1>

@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Encart from '$lib/components/Encart.svelte';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import { COULEUR_KIND } from '$lib/format';
 	import { CHAPO_RUBRIQUE, KIND_PAR_RUBRIQUE, SURLIGNE_RUBRIQUE, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { PageData } from './$types';
@@ -33,12 +36,24 @@
 			data.rubrique === 'revue-de-presse' ||
 			(data.rubrique === 'actualites' && data.app.actif)
 	);
+
+	// Chaque page de la liste est une page à part entière : elle se désigne
+	// elle-même comme canonique et porte son numéro dans le titre. Les renvoyer
+	// toutes vers la page 1 ferait disparaître de l'index les publications
+	// anciennes, qui ne sont listées nulle part ailleurs.
+	const chemin = $derived(`/${data.rubrique}${data.page > 1 ? `?page=${data.page}` : ''}`);
+	const suffixe = $derived(data.page > 1 ? ` (page ${data.page})` : '');
 </script>
 
-<svelte:head>
-	<title>{titreAffiche} — {data.settings.siteName}</title>
-	<meta name="description" content={chapoAffiche} />
-</svelte:head>
+<Metadonnees
+	titre="{titreAffiche}{suffixe} — {data.settings.siteName}"
+	description={chapoAffiche}
+	canonique={chemin}
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: titreAffiche, chemin: `/${data.rubrique}` }
+	])}
+/>
 
 <!-- Pas de filet sous cet en-tête : le bandeau qui suit est une surface
      colorée, il pose déjà la limite. Deux traits l'un sur l'autre font une
