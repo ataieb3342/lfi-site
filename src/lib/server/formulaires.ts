@@ -21,11 +21,18 @@ export async function lirePublication(
 	const body = String(form.get('body') ?? '');
 	const authorName = String(form.get('authorName') ?? '').trim();
 	const eventAt = String(form.get('eventAt') ?? '').trim();
-	const eventCategory = String(form.get('eventCategory') ?? (kind === 'apero' ? 'apero' : 'autre'));
 
 	if (kind !== 'article' && kind !== 'actu' && kind !== 'apero' && kind !== 'revue') {
 		throw new ErreurFormulaire('Type de publication inconnu.');
 	}
+
+	// Un apéro est toujours un apéro dans l'agenda, quoi qu'indique le menu :
+	// celui-ci est à « Autre » par défaut, et l'oubli classait la soirée en gris
+	// parmi les rendez-vous sans catégorie. La migration 008 et le mode
+	// démonstration font déjà ce rapprochement ; c'est ici qu'il manquait.
+	const eventCategory =
+		kind === 'apero' ? 'apero' : String(form.get('eventCategory') ?? 'autre');
+
 	if (status !== 'draft' && status !== 'published') throw new ErreurFormulaire('État inconnu.');
 	if (!title) throw new ErreurFormulaire('Le titre est obligatoire.');
 	if (title.length > 200) throw new ErreurFormulaire('Le titre est trop long (200 caractères maximum).');

@@ -21,6 +21,12 @@
 
 	--color-pourpre: #9a3263; /* teinte intermédiaire du dégradé */
 
+	/* Le vert des formations dans l'agenda. Il n'est pas au logo : c'est la
+	   seule catégorie de rendez-vous qui n'a pas de couleur de rubrique à
+	   reprendre. Comme les autres, il est écrit ici et pas en dur dans une
+	   règle, sinon il resterait sombre sur le fond sombre. */
+	--color-vert: #1f6650;
+
 	/*
 	 * Texte et fond. Le fond n'est pas un blanc pur mais un lavande très clair,
 	 * et le texte un noir adouci : le contraste reste très large (au-delà de 12
@@ -98,6 +104,7 @@
 		--color-accent-soft: #3a1820;
 
 		--color-pourpre: #d67bb0;
+		--color-vert: #6fd3ad;
 
 		--color-ink: #f3eff8;
 		--color-ink-soft: #bbb2c8;
@@ -121,6 +128,7 @@
 	--color-accent-soft: #3a1820;
 
 	--color-pourpre: #d67bb0;
+	--color-vert: #6fd3ad;
 
 	--color-ink: #f3eff8;
 	--color-ink-soft: #bbb2c8;
@@ -216,6 +224,27 @@ h1, h2, h3, h4 {
 	background: #1a0f2e;
 	color: #fff;
 }
+
+/* Le bouton d'une surface colorée. Ses couleurs sont fixes, comme celles des
+   surfaces elles-mêmes : `text-brand` deviendrait un lavande clair en thème
+   sombre, donc illisible sur la pastille blanche. */
+.bouton-sur-fond {
+	display: inline-block;
+	border-radius: 9999px;
+	background: #fff;
+	padding: 0.5rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 700;
+	color: #43206c;
+	transition: background-color 150ms;
+}
+.bouton-sur-fond:hover { background: rgba(255, 255, 255, 0.9); }
+.bouton-sur-fond-creux {
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	background: transparent;
+	color: #fff;
+}
+.bouton-sur-fond-creux:hover { background: rgba(255, 255, 255, 0.12); }
 /* Filet aux couleurs du logo. */
 .filet-degrade {
 	background: var(--filet-degrade);
@@ -464,7 +493,7 @@ main > :first-child {
 .agenda-action { color: var(--color-accent); }
 .agenda-reunion { color: var(--color-brand); }
 .agenda-apero { color: var(--color-pourpre); }
-.agenda-formation { color: #25735d; }
+.agenda-formation { color: var(--color-vert); }
 .agenda-autre { color: var(--color-ink-soft); }
 
 @media (max-width: 640px) {

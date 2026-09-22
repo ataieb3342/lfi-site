@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { PageData } from './$types';
 	import type { PublicationVue } from '$lib/types';
+	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import { filAriane } from '$lib/donnees-structurees';
 	import { lienPublication } from '$lib/format';
 
 	let { data }: { data: PageData } = $props();
@@ -67,17 +70,33 @@
 	function classeCategorie(categorie: Categorie): string {
 		return categories.find((c) => c.valeur === categorie)?.classe ?? 'agenda-autre';
 	}
+
+	// Le mois courant est l'agenda : c'est lui qui entre dans l'index, à
+	// l'adresse nue. Les autres mois portent `noindex, follow` — il y en a une
+	// infinité, le bouton « Suivant » menant toujours au suivant, et ils ne
+	// contiennent rien qui ne soit déjà listé dans /actualites et /aperos. Le
+	// `follow` reste indispensable : sans lui, les rendez-vous eux-mêmes
+	// cesseraient d'être atteints depuis cette page.
+	const moisCourant = $derived(data.mois === aujourdHuiIso.slice(0, 7));
+	const chemin = $derived(moisCourant ? '/agenda' : `/agenda?mois=${data.mois}`);
+	const suffixe = $derived(moisCourant ? '' : ` — ${calendrier.titre}`);
 </script>
 
-<svelte:head>
-	<title>Agenda</title>
-	<meta name="description" content="Le calendrier des actions, événements, apéros et formations du groupe." />
-</svelte:head>
+<Metadonnees
+	titre="Agenda{suffixe} — {data.settings.siteName}"
+	description="Le calendrier des actions, événements, apéros et formations du groupe d'action."
+	canonique={chemin}
+	indexable={moisCourant}
+	donnees={filAriane(page.url.origin, [
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: 'Agenda', chemin: '/agenda' }
+	])}
+/>
 
-<header class="max-w-2xl">
+<header class="border-b border-line pb-4">
 	<p class="text-sm font-bold tracking-wide text-brand uppercase">Nos rendez-vous</p>
 	<h1 class="titre-affiche mt-2 text-4xl text-ink sm:text-5xl">Agenda</h1>
-	<p class="mt-4 text-lg text-ink-soft">Consultez les rendez-vous du groupe, mois par mois.</p>
+	<p class="mt-4 max-w-2xl text-lg text-ink-soft">Consultez les rendez-vous du groupe, mois par mois.</p>
 </header>
 
 <section class="mt-8" aria-labelledby="mois-courant">

@@ -22,7 +22,10 @@
 	 *
 	 * Les adresses viennent des réglages. Quand aucune n'est renseignée, le
 	 * bandeau renvoie vers le site d'Action populaire plutôt que d'afficher des
-	 * boutons morts.
+	 * boutons morts. C'est vrai des deux formes : `compact` est une bande d'une
+	 * seule ligne pour la tête de la liste des actualités, mais elle mène aux
+	 * mêmes magasins. Une variante qui ignorerait `android` et `ios` viderait
+	 * les réglages de leur effet sans que personne ne s'en aperçoive.
 	 */
 	let {
 		actif = true,
@@ -52,14 +55,29 @@
 				<strong>Vous participez à un rendez-vous ?</strong>
 				Pensez à vous inscrire sur Action populaire pour nous prévenir de votre présence.
 			</p>
-			<a
-				href={SITE}
-				rel="noopener noreferrer"
-				target="_blank"
-				class="shrink-0 self-start rounded-full px-4 py-2 text-sm font-bold sm:self-auto"
-				style="background-color: #0b0b33; color: #f0e80d;"
-				>Action populaire ↗</a
-			>
+			<div class="flex shrink-0 flex-wrap gap-2 self-start sm:self-auto">
+				{#if boutons.length}
+					{#each boutons as bouton (bouton.href)}
+						<a
+							href={bouton.href}
+							rel="noopener noreferrer"
+							target="_blank"
+							class="rounded-full px-4 py-2 text-sm font-bold"
+							style="background-color: #0b0b33; color: #f0e80d;"
+							>{bouton.label} ↗</a
+						>
+					{/each}
+				{:else}
+					<a
+						href={SITE}
+						rel="noopener noreferrer"
+						target="_blank"
+						class="rounded-full px-4 py-2 text-sm font-bold"
+						style="background-color: #0b0b33; color: #f0e80d;"
+						>Action populaire ↗</a
+					>
+				{/if}
+			</div>
 		</aside>
 	{:else}
 	<Encart

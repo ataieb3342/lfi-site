@@ -41,18 +41,36 @@
 	// elle-même comme canonique et porte son numéro dans le titre. Les renvoyer
 	// toutes vers la page 1 ferait disparaître de l'index les publications
 	// anciennes, qui ne sont listées nulle part ailleurs.
-	const chemin = $derived(`/${data.rubrique}${data.page > 1 ? `?page=${data.page}` : ''}`);
+	//
+	// Le filtre de catégorie entre dans l'adresse au même titre que le numéro de
+	// page : la page affiche « Actions », pas « Actualités », et se désigner
+	// comme /actualites reviendrait à annoncer autre chose que ce qu'on montre.
+	// Sur la page 2 c'était pire encore : la canonique désignait la page 2 non
+	// filtrée, qui liste d'autres publications.
+	function lienListe(numero: number, categorie: string | null): string {
+		const params = new URLSearchParams();
+		if (categorie) params.set('categorie', categorie);
+		if (numero > 1) params.set('page', String(numero));
+		const suite = params.toString();
+		return `/${data.rubrique}${suite ? `?${suite}` : ''}`;
+	}
+	const chemin = $derived(lienListe(data.page, data.categorie));
 	const suffixe = $derived(data.page > 1 ? ` (page ${data.page})` : '');
+
+	// Une rubrique filtrée est une étape de plus dans le fil d'Ariane : « Actions »
+	// est sous « Actualités », elle ne la remplace pas.
+	const etapes = $derived([
+		{ nom: 'Accueil', chemin: '/' },
+		{ nom: titre, chemin: `/${data.rubrique}` },
+		...(filtre ? [{ nom: filtre.titre, chemin: lienListe(1, data.categorie) }] : [])
+	]);
 </script>
 
 <Metadonnees
 	titre="{titreAffiche}{suffixe} — {data.settings.siteName}"
 	description={chapoAffiche}
 	canonique={chemin}
-	donnees={filAriane(page.url.origin, [
-		{ nom: 'Accueil', chemin: '/' },
-		{ nom: titreAffiche, chemin: `/${data.rubrique}` }
-	])}
+	donnees={filAriane(page.url.origin, etapes)}
 />
 
 <!-- Pas de filet sous cet en-tête : le bandeau qui suit est une surface
@@ -121,7 +139,7 @@
 			{#if data.page > 1}
 				<a
 					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
-				href="?page={data.page - 1}{data.categorie ? `&categorie=${data.categorie}` : ''}">← Page précédente</a
+					href={lienListe(data.page - 1, data.categorie)}>← Page précédente</a
 				>
 			{:else}
 				<span></span>
@@ -130,7 +148,7 @@
 			{#if data.page < data.pages}
 				<a
 					class="rounded-full border border-line-forte px-4 py-2 text-sm font-semibold hover:bg-surface-alt"
-					href="?page={data.page + 1}{data.categorie ? `&categorie=${data.categorie}` : ''}">Page suivante →</a
+					href={lienListe(data.page + 1, data.categorie)}>Page suivante →</a
 				>
 			{:else}
 				<span></span>

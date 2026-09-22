@@ -5,7 +5,7 @@
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { formatDate, formatDateCourte } from '$lib/format';
+	import { formatDate, formatDateCourte, lienPublication } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -24,33 +24,46 @@
 	donnees={organisation(page.url.origin, data.settings, data.apero)}
 />
 
-<section class="overflow-hidden rounded-2xl bg-brand text-sur-brand">
-	<div class="grid lg:grid-cols-[1.35fr_0.65fr]">
-		<div class="p-7 sm:p-10 lg:p-12">
-			<p class="text-sm font-bold tracking-[0.2em] uppercase opacity-80">Groupe d’action · Dijon Centre</p>
-			<h1 class="titre-affiche mt-4 max-w-3xl text-4xl leading-tight sm:text-6xl">
+<!--
+	Le bandeau d'ouverture. Il occupait 475 pixels — soit davantage que le
+	carrousel de 425 qu'on avait retiré précisément pour cela : l'accueil
+	s'ouvrait sur un écran entier de surface colorée et le premier article
+	passait sous la ligne de flottaison.
+
+	Il dit la même chose sur deux cents pixels, au gabarit des autres bandeaux
+	du site (voir BandeauApero.svelte) : même rembourrage, même échelle de
+	titre, mêmes boutons. La surface est `.fond-degrade` et non un aplat de
+	violet, comme partout ailleurs sur le site.
+-->
+<section class="fond-degrade overflow-hidden rounded-2xl px-4 py-5 sm:px-6 sm:py-6">
+	<div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8">
+		<div>
+			<p class="text-[0.6875rem] font-bold tracking-[0.18em] text-white/75 uppercase">
+				Groupe d’action · Dijon Centre
+			</p>
+			<h1 class="titre-affiche mt-1 max-w-2xl text-2xl text-white sm:text-3xl">
 				Agir ici, discuter ensemble, changer les choses.
 			</h1>
-			<p class="mt-5 max-w-2xl text-lg leading-relaxed opacity-90">{data.settings.description}</p>
-			<div class="mt-7 flex flex-wrap gap-3">
-				<a class="rounded-full bg-surface px-5 py-3 font-bold text-ink hover:bg-surface-alt" href="/agenda">
-					Voir l’agenda
-				</a>
-				<a class="rounded-full border border-current px-5 py-3 font-bold hover:bg-white/10" href="/nous-rejoindre">
-					Nous rejoindre
-				</a>
+			<p class="mt-2 max-w-2xl leading-snug text-white/85">{data.settings.description}</p>
+			<div class="mt-4 flex flex-wrap gap-2">
+				<a class="bouton-sur-fond" href="/agenda">Voir l’agenda</a>
+				<a class="bouton-sur-fond bouton-sur-fond-creux" href="/nous-rejoindre">Nous rejoindre</a>
 			</div>
 		</div>
 
+		<!-- Le prochain rendez-vous, en vignette et non en colonne pleine hauteur :
+		     c'est un raccourci, pas une seconde moitié de page. -->
 		{#if prochainRendezVous}
 			<a
-				href="/actualites/{prochainRendezVous.slug}"
-				class="group flex flex-col justify-end border-t border-white/20 bg-black/10 p-7 hover:bg-black/15 lg:border-t-0 lg:border-l sm:p-8"
+				href={lienPublication(prochainRendezVous.kind, prochainRendezVous.slug)}
+				class="group block rounded-xl bg-black/15 px-4 py-3 hover:bg-black/25 lg:w-64"
 			>
-				<p class="text-xs font-bold tracking-[0.18em] uppercase opacity-75">Prochain rendez-vous</p>
-				<p class="mt-3 text-3xl font-extrabold">{formatDateCourte(prochainRendezVous.eventAt)}</p>
-				<h2 class="mt-2 text-xl font-bold leading-snug group-hover:underline">{prochainRendezVous.title}</h2>
-				<span class="mt-5 text-sm font-bold">En savoir plus →</span>
+				<p class="text-[0.6875rem] font-bold tracking-[0.18em] text-white/75 uppercase">
+					Prochain rendez-vous{' · '}{formatDateCourte(prochainRendezVous.eventAt)}
+				</p>
+				<h2 class="mt-1 leading-snug font-bold text-white group-hover:underline">
+					{prochainRendezVous.title}
+				</h2>
 			</a>
 		{/if}
 	</div>
