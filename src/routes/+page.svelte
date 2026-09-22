@@ -14,10 +14,14 @@
 	const suite = $derived(data.articles.slice(1));
 </script>
 
-<!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
-     Google affiche, et « LFI Dijon Centre » seul ne dit pas ce qu'on y trouve. -->
+<!-- Le titre de l'accueil est le seul nom du site, sans la devise. Un onglet
+     de navigateur n'affiche qu'une vingtaine de caractères : « LFI Dijon
+     Centre — Groupe d'action de La Fra… » était coupé en plein milieu, et
+     illisible quand plusieurs onglets sont ouverts. Ce que la devise apportait
+     au référencement se trouve de toute façon dans la description ci-dessous,
+     dans l'en-tête de la page et dans `alternateName` des données structurées. -->
 <Metadonnees
-	titre="{data.settings.siteName} — {data.settings.tagline}"
+	titre={data.settings.siteName}
 	description={data.settings.description}
 	image={une?.cover?.url ?? null}
 	donnees={organisation(page.url.origin, data.settings, data.apero)}
