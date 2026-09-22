@@ -1,7 +1,8 @@
 # Site du groupe d'action LFI Dijon Centre
 
-Site d'information : articles, actualités, commentaires anonymes modérés,
-administration protégée par double authentification.
+Site d'information : articles, actualités classées par catégorie, agenda
+interactif, commentaires anonymes modérés et administration protégée par
+double authentification.
 
 - **Hébergement** : VPS français (OVH ou Scaleway), Docker + Caddy.
 - **Données** : un fichier SQLite, les images et les PDF de la bibliothèque.
@@ -41,7 +42,9 @@ scripts/           sauvegarde et restauration
 | Je veux… | Où |
 | --- | --- |
 | Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
-| Annoncer une action à venir | Même écran, type « Actualité » + renseigner la date de l'action |
+| Ajouter un évènement | Administration → Publications → Nouvelle publication, puis renseigner sa date et sa catégorie |
+| Classer un rendez-vous | Choisir parmi « Action », « Réunion », « Apéro », « Formation » ou « Autre » |
+| Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
@@ -56,6 +59,20 @@ scripts/           sauvegarde et restauration
 Les publications s'écrivent en **Markdown** : `## Titre`, `**gras**`,
 `*italique*`, `[lien](https://…)`, `> citation`, listes à tirets. Le HTML n'est
 pas interprété, c'est une protection volontaire.
+
+## Navigation et agenda
+
+La navigation publique est regroupée en deux ensembles :
+
+- **Actualités** : vue d’ensemble, agenda, actions, événements et formations ;
+- **Ressources** : bibliothèque, revue de presse, boîte à outils et jeux.
+
+Un clic sur le nom d’un ensemble ouvre sa page principale ; la flèche affiche
+ses sous-rubriques.
+
+L’agenda rassemble les publications qui possèdent une date de rendez-vous.
+Chaque événement reçoit une catégorie, action, réunion, apéro, formation ou
+autre, utilisée pour sa couleur et les filtres du calendrier.
 
 ## Site de démonstration
 
