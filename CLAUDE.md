@@ -802,3 +802,15 @@ par Administration → Médias.
 
 Voir `DEPLOIEMENT.md`. VPS français, Docker + Caddy, sauvegarde quotidienne par
 `scripts/sauvegarde.sh`.
+
+**Pousser sur `main` met le site à jour.** `scripts/deployer.sh` tourne toutes
+les cinq minutes sur le serveur : si `main` a bougé, il sauvegarde, récupère le
+code et redémarre ; sinon il ne fait rien. C'est le serveur qui interroge
+GitHub, et non l'inverse — aucune clé d'accès à la machine de production ne
+traîne donc chez un tiers.
+
+Deux conséquences à garder en tête. Un commit poussé part **en production dans
+les cinq minutes**, sans relecture : `npm run check` avant de pousser n'est pas
+une politesse. Et si la compilation échoue, les conteneurs en place continuent
+de servir la version précédente — le site ne tombe pas, il cesse simplement de
+se mettre à jour, ce que seul `/var/log/deploiement-site.log` dira.
