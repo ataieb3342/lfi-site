@@ -21,7 +21,7 @@ export type PublicationVue = {
 	authorAdminId: number | null;
 	authorProfileUrl: string | null;
 	commentCount: number;
-	/** Date de l'action annoncée (AAAA-MM-JJ), si la publication en annonce une. */
+	/** Date du rendez-vous ou de l’action racontée (AAAA-MM-JJ). */
 	eventAt: string | null;
 	/** Catégorie utilisée pour la couleur et le filtrage dans l'agenda. */
 	eventCategory: 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
@@ -38,7 +38,7 @@ export type PublicationVue = {
 	eventMeetingPoint: string;
 	eventMap: { url: string; alt: string } | null;
 	eventMapEmbedUrl: string;
-	/** Vrai tant que la date de l'action n'est pas passée. */
+	/** Vrai tant que la date du rendez-vous n'est pas passée. */
 	aVenir: boolean;
 	cover: { url: string; alt: string } | null;
 };

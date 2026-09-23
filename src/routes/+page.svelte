@@ -73,12 +73,12 @@
 	<a class="carte group block p-5 hover:border-brand" href="/agenda">
 		<span class="text-xs font-bold tracking-wide text-brand uppercase">Quand ?</span>
 		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">L’agenda</strong>
-		<span class="mt-1 block text-sm text-ink-soft">Actions, événements, apéros et formations.</span>
+		<span class="mt-1 block text-sm text-ink-soft">Événements, manifestations, apéros et formations.</span>
 	</a>
 	<a class="carte group block p-5 hover:border-brand" href="/actualites?categorie=action">
 		<span class="text-xs font-bold tracking-wide text-brand uppercase">Sur le terrain</span>
-		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Nos actions</strong>
-		<span class="mt-1 block text-sm text-ink-soft">Ce que le groupe organise près de chez vous.</span>
+		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Nos retours d’action</strong>
+		<span class="mt-1 block text-sm text-ink-soft">Ce que le groupe a déjà réalisé sur le terrain.</span>
 	</a>
 	<a class="carte group block p-5 hover:border-brand" href="/le-groupe">
 		<span class="text-xs font-bold tracking-wide text-brand uppercase">Avec qui ?</span>

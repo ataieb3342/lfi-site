@@ -365,6 +365,18 @@ const MIGRATIONS: string[] = [
 	// 014 — carte Google Maps intégrée à partir du code fourni par Google
 	`
 	alter table publications add column event_map_embed_url text not null default '';
+	`,
+	// 015 — les actions ne sont plus annoncées : les anciennes fiches doivent
+	// être relues avant de devenir d’éventuels retours d’action.
+	`
+	delete from publication_managers
+	 where publication_id in (select id from publications where event_category = 'action');
+	update publications set
+	 status = 'draft',
+	 event_start_time = '', event_end_time = '', event_location = '', event_address = '',
+	 event_location_url = '', event_managers = '', event_signup_url = '',
+	 event_meeting_point = '', event_map_media_id = null, event_map_embed_url = ''
+	 where event_category = 'action';
 	`
 ];
 

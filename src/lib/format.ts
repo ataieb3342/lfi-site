@@ -57,7 +57,7 @@ export const LIBELLE_KIND: Record<string, string> = {
 
 /** Libellé du type tel qu'il est choisi dans l'administration. */
 export function libellePublication(kind: string, eventCategory: string): string {
-	if (kind === 'actu' && eventCategory === 'action') return 'Action';
+	if (kind === 'actu' && eventCategory === 'action') return 'Retour d’action';
 	if (kind === 'actu' && eventCategory === 'reunion') return 'Événement';
 	if (kind === 'actu' && eventCategory === 'formation') return 'Formation';
 	return LIBELLE_KIND[kind] ?? 'Publication';
@@ -90,7 +90,7 @@ export function formatPlageHoraire(debut: string, fin: string): string {
 
 /** Libellé court de la pastille d'un rendez-vous. */
 export const LIBELLE_EVENEMENT: Record<string, string> = {
-	action: 'Action',
+	action: 'Retour d’action',
 	reunion: 'Événement',
 	apero: 'Apéro',
 	formation: 'Formation',

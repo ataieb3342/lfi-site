@@ -13,7 +13,7 @@
 
 	const titre = $derived(TITRE_RUBRIQUE[data.rubrique]);
 	const filtresActualites = {
-		action: { titre: 'Actions', chapo: 'Les tractages, distributions, porte-à-porte et mobilisations du groupe.' },
+		action: { titre: 'Retours d’action', chapo: 'Les tractages, collages et porte-à-porte déjà réalisés par le groupe.' },
 		reunion: { titre: 'Événements', chapo: 'Les réunions publiques et rendez-vous ouverts à toutes et tous.' },
 		formation: { titre: 'Formations', chapo: 'Les ateliers pour apprendre, partager des pratiques et gagner en confiance.' }
 	} as const;

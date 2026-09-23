@@ -170,6 +170,8 @@ type Fiche = {
 	actionDans?: number | (() => number);
 	/** Pastille affichée dans l'agenda et sur les rendez-vous. */
 	categorieEvenement?: 'action' | 'reunion' | 'formation';
+	/** Nature d’un retour d’action. */
+	categorieAction?: 'porte-a-porte' | 'tractage' | 'collage';
 	/** Vrai pour la fiche qui reçoit l'image de couverture de la démonstration. */
 	illustree?: true;
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
@@ -180,28 +182,27 @@ type Fiche = {
 const FICHES: Fiche[] = [
 	{
 		kind: 'actu',
-		title: 'Tractage au marché des Halles samedi matin',
+		title: 'Retour sur notre tractage',
 		summary:
-			'Rendez-vous à 9 h 30 devant l’entrée principale des Halles pour distribuer notre tract sur les transports.',
-		actionDans: prochainSamedi,
+			'Retour sur notre tractage et les échanges avec les passantes et les passants.',
+		actionDans: -3,
 		categorieEvenement: 'action',
-		publieIlYa: 2,
-		body: `Nous serons au marché des Halles **samedi de 9 h 30 à 12 h** pour distribuer le tract du groupe sur la gratuité des transports pour les moins de 26 ans.
+		categorieAction: 'tractage',
+		publieIlYa: 1,
+		body: `Nous avons distribué notre tract sur la gratuité des transports pour les moins de 26 ans et échangé avec de nombreuses personnes.
 
-## Ce qu’il faut savoir
+## Ce que nous retenons
 
-- Rendez-vous devant l’entrée principale, côté rue Bannelier.
-- Les tracts et le matériel sont apportés par le groupe : venez les mains libres.
-- Une heure suffit, personne n’est obligé de rester toute la matinée.
-- Première fois ? Vous serez en binôme avec quelqu’un qui a l’habitude.
+- La question du prix des transports revient souvent.
+- Plusieurs personnes souhaitent davantage de fréquences en soirée.
+- Les échanges nourriront nos prochaines prises de parole.
 
 > Distribuer un tract, c’est surtout écouter les gens. On apprend plus en une matinée de marché qu’en dix réunions.
-
-Prévenez-nous par courriel si vous venez, pour que l’on prévoie assez de tracts.`,
+`,
 		commentaires: [
 			{
 				auteur: 'Camille',
-				texte: 'Je viens avec deux amis, on arrive vers 10 h. Il y aura des tracts en assez grand nombre ?',
+				texte: 'Merci pour ce retour. Les échanges sur les fréquences en soirée sont particulièrement intéressants.',
 				statut: 'pending'
 			}
 		]
@@ -545,7 +546,7 @@ Une trentaine de personnes, dont huit qui venaient pour la première fois. Bienv
 
 ## Calendrier
 
-Les prochaines actions sont annoncées dans la rubrique Actualités du site, avec leur date. Consultez-la régulièrement, ou abonnez-vous au flux RSS.
+Les actions terminées peuvent faire l’objet d’un retour dans la rubrique Actualités, sans information opérationnelle sur les prochaines actions.
 
 ## Finances
 
@@ -598,7 +599,8 @@ function remplirContenus(adminId: number, imageId: number | null) {
 						? null
 						: dansNJours(typeof fiche.actionDans === 'function' ? fiche.actionDans() : fiche.actionDans),
 				eventCategory:
-					fiche.kind === 'apero' ? 'apero' : (fiche.categorieEvenement ?? 'autre')
+					fiche.kind === 'apero' ? 'apero' : (fiche.categorieEvenement ?? 'autre'),
+				actionCategory: fiche.categorieAction
 			},
 			adminId
 		);

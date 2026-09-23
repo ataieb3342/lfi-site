@@ -8,8 +8,7 @@ double authentification.
 - **Données** : un fichier SQLite, les images et les PDF de la bibliothèque.
   Sauvegarder revient à copier `data/`.
 - **Vie privée** : aucun cookie de mesure d'audience et aucune adresse IP
-  conservée en clair. Une carte Google Maps peut être intégrée à une action ;
-  son affichage contacte alors Google.
+  conservée en clair.
 
 ## Démarrer en local
 
@@ -43,7 +42,7 @@ scripts/           sauvegarde et restauration
 | Je veux… | Où |
 | --- | --- |
 | Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
-| Ajouter une action | Choisir « Action », puis collage, porte-à-porte ou tractage |
+| Raconter une action terminée | Choisir « Retour d’action », puis collage, porte-à-porte ou tractage |
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
 | Relire les commentaires reçus | Administration → Commentaires |
@@ -61,24 +60,24 @@ Les publications s'écrivent en **Markdown** : `## Titre`, `**gras**`,
 `*italique*`, `[lien](https://…)`, `> citation`, listes à tirets. Le HTML n'est
 pas interprété, c'est une protection volontaire.
 
-Pour une action, le titre et le chapô sont préparés à partir de la date, des
-horaires et du lieu, puis restent modifiables. Les responsables se choisissent
-parmi les comptes ou se saisissent librement ; leur nom ouvre leur fiche si
-elle est publique. Une capture ou une carte Google Maps peut compléter le lieu.
+Un retour d’action ne peut porter que sur une action terminée. Le titre et le
+chapô sont préparés à partir du type d’action et de sa date, puis restent
+modifiables. Aucun horaire, lieu, responsable, carte ou lien d’inscription
+n’est enregistré. Une invitation vers Action populaire termine automatiquement
+la fiche.
 
 ## Navigation et agenda
 
 La navigation publique est regroupée en deux ensembles :
 
-- **Actualités** : vue d’ensemble, agenda, actions, événements et formations ;
+- **Actualités** : vue d’ensemble, agenda, retours d’action, événements et formations ;
 - **Ressources** : bibliothèque, revue de presse, boîte à outils et jeux.
 
 Un clic sur le nom d’un ensemble ouvre sa page principale ; la flèche affiche
 ses sous-rubriques.
 
-L’agenda rassemble les publications qui possèdent une date de rendez-vous.
-Chaque événement reçoit une catégorie, action, réunion, apéro, formation ou
-autre, utilisée pour sa couleur et les filtres du calendrier.
+L’agenda rassemble les rendez-vous à venir. Les retours d’action restent dans
+les actualités et n’annoncent jamais une action à l’avance.
 
 ## Site de démonstration
 

@@ -15,7 +15,7 @@
 			liens: [
 				{ href: '/agenda', label: 'Agenda' },
 				{ href: '/aperos', label: 'Apéros' },
-				{ href: '/actualites?categorie=action', label: 'Actions' },
+				{ href: '/actualites?categorie=action', label: 'Retours d’action' },
 				{ href: '/actualites?categorie=reunion', label: 'Événements' },
 				{ href: '/actualites?categorie=formation', label: 'Formations' },
 				{ href: '/articles', label: 'Articles' },

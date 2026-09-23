@@ -99,7 +99,7 @@
 		return (
 			valeurs.kind ??
 			(publication?.kind === 'actu' && ['action', 'reunion', 'formation'].includes(publication.eventCategory)
-				? publication.eventCategory
+				? publication.eventCategory === 'action' ? 'retour-action' : publication.eventCategory
 				: publication?.kind) ??
 			'article'
 		);
@@ -110,22 +110,22 @@
 		'porte-a-porte': {
 			nom: 'Porte-à-porte',
 			accroche:
-				'Allons à la rencontre des habitantes et habitants du quartier pour échanger sur leurs préoccupations et présenter nos propositions.',
+				'Retour sur notre porte-à-porte et les échanges avec les habitantes et habitants.',
 			texte:
-				'Nous organisons un porte-à-porte dans le quartier. Venez avec nous rencontrer les habitantes et habitants, écouter leurs préoccupations et présenter nos propositions.\n\nAucune expérience n’est nécessaire : les nouvelles personnes sont les bienvenues.'
+				'Nous sommes allés à la rencontre des habitantes et habitants.\n\n## Ce que nous retenons\n\nPrésentez ici les échanges, les sujets qui sont revenus et les suites envisagées.'
 		},
 		tractage: {
 			nom: 'Tractage',
 			accroche:
-				'Retrouvons-nous pour diffuser nos propositions et échanger avec les passantes et les passants.',
+				'Retour sur notre tractage et les échanges avec les passantes et les passants.',
 			texte:
-				'Nous nous retrouvons pour distribuer des tracts et échanger avec les passantes et les passants. Le matériel est fourni et les nouvelles personnes sont les bienvenues.'
+				'Nous avons distribué nos tracts et échangé avec les passantes et les passants.\n\n## Ce que nous retenons\n\nPrésentez ici l’accueil reçu, les discussions et les suites envisagées.'
 		},
 		collage: {
 			nom: 'Collage d’affiches',
-			accroche: 'Rendez-vous pour une soirée de collage d’affiches.',
+			accroche: 'Retour sur notre collage d’affiches.',
 			texte:
-				'Nous nous retrouvons pour une soirée de collage d’affiches.\n\nLes secteurs de collage seront définis sur place en fonction des groupes d’action présents, afin de répartir les équipes et de concentrer le collage sur les différents secteurs.\n\nN’hésitez pas à nous rejoindre !'
+				'Nous avons mené une opération de collage d’affiches.\n\n## Ce que nous retenons\n\nPrésentez ici le déroulement général et le bilan de l’action, sans publier d’informations opérationnelles.'
 		},
 	} as const;
 
@@ -164,25 +164,6 @@
 			(publication?.authorAdminId ? String(publication.authorAdminId) : publication?.authorName ? 'other' : '')
 		);
 	}
-	function carteIntegreeInitiale() {
-		return valeurs.eventMapEmbed ?? publication?.eventMapEmbedUrl ?? '';
-	}
-	function extraireAdresseCarte(brut: string) {
-		const attributSrc = brut.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
-		let adresse = (attributSrc ?? brut).trim();
-		const lienMarkdown = adresse.match(/\]\((https:\/\/[^)]+)\)/i);
-		if (lienMarkdown) adresse = lienMarkdown[1];
-		adresse = adresse.replaceAll('&amp;', '&');
-		try {
-			const url = new URL(adresse);
-			return url.protocol === 'https:' && url.hostname === 'www.google.com' && url.pathname.startsWith('/maps/embed')
-				? url.href
-				: '';
-		} catch {
-			return '';
-		}
-	}
-
 	let categorieActionSelectionnee = $state<CategorieAction>(categorieActionInitiale());
 	let titre = $state(titreInitial());
 	let resume = $state(resumeInitial());
@@ -193,23 +174,15 @@
 	let lieu = $state(lieuInitial());
 	let pointRendezVous = $state(pointRendezVousInitial());
 	let auteurChoisi = $state(auteurInitial());
-	let carteIntegree = $state(carteIntegreeInitiale());
 	let dernierModele = $state<CategorieAction | null>(null);
 	let dernierTitreAutomatique = $state('');
 	let dernierChapoAutomatique = $state('');
 
 	function textesAutomatiques(categorie = categorieActionSelectionnee) {
 		const modele = modelesAction[categorie];
-		const nouveauTitre = lieu ? `${modele.nom} à ${lieu}` : modele.nom;
-		const date = dateRendezVous ? `Le ${formatDateLongue(dateRendezVous)}` : '';
-		const horaire = formatPlageHoraire(heureDebut, heureFin);
-		const moment = [date, horaire].filter(Boolean).join(', ');
-		const informations = [
-			moment ? `${moment}.` : '',
-			lieu ? `Lieu : ${lieu}.` : '',
-			pointRendezVous ? `Point de rendez-vous : ${pointRendezVous}.` : ''
-		].filter(Boolean);
-		const nouveauChapo = [...informations, modele.accroche].join('\n');
+		const nouveauTitre = `Retour sur notre ${modele.nom.toLocaleLowerCase('fr')}`;
+		const date = dateRendezVous ? `Action menée le ${formatDateLongue(dateRendezVous)}.` : '';
+		const nouveauChapo = [date, modele.accroche].filter(Boolean).join('\n');
 		return { titre: nouveauTitre, chapo: nouveauChapo };
 	}
 
@@ -232,7 +205,7 @@
 
 	function choisirType(type: string) {
 		typeSelectionne = type;
-		if (type === 'action') choisirCategorieAction(categorieActionSelectionnee);
+		if (type === 'retour-action') choisirCategorieAction(categorieActionSelectionnee);
 	}
 
 	const v = $derived({
@@ -254,14 +227,13 @@
 		eventAddress: valeurs.eventAddress ?? publication?.eventAddress ?? '',
 		eventLocationUrl: valeurs.eventLocationUrl ?? publication?.eventLocationUrl ?? '',
 		eventManagers: valeurs.eventManagers ?? publication?.eventManagers ?? '',
-		eventSignupUrl:
-			valeurs.eventSignupUrl || publication?.eventSignupUrl ||
-			(typeSelectionne === 'action' ? 'https://actionpopulaire.fr' : ''),
-		eventMapEmbed: carteIntegree
+		eventSignupUrl: valeurs.eventSignupUrl || publication?.eventSignupUrl || '',
+		eventMapEmbed: ''
 	});
 
-	const estRendezVous = $derived(['action', 'reunion', 'formation', 'apero'].includes(typeSelectionne));
-	const apercuCarteIntegree = $derived(extraireAdresseCarte(carteIntegree));
+	const estRetourAction = $derived(typeSelectionne === 'retour-action');
+	const estRendezVous = $derived(['reunion', 'formation', 'apero'].includes(typeSelectionne));
+	const aujourdHui = new Date().toISOString().slice(0, 10);
 </script>
 
 {#if erreur}
@@ -336,14 +308,14 @@
 				>
 					<option value="article">Article</option>
 					<option value="actu">Actualité</option>
-					<option value="action">Action</option>
+					<option value="retour-action">Retour d’action</option>
 					<option value="reunion">Événement</option>
 					<option value="formation">Formation</option>
 					<option value="apero">Apéro thématique</option>
 					<option value="revue">Revue de presse</option>
 				</select>
 				<p class="aide">
-					Un seul choix suffit. Les champs utiles apparaissent automatiquement pour une action,
+					Un seul choix suffit. Les champs utiles apparaissent automatiquement pour un retour d’action,
 					un événement, une formation ou un apéro.
 				</p>
 			</div>
@@ -376,27 +348,28 @@
 				</div>
 			{/if}
 
+			{#if estRetourAction}
+				<div class="rounded-lg border border-brand/25 bg-brand-soft/40 p-3 space-y-3">
+					<p class="text-sm font-bold text-brand">Retour sur une action terminée</p>
+					<div>
+						<label class="etiquette" for="actionCategory">Type d’action</label>
+						<select id="actionCategory" name="actionCategory" class="champ" value={categorieActionSelectionnee} onchange={(event) => choisirCategorieAction(event.currentTarget.value as CategorieAction)}>
+							<option value="collage">Collage d’affiches</option>
+							<option value="porte-a-porte">Porte-à-porte</option>
+							<option value="tractage">Tractage / distribution</option>
+						</select>
+					</div>
+					<div>
+						<label class="etiquette" for="eventAt">Date de l’action</label>
+						<input id="eventAt" name="eventAt" type="date" class="champ" required max={aujourdHui} value={dateRendezVous} onchange={(event) => { dateRendezVous = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+					</div>
+					<p class="aide">Seules les actions déjà terminées peuvent être publiées. Aucun horaire, lieu, responsable, carte ou lien d’inscription n’est enregistré.</p>
+				</div>
+			{/if}
+
 			{#if estRendezVous}
 				<div class="rounded-lg border border-brand/25 bg-brand-soft/40 p-3 space-y-3">
 					<p class="text-sm font-bold text-brand">Informations pratiques</p>
-
-					{#if typeSelectionne === 'action'}
-						<div>
-							<label class="etiquette" for="actionCategory">Type d’action</label>
-							<select
-								id="actionCategory"
-								name="actionCategory"
-								class="champ"
-								value={categorieActionSelectionnee}
-								onchange={(event) => choisirCategorieAction(event.currentTarget.value as CategorieAction)}
-							>
-								<option value="collage">Collage d’affiches</option>
-								<option value="porte-a-porte">Porte-à-porte</option>
-								<option value="tractage">Tractage / distribution</option>
-							</select>
-						<p class="aide">Le titre et le chapô sont calculés avec la date, les horaires et le lieu. Tout reste modifiable.</p>
-						</div>
-					{/if}
 
 					<div>
 						<label class="etiquette" for="eventAt">Date</label>
@@ -430,46 +403,6 @@
 						<label class="etiquette" for="eventLocationUrl">Lien vers le lieu</label>
 						<input id="eventLocationUrl" name="eventLocationUrl" type="url" class="champ" maxlength="500" value={v.eventLocationUrl} placeholder="https://maps.app.goo.gl/…" />
 					</div>
-
-					{#if typeSelectionne === 'action'}
-						<div class="space-y-2 rounded border border-line bg-carte p-2.5">
-							<label class="etiquette" for="eventMapEmbed">Carte Google Maps intégrée <span class="font-normal text-ink-faint">(facultatif)</span></label>
-							<textarea id="eventMapEmbed" name="eventMapEmbed" class="champ font-mono text-xs" rows="4" maxlength="8000" placeholder="Collez ici le code <iframe …></iframe> fourni par Google Maps" bind:value={carteIntegree}></textarea>
-							<p class="aide">Vous pouvez coller le code iframe complet ou seulement son lien. Seule l’adresse sécurisée de la carte sera conservée.</p>
-							{#if apercuCarteIntegree}
-								<iframe
-									src={apercuCarteIntegree}
-									title="Aperçu de la carte du lieu"
-									class="aspect-video w-full rounded border border-line"
-									loading="lazy"
-									referrerpolicy="strict-origin-when-cross-origin"
-									allowfullscreen
-								></iframe>
-							{:else if carteIntegree.trim()}
-								<p class="text-xs font-semibold text-accent">Le code collé ne contient pas encore une adresse Google Maps intégrable.</p>
-							{/if}
-						</div>
-						<div class="space-y-2 rounded border border-line bg-carte p-2.5">
-							<p class="etiquette mb-0">Capture de la carte <span class="font-normal text-ink-faint">(solution de repli)</span></p>
-							{#if publication?.eventMap}
-								<img src={publication.eventMap.url} alt={publication.eventMap.alt} class="aspect-video w-full rounded object-cover" />
-								<label class="flex items-start gap-2 text-xs text-ink">
-									<input type="checkbox" name="retirerCarte" value="1" class="mt-0.5" />
-									<span>Retirer cette capture</span>
-								</label>
-							{/if}
-							<label class="sr-only" for="eventMap">Ajouter une capture de la carte</label>
-							<input id="eventMap" name="eventMap" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" class="champ" />
-							<label class="sr-only" for="eventMapAlt">Description de la carte</label>
-							<input id="eventMapAlt" name="eventMapAlt" class="champ" maxlength="300" value={publication?.eventMap?.alt ?? ''} placeholder="Carte du point de rendez-vous" />
-							<p class="aide">L’image est conservée sur le site. Au clic, elle ouvre le lien vers le lieu.</p>
-						</div>
-						<div>
-							<label class="etiquette" for="eventSignupUrl">Lien pour prévenir de sa venue</label>
-							<input id="eventSignupUrl" name="eventSignupUrl" type="url" class="champ" maxlength="500" value={v.eventSignupUrl} placeholder="https://actionpopulaire.fr/evenements/…" />
-							<p class="aide">La fiche invitera les personnes à signaler leur venue sur ce lien.</p>
-						</div>
-					{/if}
 
 					<fieldset class="rounded border border-line bg-carte p-2.5">
 						<legend class="etiquette px-1">Responsable{admins.length > 1 ? 's' : ''}</legend>

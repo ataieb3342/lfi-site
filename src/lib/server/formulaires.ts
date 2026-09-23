@@ -10,40 +10,14 @@ import { listAdmins } from './auth.ts';
  */
 export class ErreurFormulaire extends Error {}
 
-/** Accepte le code iframe copié depuis Google Maps, ou son URL seule. */
-function lireCarteIntegree(valeur: FormDataEntryValue | null): string {
-	const brut = String(valeur ?? '').trim();
-	if (!brut) return '';
-	if (brut.length > 8_000) throw new ErreurFormulaire('Le code de la carte est trop long.');
-
-	const attributSrc = brut.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
-	let adresse = (attributSrc ?? brut).trim();
-	// Tolère aussi un lien Markdown accidentellement collé dans l’attribut src.
-	const lienMarkdown = adresse.match(/\]\((https:\/\/[^)]+)\)/i);
-	if (lienMarkdown) adresse = lienMarkdown[1];
-	adresse = adresse.replaceAll('&amp;', '&');
-
-	let url: URL;
-	try {
-		url = new URL(adresse);
-	} catch {
-		throw new ErreurFormulaire("Le code de la carte Google Maps n’est pas reconnu.");
-	}
-	if (url.protocol !== 'https:' || url.hostname !== 'www.google.com' || !url.pathname.startsWith('/maps/embed')) {
-		throw new ErreurFormulaire('Utilisez le code d’intégration fourni par Google Maps.');
-	}
-	if (url.href.length > 5_000) throw new ErreurFormulaire('Le lien de la carte est trop long.');
-	return url.href;
-}
-
 export async function lirePublication(
 	form: FormData,
 	adminId: number,
 	couvertureActuelle: number | null,
-	carteActuelle: number | null = null
+	_carteActuelle: number | null = null
 ): Promise<PublicationInput> {
 	const typeAffiche = String(form.get('kind') ?? 'article');
-	const kind = ['action', 'reunion', 'formation'].includes(typeAffiche) ? 'actu' : typeAffiche;
+	const kind = ['retour-action', 'reunion', 'formation'].includes(typeAffiche) ? 'actu' : typeAffiche;
 	const status = String(form.get('status') ?? 'draft');
 	const title = String(form.get('title') ?? '').trim();
 	const summary = String(form.get('summary') ?? '').trim();
@@ -60,27 +34,30 @@ export async function lirePublication(
 	// Les types datés déterminent directement leur catégorie d'agenda. Un apéro
 	// reste toujours un apéro ; les publications ordinaires n'ont pas de catégorie.
 	const eventCategory =
-		typeAffiche === 'action' || typeAffiche === 'reunion' || typeAffiche === 'formation'
-			? typeAffiche
+		typeAffiche === 'retour-action' || typeAffiche === 'reunion' || typeAffiche === 'formation'
+			? typeAffiche === 'retour-action' ? 'action' : typeAffiche
 			: kind === 'apero'
 				? 'apero'
 				: 'autre';
 	const actionCategory = String(form.get('actionCategory') ?? 'autre');
-	const eventStartTime = String(form.get('eventStartTime') ?? '').trim();
-	const eventEndTime = String(form.get('eventEndTime') ?? '').trim();
-	const eventLocation = String(form.get('eventLocation') ?? '').trim();
-	const eventAddress = String(form.get('eventAddress') ?? '').trim();
-	const eventLocationUrl = String(form.get('eventLocationUrl') ?? '').trim();
-	const eventManagers = String(form.get('eventManagers') ?? '').trim();
-	const eventManagerAdminIds = form
-		.getAll('eventManagerAdminIds')
-		.map((valeur) => Number(valeur))
-		.filter((id) => Number.isInteger(id) && admins.some((admin) => admin.id === id));
-	const eventSignupUrl = String(form.get('eventSignupUrl') ?? '').trim();
-	const eventMeetingPoint = String(form.get('eventMeetingPoint') ?? '').trim();
-	const eventMapEmbedUrl = lireCarteIntegree(form.get('eventMapEmbed'));
+	const estRetourAction = typeAffiche === 'retour-action';
+	const eventStartTime = estRetourAction ? '' : String(form.get('eventStartTime') ?? '').trim();
+	const eventEndTime = estRetourAction ? '' : String(form.get('eventEndTime') ?? '').trim();
+	const eventLocation = estRetourAction ? '' : String(form.get('eventLocation') ?? '').trim();
+	const eventAddress = estRetourAction ? '' : String(form.get('eventAddress') ?? '').trim();
+	const eventLocationUrl = estRetourAction ? '' : String(form.get('eventLocationUrl') ?? '').trim();
+	const eventManagers = estRetourAction ? '' : String(form.get('eventManagers') ?? '').trim();
+	const eventManagerAdminIds = estRetourAction
+		? []
+		: form
+				.getAll('eventManagerAdminIds')
+				.map((valeur) => Number(valeur))
+				.filter((id) => Number.isInteger(id) && admins.some((admin) => admin.id === id));
+	const eventSignupUrl = estRetourAction ? '' : String(form.get('eventSignupUrl') ?? '').trim();
+	const eventMeetingPoint = estRetourAction ? '' : String(form.get('eventMeetingPoint') ?? '').trim();
+	const eventMapEmbedUrl = '';
 
-	if (!['article', 'actu', 'action', 'reunion', 'formation', 'apero', 'revue'].includes(typeAffiche)) {
+	if (!['article', 'actu', 'retour-action', 'reunion', 'formation', 'apero', 'revue'].includes(typeAffiche)) {
 		throw new ErreurFormulaire('Type de publication inconnu.');
 	}
 
@@ -94,14 +71,17 @@ export async function lirePublication(
 	}
 	// Un apéro sans date n'a pas de sens : c'est elle qui le place dans la
 	// liste, avant ou après la soirée.
-	if (['action', 'reunion', 'formation', 'apero'].includes(typeAffiche) && !eventAt) {
+	if (['retour-action', 'reunion', 'formation', 'apero'].includes(typeAffiche) && !eventAt) {
 		throw new ErreurFormulaire('Ce type de publication a toujours une date : renseignez la date du rendez-vous.');
 	}
 	if (!['action', 'reunion', 'apero', 'formation', 'autre'].includes(eventCategory)) {
 		throw new ErreurFormulaire("La catégorie de l'événement est invalide.");
 	}
-	if (typeAffiche === 'action' && !['porte-a-porte', 'tractage', 'collage'].includes(actionCategory)) {
+	if (typeAffiche === 'retour-action' && !['porte-a-porte', 'tractage', 'collage'].includes(actionCategory)) {
 		throw new ErreurFormulaire("La catégorie de l'action est invalide.");
+	}
+	if (estRetourAction && eventAt > new Date().toISOString().slice(0, 10)) {
+		throw new ErreurFormulaire("Un retour d’action ne peut être publié qu’après l’action.");
 	}
 	if (eventStartTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(eventStartTime)) {
 		throw new ErreurFormulaire("L'heure de début est invalide.");
@@ -139,23 +119,7 @@ export async function lirePublication(
 		}
 	}
 
-	// Capture de carte : image locale uniquement. Le service cartographique
-	// n'est contacté qu'au clic sur le lien public.
-	let eventMapMediaId = carteActuelle;
-	if (form.get('retirerCarte') === '1') eventMapMediaId = null;
-	const fichierCarte = form.get('eventMap');
-	if (fichierCarte instanceof File && fichierCarte.size > 0) {
-		try {
-			const carte = await storeUpload(
-				fichierCarte,
-				String(form.get('eventMapAlt') ?? '').trim() || `Carte du lieu de l’action`,
-				adminId
-			);
-			eventMapMediaId = carte.id;
-		} catch (err) {
-			throw new ErreurFormulaire((err as Error).message);
-		}
-	}
+	const eventMapMediaId = null;
 
 	return {
 		kind: kind as Kind,

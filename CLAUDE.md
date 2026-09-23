@@ -23,7 +23,7 @@ vérification manuelle dans le navigateur tiennent ce rôle.
 
 SvelteKit 2 (Svelte 5, runes) + SQLite + Tailwind 4. Un seul processus Node,
 aucun service externe nécessaire au fonctionnement du serveur, aucune dépendance
-native. Une fiche d’action peut toutefois afficher une carte Google Maps intégrée.
+native.
 
 | Chemin | Rôle |
 | --- | --- |
@@ -83,10 +83,7 @@ faille connue.
    injecter de script dans les pages.
 2. **La CSP de `vite.config.ts` reste en `default-src 'none'`.** Ne jamais
 	 ajouter `'unsafe-inline'` à `script-src`. Pas de polices Google, pas de CDN,
-	 pas d'outil de mesure d'audience. La seule exception externe autorisée est
-	 `https://www.google.com` dans `frame-src`, pour les cartes Google Maps des
-	 fiches d’action. Leur URL est validée côté serveur : aucun HTML libre n’est
-	 interprété.
+	 pas d'outil de mesure d'audience ni d’iframe externe.
 3. **Aucune adresse IP en clair en base.** On stocke `hmac('ip', adresse)`.
    Cela suffit pour limiter le spam et bloquer quelqu'un, sans conserver de
    donnée personnelle exploitable en cas de fuite.
@@ -244,12 +241,18 @@ rubrique le ferait déborder sur les écrans moyens. On y accède par le pied de
 page, par le menu mobile et par l'encart en tête de la liste des articles.
 
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
-actions dont la date n'est pas passée remontent en tête, de la plus proche à la
+rendez-vous dont la date n'est pas passée remontent en tête, de la plus proche à la
 plus lointaine, puis viennent les autres par date de publication. La comparaison
 se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now')` — c'est exact et
 sans piège de fuseau horaire.
 
 Une actualité sans `event_at` se comporte comme une simple brève d'information.
+
+Une publication de catégorie `action` est uniquement un **retour d’action** :
+sa date doit être passée et elle ne contient ni horaire, ni lieu, ni carte, ni
+responsable, ni inscription. Elle reste dans les actualités et est exclue de
+l’agenda. La fiche se termine automatiquement par une invitation générale à
+rejoindre le groupe sur Action populaire, sans annoncer la prochaine action.
 
 ## Les apéros thématiques
 
@@ -376,9 +379,10 @@ un écran entier de surface colorée avant le premier article. Il a été retir�
 `CarrouselAccueil.svelte` avec lui. La raison n'était pas seulement sa hauteur :
 six diapositives sur sept répétaient ce qui se trouvait déjà ailleurs sur la même
 page ou dans l'en-tête — l'identité du groupe est dans l'en-tête, le pied de page
-et « Le groupe » ; les prochaines actions sont dans la colonne « Actualités » de
-l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
-`agenda`) ; la bibliothèque est dans l'en-tête.
+et « Le groupe » ; les rendez-vous publics sont dans la colonne « Actualités »
+de l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
+`agenda`) ; les retours d’action restent chronologiques et la bibliothèque est
+dans l'en-tête.
 
 La page tient donc en quatre blocs, de haut en bas :
 
@@ -785,8 +789,8 @@ de connexion affiche les identifiants et le code du moment. L'administration
 est donc ouverte à tout le monde : ce mode est réservé au site de test sur
 Render (`render.yaml`, `DEMO.md`) et ne doit jamais être activé en production.
 Les contenus fictifs sont dans le tableau `FICHES` de ce fichier ; les dates
-d'action sont relatives au jour du démarrage, pour qu'il y ait toujours des
-actions « à venir ».
+des rendez-vous sont relatives au jour du démarrage. Le retour d’action fictif
+porte toujours sur une date passée.
 
 La fiche portant `illustree: true` reçoit une **image de couverture**, encodée
 en base64 dans `demo-image.ts`. Elle est dans le code et non dans

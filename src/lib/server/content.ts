@@ -82,7 +82,7 @@ const PUBLIC_SELECT = `
  *
  * - « chronologique » : du plus récent au plus ancien. C'est ce qu'on attend
  *   d'articles d'analyse.
- * - « agenda » : les actions encore à venir d'abord, de la plus proche à la plus
+ * - « agenda » : les rendez-vous encore à venir d'abord, de la plus proche à la plus
  *   lointaine, puis tout le reste par date de publication. Sans cela, un appel à
  *   mobilisation vieux de trois mois resterait en tête de liste.
  * - « archives » : comme « agenda » pour les rendez-vous à venir, mais les
@@ -141,6 +141,7 @@ export function listAgenda(debut: string, fin: string) {
 			`${PUBLIC_SELECT}
 			 where p.status = 'published'
 			   and p.event_at is not null
+			   and p.event_category != 'action'
 			   and p.event_at >= ? and p.event_at < ?
 			 order by p.event_at asc, p.title collate nocase asc`
 		)

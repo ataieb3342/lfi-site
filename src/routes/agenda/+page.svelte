@@ -10,7 +10,6 @@
 
 	type Categorie = PublicationVue['eventCategory'];
 	const categories: { valeur: Categorie; libelle: string; classe: string }[] = [
-		{ valeur: 'action', libelle: 'Actions', classe: 'agenda-action' },
 		{ valeur: 'reunion', libelle: 'Événements', classe: 'agenda-reunion' },
 		{ valeur: 'apero', libelle: 'Apéros', classe: 'agenda-apero' },
 		{ valeur: 'formation', libelle: 'Formations', classe: 'agenda-formation' },

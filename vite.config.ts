@@ -26,7 +26,6 @@ export default defineConfig({
 					'img-src': ['self', 'data:'],
 					'font-src': ['self'],
 					'connect-src': ['self'],
-					'frame-src': ['https://www.google.com'],
 					'form-action': ['self'],
 					'base-uri': ['none'],
 					'object-src': ['none'],
