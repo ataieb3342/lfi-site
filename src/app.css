@@ -319,6 +319,175 @@ h1, h2, h3, h4 {
 .contenu table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
 .contenu th, .contenu td { border: 1px solid var(--color-line); padding: 0.5rem 0.75rem; text-align: left; }
 
+/* Mise en page éditoriale « Carnet aquarelle ». En mode automatique, cette
+   page reste claire ; un choix explicite « Sombre » reste prioritaire. */
+:root:not([data-theme='sombre']):has(.article-aquarelle) {
+	color-scheme: light;
+	--color-brand: #58277e;
+	--color-brand-dark: #43206c;
+	--color-brand-soft: #f1ebf8;
+	--color-accent: #b8334a;
+	--color-accent-dark: #9c1e33;
+	--color-accent-soft: #fbeaee;
+	--color-ink: #2a1f36;
+	--color-ink-soft: #4d4459;
+	--color-ink-faint: #6f6679;
+	--color-surface: #f4eefb;
+	--color-carte: #fdfbff;
+	--color-surface-alt: #e9dff6;
+	--color-line: #e1dbe8;
+	--color-line-forte: #918799;
+	--color-sur-brand: #fff;
+}
+.article-aquarelle {
+	--lavis-violet: color-mix(in srgb, var(--color-brand) 26%, transparent);
+	--lavis-vert: color-mix(in srgb, #2f9a68 20%, transparent);
+	--lavis-rouge: color-mix(in srgb, var(--color-accent) 17%, transparent);
+	max-width: 52rem;
+	font-family: var(--font-sans);
+}
+.article-aquarelle article {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid color-mix(in srgb, var(--color-line) 72%, var(--color-brand) 28%);
+	border-radius: 0.5rem 1.5rem 0.7rem 1.1rem;
+	background:
+		radial-gradient(ellipse 24rem 32rem at -8% 18%, var(--lavis-violet), transparent 65%),
+		radial-gradient(ellipse 18rem 25rem at 108% 42%, var(--lavis-vert), transparent 68%),
+		radial-gradient(ellipse 21rem 30rem at -8% 74%, var(--lavis-rouge), transparent 68%),
+		repeating-linear-gradient(0deg, color-mix(in srgb, var(--color-ink) 2%, transparent) 0 1px, transparent 1px 5px),
+		color-mix(in srgb, var(--color-carte) 94%, #fff8df 6%);
+	padding: clamp(1rem, 4vw, 2.6rem);
+	box-shadow: 0 18px 48px color-mix(in srgb, var(--color-brand) 12%, transparent);
+}
+.article-aquarelle article::before,
+.article-aquarelle article::after {
+	position: absolute;
+	z-index: 0;
+	width: 4rem;
+	aspect-ratio: 2 / 3;
+	background: url('/images/articles/sticker-fleur.png') center / contain no-repeat;
+	content: '';
+	opacity: 0.13;
+	pointer-events: none;
+}
+.article-aquarelle article::before { top: 24%; right: -1.25rem; transform: rotate(10deg); }
+.article-aquarelle article::after { bottom: 7%; left: -1.2rem; transform: rotate(-12deg) scale(0.85); }
+.article-aquarelle article > header,
+.article-aquarelle article > .contenu { position: relative; z-index: 1; }
+.article-aquarelle article > header {
+	border: 0;
+	padding: 0.8rem 0.4rem 2rem;
+}
+.sur-titre-aquarelle {
+	display: inline-block;
+	margin-bottom: 0.7rem;
+	background: var(--color-brand);
+	padding: 0.28rem 0.65rem;
+	color: var(--color-sur-brand);
+	font-size: 0.76rem;
+	font-weight: 850;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	transform: rotate(-1deg);
+}
+.article-aquarelle article > header h1 {
+	max-width: 13ch;
+	color: var(--color-brand);
+	font-family: "Arial Narrow", "Avenir Next Condensed", var(--font-sans);
+	font-size: clamp(2.45rem, 7vw, 4.4rem);
+	font-weight: 900;
+	letter-spacing: -0.045em;
+	line-height: 0.98;
+	text-transform: uppercase;
+}
+:is(.article-aquarelle .contenu, .article-carnet-apercu) {
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+}
+:is(.article-aquarelle .contenu, .article-carnet-apercu) h2 {
+	position: relative;
+	display: table;
+	z-index: 0;
+	clear: none;
+	max-width: 20ch;
+	margin-top: 1.9em;
+	font-size: clamp(1.55rem, 4vw, 2.15rem);
+	font-weight: 850;
+	line-height: 1.05;
+}
+:is(.article-aquarelle .contenu, .article-carnet-apercu) h2::after {
+	position: absolute;
+	right: -0.35rem;
+	bottom: 0.05em;
+	left: -0.35rem;
+	z-index: -1;
+	height: 0.5em;
+	border-radius: 65% 35% 55% 45%;
+	background: color-mix(in srgb, var(--color-brand) 42%, transparent);
+	content: '';
+	transform: rotate(-0.6deg);
+}
+.personnage-amfis {
+	position: relative;
+	z-index: 1;
+	display: block;
+	width: min(36%, 14rem);
+	margin-block: 0.35rem 0.65rem;
+	isolation: isolate;
+}
+.personnage-amfis-rita { float: right; margin-left: 1.25rem; transform: rotate(-0.25deg); }
+.personnage-amfis-zaza { float: left; margin-right: 1.25rem; padding-bottom: 10rem; transform: rotate(0.25deg); }
+.bulle-amfis {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 88%;
+	aspect-ratio: 1.2 / 1;
+	margin: 0 auto 0.35rem;
+	border: 3px solid currentColor;
+	border-radius: 50%;
+	background: transparent;
+	padding: 1.3rem 1.5rem;
+	font-family: "Arial Rounded MT Bold", "Trebuchet MS", var(--font-sans);
+	font-size: clamp(0.6rem, 1.15vw, 0.74rem);
+	font-style: normal;
+	font-weight: 800;
+	line-height: 1.38;
+	letter-spacing: 0.01em;
+	text-align: center;
+}
+.personnage-amfis-rita .bulle-amfis {
+	border-color: #d49a16;
+	border-radius: 54% 46% 52% 48% / 45% 55% 47% 53%;
+	color: color-mix(in srgb, #b27800 72%, var(--color-ink) 28%);
+	outline: 1.5px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+	outline-offset: 2px;
+}
+.personnage-amfis-zaza .bulle-amfis {
+	border-radius: 48% 52% 46% 54% / 53% 47% 55% 45%;
+	color: #167daa;
+}
+.personnage-amfis img { display: block; width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 8px 8px rgba(42, 31, 54, 0.12)); }
+.nom-amfis {
+	position: relative;
+	z-index: 2;
+	width: max-content;
+	margin: -1.5rem auto 0;
+	border-radius: 999px;
+	background: var(--color-carte);
+	padding: 0.2rem 0.55rem;
+	color: var(--color-ink);
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+.personnage-amfis-rita .nom-amfis { margin-top: 0.6rem; }
+@media (max-width: 520px) {
+	.personnage-amfis { float: none; width: min(82%, 18rem); margin: 1.5rem auto 2rem; padding-bottom: 0; transform: none; }
+	.bulle-amfis { width: 88%; padding: 1.1rem 1.35rem; font-size: 0.66rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }
 	*, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

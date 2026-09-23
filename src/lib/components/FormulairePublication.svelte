@@ -7,6 +7,7 @@
 		title?: string;
 		summary?: string;
 		body?: string;
+		layoutStyle?: string;
 		authorName?: string;
 		authorAdminId?: string;
 		status?: string;
@@ -143,6 +144,9 @@
 	function corpsInitial() {
 		return valeurs.body ?? '';
 	}
+	function miseEnPageInitiale() {
+		return valeurs.layoutStyle ?? publication?.layoutStyle ?? 'standard';
+	}
 	function dateInitiale() {
 		return valeurs.eventAt ?? publication?.eventAt ?? '';
 	}
@@ -168,6 +172,7 @@
 	let titre = $state(titreInitial());
 	let resume = $state(resumeInitial());
 	let corps = $state(corpsInitial());
+	let miseEnPage = $state(miseEnPageInitiale());
 	let dateRendezVous = $state(dateInitiale());
 	let heureDebut = $state(heureDebutInitiale());
 	let heureFin = $state(heureFinInitiale());
@@ -213,6 +218,7 @@
 		title: titre,
 		summary: valeurs.summary ?? publication?.summary ?? '',
 		body: valeurs.body ?? '',
+		layoutStyle: miseEnPage,
 		authorName: valeurs.authorName ?? publication?.authorName ?? '',
 		status: valeurs.status ?? publication?.status ?? 'draft',
 		commentsOpen: valeurs.commentsOpen ?? publication?.commentsOpen ?? true,
@@ -287,7 +293,7 @@
 				<h2 id="apercu-titre" class="text-sm font-bold tracking-wide text-ink-faint uppercase">Aperçu du texte</h2>
 				<!-- HTML produit par markdown.ts (html: false) : aucune balise brute
 				     saisie dans le texte n'est interprétée. -->
-				<div class="contenu mt-4">
+				<div class="contenu mt-4" class:article-carnet-apercu={miseEnPage === 'carnet-aquarelle'}>
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					{@html apercu}
 				</div>
@@ -319,6 +325,19 @@
 					un événement, une formation ou un apéro.
 				</p>
 			</div>
+
+			{#if typeSelectionne === 'article'}
+				<div>
+					<label class="etiquette" for="layoutStyle">Mise en page</label>
+					<select id="layoutStyle" name="layoutStyle" class="champ" bind:value={miseEnPage}>
+						<option value="standard">Standard</option>
+						<option value="carnet-aquarelle">Carnet aquarelle</option>
+					</select>
+					<p class="aide">Le carnet aquarelle conserve le texte en Markdown et ajoute l’habillage illustré.</p>
+				</div>
+			{:else}
+				<input type="hidden" name="layoutStyle" value="standard" />
+			{/if}
 
 			<div>
 				<label class="etiquette" for="status">État</label>

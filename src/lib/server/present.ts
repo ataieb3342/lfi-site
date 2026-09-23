@@ -30,6 +30,7 @@ export function presentPublication(row: PublicationListItem | Publication): Publ
 		slug: row.slug,
 		title: row.title,
 		summary: row.summary,
+		layoutStyle: row.layout_style,
 		status: row.status,
 		pinned: !!row.pinned,
 		commentsOpen: !!row.comments_open,

@@ -377,6 +377,11 @@ const MIGRATIONS: string[] = [
 	 event_location_url = '', event_managers = '', event_signup_url = '',
 	 event_meeting_point = '', event_map_media_id = null, event_map_embed_url = ''
 	 where event_category = 'action';
+	`,
+	// 016 — choix facultatif d'une mise en page éditoriale pour les articles
+	`
+	alter table publications add column layout_style text not null default 'standard'
+		check (layout_style in ('standard', 'carnet-aquarelle'));
 	`
 ];
 

@@ -22,6 +22,7 @@ export async function lirePublication(
 	const title = String(form.get('title') ?? '').trim();
 	const summary = String(form.get('summary') ?? '').trim();
 	const body = String(form.get('body') ?? '');
+	const layoutStyle = String(form.get('layoutStyle') ?? 'standard');
 	const choixAuteur = String(form.get('authorAdminId') ?? '').trim();
 	const admins = listAdmins().filter((admin) => !admin.disabled_at);
 	const auteurAdminId = /^\d+$/.test(choixAuteur) ? Number(choixAuteur) : null;
@@ -62,6 +63,9 @@ export async function lirePublication(
 	}
 
 	if (status !== 'draft' && status !== 'published') throw new ErreurFormulaire('État inconnu.');
+	if (!['standard', 'carnet-aquarelle'].includes(layoutStyle)) {
+		throw new ErreurFormulaire('Mise en page inconnue.');
+	}
 	if (!title) throw new ErreurFormulaire('Le titre est obligatoire.');
 	if (title.length > 200) throw new ErreurFormulaire('Le titre est trop long (200 caractères maximum).');
 	if (summary.length > 500) throw new ErreurFormulaire('Le chapô est trop long (500 caractères maximum).');
@@ -127,6 +131,7 @@ export async function lirePublication(
 		title,
 		summary,
 		body,
+		layoutStyle: layoutStyle as PublicationInput['layoutStyle'],
 		authorName,
 		authorAdminId: auteurAdmin?.id ?? null,
 		commentsOpen: form.get('commentsOpen') === '1',
@@ -165,6 +170,7 @@ export function valeursSaisies(form: FormData) {
 		title: String(form.get('title') ?? ''),
 		summary: String(form.get('summary') ?? ''),
 		body: String(form.get('body') ?? ''),
+		layoutStyle: String(form.get('layoutStyle') ?? 'standard'),
 		authorName: String(form.get('authorName') ?? ''),
 		authorAdminId: String(form.get('authorAdminId') ?? ''),
 		status: String(form.get('status') ?? 'draft'),

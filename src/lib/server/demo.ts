@@ -164,6 +164,7 @@ type Fiche = {
 	title: string;
 	summary: string;
 	body: string;
+	auteur?: string;
 	/** Nombre de jours écoulés depuis la publication, ou une fonction qui le calcule. */
 	publieIlYa: number | (() => number);
 	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
@@ -174,12 +175,79 @@ type Fiche = {
 	categorieAction?: 'porte-a-porte' | 'tractage' | 'collage';
 	/** Vrai pour la fiche qui reçoit l'image de couverture de la démonstration. */
 	illustree?: true;
+	/** Mise en page éditoriale facultative. */
+	layoutStyle?: 'standard' | 'carnet-aquarelle';
 	commentaires?: { auteur: string; texte: string; statut: 'approved' | 'pending' }[];
 	/** Le dossier partagé d'un apéro : un titre, un lien facultatif, un mot. */
 	sources?: { titre: string; lien?: string; note?: string; auteur: string; statut: 'approved' | 'pending' }[];
 };
 
 const FICHES: Fiche[] = [
+	{
+		kind: 'article',
+		title: 'Premiers Amfis : beaucoup d’idées, peu de sommeil',
+		summary:
+			'Pour ses premiers Amfis, Zaza raconte une journée de militantisme entre navettes, foule, transports et sieste involontaire.',
+		publieIlYa: 0,
+		layoutStyle: 'carnet-aquarelle',
+		auteur: 'Zaza',
+		body: `![Rita faisant un signe de la main, dessinée à l’aquarelle](/images/articles/sticker-rita.png)
+
+Et si, et si ! Je racontais les Amfis 2026. Mon premier.
+
+Quatre jours, dont trois sur place pour moi.
+
+Mon Dieu, quelle immensité ! Peu de temps avant, Rita m’avait proposé de devenir coordinatrice du groupe d’action de La France insoumise de Dijon Centre-Ville.
+
+En étais-je capable ? Légitime ? Mais surtout, au vu de l’enjeu de l’année 2026-2027, étais-je prête à assumer du militantisme et des responsabilités en pleine campagne présidentielle ?
+
+## Première épreuve : atteindre les Amfis
+
+J’arrive le premier jour pour accéder aux navettes (après avoir fait du stop le matin, au départ de mon camping à plus de 20 bornes de Valence). Près de deux heures d’attente pour accéder au lieu. Un soleil ardent me cueille et, heureusement, Vincent devient instantanément mon pair-aidant pour la journée. Il est bavard, mais moi aussi, alors ça va.
+
+Rita, qui est bénévole aux Amfis, nous attend à la sortie de la réglementaire fouille au corps.
+
+## Mais quel monde !
+
+![Zaza, le bras levé, dessinée à l’aquarelle](/images/articles/zaza-fond-bleu.png)
+
+On se balade, mais quel monde ! Et le pire reste à venir : nous ne sommes que vendredi.
+
+Partout où porte mon regard, des personnes marchent d’un air affairé, un petit groupe discute, tandis que les autres s’arrêtent et regardent autour d’elles pour prendre leurs repères.
+
+Vincent veut manger. Évidemment, il est bientôt midi. Tandis qu’il fait la queue, je m’aperçois d’une bousculade et réalise que c’est l’heure de l’allocution d’Antoine Léaument, le youtubeur en chef et député populaire. Je m’approche pour l’écouter, avec des boules Quiès, parce que la prévention de l’ouïe, aux Amfis, il y a encore du travail à faire sur cette thématique.
+
+Il parle bien et fort, se rit de la médiocrité des membres élus du RN (et ma foi, il a raison) et me donne envie d’aller rapidement écouter les prochaines interventions. Tout le monde est joyeux et les « on va gagner » sont puissants, enjoués, sans l’ombre de la peur. Ils sont suivis systématiquement d’un « Siamo tutti antifascisti », tout aussi exaltant.
+
+## Peut-on vraiment sortir de la voiture ?
+
+Il est 13 h 30 et je décide d’aller écouter la conférence « Des transports sans pétrole ? ». Les tours de parole entre intervenants sont bien respectés. Sont présents : Aurélien Bigo, chercheur sur la bifurcation énergétique des transports, Sylvie Landriève, directrice du Forum Vies Mobiles, Karima Delli, conseillère régionale des Hauts-de-France et ancienne présidente de la commission des transports du Parlement européen, ainsi que Sylvain Carrière, député LFI.
+
+J’ignorais qu’une personne en insertion sur deux avait déjà refusé un emploi ou une formation à cause de difficultés de mobilité. Parmi ces personnes, 28 % avaient même abandonné un emploi ou une formation en cours.
+
+Selon Wimoov, 17 millions de personnes sont en situation de précarité liée à la mobilité en 2026. Cela concerne notamment celles qui vivent loin des transports publics, qui n’ont pas d’alternative à la voiture ou pour qui le coût des déplacements est devenu trop élevé.
+
+Certains territoires européens ont imaginé des abonnements uniques permettant d’emprunter plusieurs réseaux de transports publics. Lorsque l’offre est large, simple et abordable, sortir de la voiture devient beaucoup plus envisageable.
+
+Une donnée historique m’a particulièrement amusée : malgré l’augmentation considérable de notre vitesse de déplacement, le temps moyen passé chaque jour dans les transports serait resté relativement stable, autour d’une heure. Nous ne gagnons donc pas vraiment du temps : nous parcourons surtout de plus grandes distances. C’est absurde et drôle à la fois.
+
+Au final, on ne parvient pas à régler les problèmes de trajet avec de la technologie et des solutions individuelles, mais avec une organisation collective qui s’appuie sur des faits scientifiques et des personnes compétentes dont l’intérêt collectif est la priorité.
+
+## Morphée entre en scène
+
+Je pensais m’ennuyer et, au final, j’avais déjà appris énormément de choses. Bon, à la conférence suivante, Morphée a quand même fini par réclamer son dû. Après l’orage, la tente qui prenait l’eau et les quelques heures de sommeil, je pouvais difficilement lui en vouloir.
+
+Et ce n’était que le premier jour…
+
+---
+
+### Sources
+
+- [Programme officiel des Amfis 2026](https://amfis.fr/programme/)
+- [Baromètre des mobilités 2026 — Wimoov](https://wimoov.org/barometre-des-mobilites/etude-barometre-precarite-mobilites-2026/)
+- [Mobilité et accès à l’emploi — rapport public](https://www.vie-publique.fr/files/rapport/pdf/174000685.pdf)
+- [Temps de transport et vitesse — Forum Vies Mobiles](https://forumviesmobiles.org/regards-croises/464/temps-de-transport-et-vitesse)`
+	},
 	{
 		kind: 'actu',
 		title: 'Retour sur notre tractage',
@@ -588,12 +656,13 @@ function remplirContenus(adminId: number, imageId: number | null) {
 				title: fiche.title,
 				summary: fiche.summary,
 				body: fiche.body,
+				layoutStyle: fiche.layoutStyle ?? 'standard',
 				status: 'published',
 				commentsOpen: true,
 				pinned: false,
 				// Une seule fiche est illustrée : celle que `demo-image.ts` désigne.
 				coverMediaId: fiche.illustree ? imageId : null,
-				authorName: auteur,
+				authorName: fiche.auteur ?? auteur,
 				eventAt:
 					fiche.actionDans === undefined
 						? null

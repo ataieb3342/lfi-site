@@ -57,7 +57,7 @@
 
 <!-- Toute la fiche partage la même colonne de lecture : en-tête, image,
      texte, dossier partagé et commentaires ont ainsi le même bord gauche. -->
-<div class="mx-auto max-w-2xl">
+<div class="mx-auto max-w-2xl" class:article-aquarelle={p.layoutStyle === 'carnet-aquarelle'}>
 
 {#if data.apercu}
 	<p class="mb-6 rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
@@ -81,6 +81,9 @@
 
 <article>
 	<header class="border-b border-line pb-4">
+		{#if p.layoutStyle === 'carnet-aquarelle'}
+			<p class="sur-titre-aquarelle">Carnet illustré</p>
+		{/if}
 		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{libellePublication(p.kind, p.eventCategory)}</p>
 		<h1 class="mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
 		{#if !p.eventAt && (p.publishedAt || p.authorName)}

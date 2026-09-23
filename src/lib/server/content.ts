@@ -3,6 +3,7 @@ import { supprimerPdf } from './bibliotheque.ts';
 
 export type Kind = 'article' | 'actu' | 'apero' | 'revue';
 export type Status = 'draft' | 'published';
+export type StyleMiseEnPage = 'standard' | 'carnet-aquarelle';
 export type CategorieEvenement = 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
 export type CategorieAction = 'porte-a-porte' | 'tractage' | 'collage' | 'mobilisation' | 'collecte' | 'autre';
 
@@ -36,6 +37,7 @@ export type Publication = {
 	updated_at: string;
 	author_id: number | null;
 	author_name: string;
+	layout_style: StyleMiseEnPage;
 };
 
 export type PublicationListItem = Publication & { comment_count: number };
@@ -192,6 +194,7 @@ export type PublicationInput = {
 	title: string;
 	summary: string;
 	body: string;
+	layoutStyle?: StyleMiseEnPage;
 	status: Status;
 	commentsOpen: boolean;
 	pinned: boolean;
@@ -224,8 +227,8 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			  event_at, event_category, action_category, event_start_time, event_end_time,
 			  event_location, event_address, event_location_url, event_managers, event_signup_url,
 			  event_meeting_point, event_map_media_id, event_map_embed_url, byline_admin_id,
-			  published_at, created_at, updated_at, author_id, author_name)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			  published_at, created_at, updated_at, author_id, author_name, layout_style)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -255,7 +258,8 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			timestamp,
 			timestamp,
 			authorId,
-			input.authorName
+			input.authorName,
+			input.layoutStyle ?? 'standard'
 		);
 	const id = Number(result.lastInsertRowid);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
@@ -281,7 +285,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		   action_category = ?, event_start_time = ?, event_end_time = ?, event_location = ?,
 		   event_address = ?, event_location_url = ?, event_managers = ?, event_signup_url = ?,
 		   event_meeting_point = ?, event_map_media_id = ?, event_map_embed_url = ?, byline_admin_id = ?, published_at = ?,
-		   updated_at = ?, author_name = ?
+		   updated_at = ?, author_name = ?, layout_style = ?
 		 where id = ?`
 	).run(
 		input.kind,
@@ -310,6 +314,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		publishedAt,
 		now(),
 		input.authorName,
+		input.layoutStyle ?? 'standard',
 		id
 	);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);

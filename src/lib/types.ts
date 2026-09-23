@@ -12,6 +12,7 @@ export type PublicationVue = {
 	slug: string;
 	title: string;
 	summary: string;
+	layoutStyle: 'standard' | 'carnet-aquarelle';
 	status: 'draft' | 'published';
 	pinned: boolean;
 	commentsOpen: boolean;

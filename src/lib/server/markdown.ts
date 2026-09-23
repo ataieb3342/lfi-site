@@ -29,6 +29,36 @@ md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
 	return defaultLinkOpen(tokens, idx, options, env, self);
 };
 
+// Dans le template « Carnet aquarelle », ces deux images deviennent des
+// personnages éditoriaux avec une bulle en vrai texte. Le contenu reste donc
+// lisible, sélectionnable et adaptable sur mobile.
+const defaultImage =
+	md.renderer.rules.image ??
+	((tokens, idx, options, _env, self) => self.renderToken(tokens, idx, options));
+
+md.renderer.rules.image = (tokens, idx, options, env, self) => {
+	const src = String(tokens[idx].attrGet('src') ?? '');
+	const alt = escapeHtml(tokens[idx].content || 'Illustration à l’aquarelle');
+
+	if (src === '/images/articles/sticker-rita.png') {
+		return `<aside class="personnage-amfis personnage-amfis-rita">
+			<blockquote class="bulle-amfis">Et si… et si tu devenais coordinatrice du groupe d’action de Dijon Centre-Ville ?</blockquote>
+			<img src="${src}" alt="${alt}">
+			<p class="nom-amfis">Rita</p>
+		</aside>\n`;
+	}
+
+	if (src === '/images/articles/zaza-fond-bleu.png') {
+		return `<aside class="personnage-amfis personnage-amfis-zaza">
+			<blockquote class="bulle-amfis">Tu crois que je suis la bonne personne ? J’ai des avis tranchés. Je pense être clivante.</blockquote>
+			<img src="${src}" alt="${alt}">
+			<p class="nom-amfis">Zaza</p>
+		</aside>\n`;
+	}
+
+	return defaultImage(tokens, idx, options, env, self);
+};
+
 /**
  * Bloc vidéo.
  *
