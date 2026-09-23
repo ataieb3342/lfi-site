@@ -55,6 +55,39 @@ export const LIBELLE_KIND: Record<string, string> = {
 	revue: 'Revue de presse'
 };
 
+/** Libellé du type tel qu'il est choisi dans l'administration. */
+export function libellePublication(kind: string, eventCategory: string): string {
+	if (kind === 'actu' && eventCategory === 'action') return 'Action';
+	if (kind === 'actu' && eventCategory === 'reunion') return 'Événement';
+	if (kind === 'actu' && eventCategory === 'formation') return 'Formation';
+	return LIBELLE_KIND[kind] ?? 'Publication';
+}
+
+export const LIBELLE_ACTION: Record<string, string> = {
+	'porte-a-porte': 'Porte-à-porte',
+	tractage: 'Tractage / distribution',
+	collage: 'Collage d’affiches',
+	mobilisation: 'Mobilisation',
+	collecte: 'Collecte',
+	autre: 'Action'
+};
+
+/** « 18:00 » devient « 18 h », « 18:30 » devient « 18 h 30 ». */
+export function formatHeure(heure: string): string {
+	const correspondance = heure.match(/^(\d{2}):(\d{2})$/);
+	if (!correspondance) return heure;
+	return correspondance[2] === '00'
+		? `${Number(correspondance[1])} h`
+		: `${Number(correspondance[1])} h ${correspondance[2]}`;
+}
+
+export function formatPlageHoraire(debut: string, fin: string): string {
+	if (debut && fin) return `de ${formatHeure(debut)} à ${formatHeure(fin)}`;
+	if (debut) return `à ${formatHeure(debut)}`;
+	if (fin) return `jusqu’à ${formatHeure(fin)}`;
+	return '';
+}
+
 /** Libellé court de la pastille d'un rendez-vous. */
 export const LIBELLE_EVENEMENT: Record<string, string> = {
 	action: 'Action',

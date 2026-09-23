@@ -39,7 +39,10 @@
 	enctype="multipart/form-data"
 	use:enhance={({ action, formData }) => {
 		// L'aperçu n'a pas besoin de l'image de couverture : on ne l'envoie pas.
-		if (action.search === '?/apercu') formData.delete('cover');
+		if (action.search === '?/apercu') {
+			formData.delete('cover');
+			formData.delete('eventMap');
+		}
 		return async ({ update }) => {
 			// reset: false : les champs gardent ce qu'on vient de taper, et le
 			// fichier choisi reste sélectionné.
@@ -50,6 +53,7 @@
 >
 	<FormulairePublication
 		publication={data.publication}
+		admins={data.admins}
 		{valeurs}
 		erreur={form?.erreur ?? ''}
 		apercu={form?.apercu ?? ''}

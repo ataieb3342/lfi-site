@@ -178,10 +178,10 @@
 								>
 									{formatDateCourte(actu.eventAt)}
 								</span>
+							{:else if actu.eventAt}
+								<span class="block text-xs text-ink-faint">Rendez-vous du {formatDate(actu.eventAt)}</span>
 							{:else}
-								<time class="block text-xs text-ink-faint" datetime={actu.publishedAt ?? undefined}
-									>{formatDate(actu.publishedAt)}</time
-								>
+								<time class="block text-xs text-ink-faint" datetime={actu.publishedAt ?? undefined}>{formatDate(actu.publishedAt)}</time>
 							{/if}
 							<span class="mt-1 block font-semibold">{actu.title}</span>
 						</a>

@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { deletePublication, getById, updatePublication } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
 import { apercuPublication, ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
-import { audit } from '$lib/server/auth';
+import { audit, listAdminChoices } from '$lib/server/auth';
 
 function charger(id: string) {
 	const publication = getById(Number(id));
@@ -15,6 +15,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const publication = charger(params.id);
 	return {
 		publication: presentPublication(publication),
+		admins: listAdminChoices().map(({ id, name, profile_public }) => ({
+			id,
+			name,
+			profilePublic: !!profile_public
+		})),
 		corps: publication.body,
 		enregistre: url.searchParams.has('enregistre')
 	};
@@ -27,7 +32,12 @@ export const actions: Actions = {
 		const form = await request.formData();
 
 		try {
-			const saisie = await lirePublication(form, admin.id, publication.cover_media_id);
+			const saisie = await lirePublication(
+				form,
+				admin.id,
+				publication.cover_media_id,
+				publication.event_map_media_id
+			);
 			// L'URL n'est régénérée que si on le demande : les liens déjà partagés
 			// sur les réseaux sociaux continuent de fonctionner.
 			updatePublication(publication.id, saisie, { reslug: form.get('regenererUrl') === '1' });

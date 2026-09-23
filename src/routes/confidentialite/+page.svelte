@@ -7,7 +7,7 @@
 <!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
 <Metadonnees
 	titre="Confidentialité — {data.settings.siteName}"
-	description="Ce site n'utilise aucun traceur, aucun service tiers et ne conserve aucune adresse IP en clair."
+	description="Ce site n'utilise aucun traceur publicitaire et ne conserve aucune adresse IP en clair. Certaines pages peuvent intégrer une carte Google Maps."
 	indexable={false}
 />
 
@@ -21,11 +21,18 @@
 <div class="contenu mt-5 max-w-2xl">
 	<h2>Ce que ce site ne fait pas</h2>
 	<ul>
-		<li>Aucun cookie n'est déposé chez les visiteurs.</li>
-		<li>Aucun outil de mesure d'audience, aucun script tiers, aucune police d'écriture distante.</li>
+		<li>Le site lui-même ne dépose aucun cookie chez les visiteurs.</li>
+		<li>Aucun outil de mesure d'audience, aucun traceur publicitaire, aucune police d'écriture distante.</li>
 		<li>Aucun compte n'est nécessaire pour lire ou commenter.</li>
-		<li>Aucune donnée n'est transmise à un tiers, ni vendue.</li>
+		<li>Les données confiées au site ne sont ni vendues ni utilisées à des fins publicitaires.</li>
 	</ul>
+
+	<h2>Cartes Google Maps</h2>
+	<p>
+		Certaines fiches d’action peuvent afficher une carte intégrée fournie par Google Maps. Lorsque cette
+		carte est chargée, le navigateur contacte les serveurs de Google, qui applique alors sa propre
+		politique de confidentialité. Le reste du contenu de la fiche demeure lisible sans interagir avec la carte.
+	</p>
 
 	<h2>Quand vous publiez un commentaire</h2>
 	<p>Sont enregistrés :</p>

@@ -4,6 +4,7 @@ import { supprimerPdf } from './bibliotheque.ts';
 export type Kind = 'article' | 'actu' | 'apero' | 'revue';
 export type Status = 'draft' | 'published';
 export type CategorieEvenement = 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
+export type CategorieAction = 'porte-a-porte' | 'tractage' | 'collage' | 'mobilisation' | 'collecte' | 'autre';
 
 export type Publication = {
 	id: number;
@@ -18,6 +19,18 @@ export type Publication = {
 	pinned: number;
 	event_at: string | null;
 	event_category: CategorieEvenement;
+	action_category: CategorieAction;
+	event_start_time: string;
+	event_end_time: string;
+	event_location: string;
+	event_address: string;
+	event_location_url: string;
+	event_managers: string;
+	event_signup_url: string;
+	event_meeting_point: string;
+	event_map_media_id: number | null;
+	event_map_embed_url: string;
+	byline_admin_id: number | null;
 	published_at: string | null;
 	created_at: string;
 	updated_at: string;
@@ -186,6 +199,19 @@ export type PublicationInput = {
 	/** Date de l'action annoncée (AAAA-MM-JJ), ou null. */
 	eventAt: string | null;
 	eventCategory: CategorieEvenement;
+	actionCategory?: CategorieAction;
+	eventStartTime?: string;
+	eventEndTime?: string;
+	eventLocation?: string;
+	eventAddress?: string;
+	eventLocationUrl?: string;
+	eventManagers?: string;
+	eventSignupUrl?: string;
+	eventMeetingPoint?: string;
+	eventMapMediaId?: number | null;
+	eventMapEmbedUrl?: string;
+	authorAdminId?: number | null;
+	eventManagerAdminIds?: number[];
 };
 
 export function createPublication(input: PublicationInput, authorId: number): number {
@@ -194,8 +220,11 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 		.prepare(
 			`insert into publications
 			 (kind, slug, title, summary, body, cover_media_id, status, comments_open, pinned,
-			  event_at, event_category, published_at, created_at, updated_at, author_id, author_name)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			  event_at, event_category, action_category, event_start_time, event_end_time,
+			  event_location, event_address, event_location_url, event_managers, event_signup_url,
+			  event_meeting_point, event_map_media_id, event_map_embed_url, byline_admin_id,
+			  published_at, created_at, updated_at, author_id, author_name)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -209,13 +238,27 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			input.pinned ? 1 : 0,
 			input.eventAt,
 			input.eventCategory,
+			input.actionCategory ?? 'autre',
+			input.eventStartTime ?? '',
+			input.eventEndTime ?? '',
+			input.eventLocation ?? '',
+			input.eventAddress ?? '',
+			input.eventLocationUrl ?? '',
+			input.eventManagers ?? '',
+			input.eventSignupUrl ?? '',
+			input.eventMeetingPoint ?? '',
+			input.eventMapMediaId ?? null,
+			input.eventMapEmbedUrl ?? '',
+			input.authorAdminId ?? null,
 			input.status === 'published' ? timestamp : null,
 			timestamp,
 			timestamp,
 			authorId,
 			input.authorName
 		);
-	return Number(result.lastInsertRowid);
+	const id = Number(result.lastInsertRowid);
+	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
+	return id;
 }
 
 export function updatePublication(id: number, input: PublicationInput, opts: { reslug: boolean }) {
@@ -233,7 +276,10 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 	db().prepare(
 		`update publications set
 		   kind = ?, slug = ?, title = ?, summary = ?, body = ?, cover_media_id = ?,
-		   status = ?, comments_open = ?, pinned = ?, event_at = ?, event_category = ?, published_at = ?,
+		   status = ?, comments_open = ?, pinned = ?, event_at = ?, event_category = ?,
+		   action_category = ?, event_start_time = ?, event_end_time = ?, event_location = ?,
+		   event_address = ?, event_location_url = ?, event_managers = ?, event_signup_url = ?,
+		   event_meeting_point = ?, event_map_media_id = ?, event_map_embed_url = ?, byline_admin_id = ?, published_at = ?,
 		   updated_at = ?, author_name = ?
 		 where id = ?`
 	).run(
@@ -248,12 +294,51 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		input.pinned ? 1 : 0,
 		input.eventAt,
 		input.eventCategory,
+		input.actionCategory ?? 'autre',
+		input.eventStartTime ?? '',
+		input.eventEndTime ?? '',
+		input.eventLocation ?? '',
+		input.eventAddress ?? '',
+		input.eventLocationUrl ?? '',
+		input.eventManagers ?? '',
+		input.eventSignupUrl ?? '',
+		input.eventMeetingPoint ?? '',
+		input.eventMapMediaId ?? null,
+		input.eventMapEmbedUrl ?? '',
+		input.authorAdminId ?? null,
 		publishedAt,
 		now(),
 		input.authorName,
 		id
 	);
+	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
 	return slug;
+}
+
+function replacePublicationManagers(publicationId: number, adminIds: number[]) {
+	const uniques = [...new Set(adminIds.filter((id) => Number.isInteger(id) && id > 0))];
+	db().prepare('delete from publication_managers where publication_id = ?').run(publicationId);
+	const inserer = db().prepare(
+		'insert into publication_managers (publication_id, admin_id) values (?, ?)'
+	);
+	for (const adminId of uniques) inserer.run(publicationId, adminId);
+}
+
+export function listPublicationManagerProfiles(publicationId: number) {
+	return db()
+		.prepare(
+			`select a.id, a.username, a.display_name, a.profile_name, a.profile_visible
+			 from publication_managers pm join admins a on a.id = pm.admin_id
+			 where pm.publication_id = ? and a.disabled_at is null
+			 order by a.display_name collate nocase`
+		)
+		.all(publicationId) as {
+			id: number;
+			username: string;
+			display_name: string;
+			profile_name: string;
+			profile_visible: number;
+		}[];
 }
 
 export function deletePublication(id: number) {

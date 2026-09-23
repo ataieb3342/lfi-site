@@ -4,8 +4,8 @@
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
-	import { articleStructure, editeur, evenementApero, filAriane } from '$lib/donnees-structurees';
-	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatTailleFichier, LIBELLE_EVENEMENT, LIBELLE_KIND } from '$lib/format';
+	import { articleStructure, editeur, evenementAction, evenementApero, filAriane } from '$lib/donnees-structurees';
+	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, LIBELLE_ACTION, libellePublication } from '$lib/format';
 	import { RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { ActionData, PageData } from './$types';
 
@@ -30,10 +30,13 @@
 	// annoncé comme un événement, il peut apparaître comme tel dans Google.
 	const rubrique = $derived(RUBRIQUE_PAR_KIND[p.kind]);
 	const adresse = $derived(`${page.url.origin}/${rubrique}/${p.slug}`);
+	const estAction = $derived(p.kind === 'actu' && p.eventCategory === 'action');
 	const fiche = $derived(
 		p.kind === 'apero'
 			? evenementApero(page.url.origin, adresse, p, data.resume, cadre, data.settings)
-			: articleStructure(page.url.origin, adresse, p, data.resume, data.settings)
+			: estAction
+				? evenementAction(page.url.origin, adresse, p, data.resume, data.settings)
+				: articleStructure(page.url.origin, adresse, p, data.resume, data.settings)
 	);
 </script>
 
@@ -80,14 +83,17 @@
 
 <article>
 	<header class="border-b border-line pb-4">
-		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{LIBELLE_KIND[p.kind]}</p>
+		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{libellePublication(p.kind, p.eventCategory)}</p>
 		<h1 class="mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
-		<p class="mt-3 text-sm text-ink-faint">
-			<time datetime={p.publishedAt ?? undefined}>{formatDate(p.publishedAt)}</time>
-			{#if p.authorName} · {p.authorName}{/if}
-		</p>
+		{#if !p.eventAt && (p.publishedAt || p.authorName)}
+			<p class="mt-3 text-sm text-ink-faint">
+				{#if p.publishedAt}<time datetime={p.publishedAt}>{formatDate(p.publishedAt)}</time>{/if}
+				{#if p.publishedAt && p.authorName} · {/if}
+				{#if p.authorName}{#if p.authorProfileUrl}<a class="hover:text-brand hover:underline" href={p.authorProfileUrl}>{p.authorName}</a>{:else}{p.authorName}{/if}{/if}
+			</p>
+		{/if}
 		{#if p.summary}
-			<p class="mt-4 max-w-2xl text-lg text-ink-soft">{p.summary}</p>
+			<p class="mt-4 max-w-2xl whitespace-pre-line text-lg text-ink-soft">{p.summary}</p>
 		{/if}
 
 		{#if p.eventAt && p.kind === 'apero'}
@@ -103,20 +109,22 @@
 				{/if}
 				{#if lieuComplet}<span class="hidden sm:inline" aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
 			</p>
-		{:else if p.eventAt}
-			<p class="mt-5 text-xs font-bold tracking-wide text-brand uppercase">
-				{LIBELLE_EVENEMENT[p.eventCategory]}
-			</p>
+		{:else if p.eventAt && !estAction}
 			<p
-				class="mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
+				class="mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
 					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
 			>
 				{#if p.aVenir}
-					Rendez-vous le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
+					Rendez-vous le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>{formatPlageHoraire(p.eventStartTime, p.eventEndTime) ? `, ${formatPlageHoraire(p.eventStartTime, p.eventEndTime)}` : ''}
 				{:else}
-					Ce rendez-vous a eu lieu le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
+					Ce rendez-vous a eu lieu le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>{formatPlageHoraire(p.eventStartTime, p.eventEndTime) ? `, ${formatPlageHoraire(p.eventStartTime, p.eventEndTime)}` : ''}
 				{/if}
 			</p>
+			{#if p.eventLocation || p.eventAddress}
+				<p class="mt-2 text-sm text-ink-soft">
+					{#if p.eventLocationUrl}<a class="font-semibold text-brand underline" href={p.eventLocationUrl} target="_blank" rel="noreferrer">{p.eventLocation || p.eventAddress}</a>{:else}<span class="font-semibold">{p.eventLocation || p.eventAddress}</span>{/if}{p.eventLocation && p.eventAddress ? ` · ${p.eventAddress}` : ''}
+				</p>
+			{/if}
 		{/if}
 	</header>
 
@@ -142,12 +150,105 @@
 		/>
 	{/if}
 
-	<!-- Contenu Markdown rendu côté serveur. `html: false` dans markdown.ts
-	     garantit qu'aucune balise brute ne peut être injectée ici. -->
-	<div class="contenu mx-auto mt-6 max-w-2xl">
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html data.corpsHtml}
-	</div>
+	{#if estAction}
+		<section class="mt-7 space-y-7" aria-label="Informations sur l’action">
+			<div>
+				<h2 class="text-xl font-extrabold text-ink">Présentation de l’événement</h2>
+				<p class="mt-2 text-sm font-bold text-brand">{LIBELLE_ACTION[p.actionCategory]}</p>
+				{#if data.corpsHtml}
+					<div class="contenu mt-3">
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html data.corpsHtml}
+					</div>
+				{/if}
+			</div>
+
+			<div class="grid gap-6 rounded-xl border border-line bg-surface-alt p-5 sm:grid-cols-2">
+				<div>
+					<h2 class="text-lg font-extrabold text-ink">Date et heure</h2>
+					{#if p.eventAt}
+						<p class="mt-2 text-ink-soft">
+							Le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time>{formatPlageHoraire(p.eventStartTime, p.eventEndTime) ? `, ${formatPlageHoraire(p.eventStartTime, p.eventEndTime)}` : ''}.
+						</p>
+					{/if}
+				</div>
+
+				<div>
+					<h2 class="text-lg font-extrabold text-ink">Lieu</h2>
+					{#if p.eventLocation}
+						<p class="mt-2 font-semibold">
+							{#if p.eventLocationUrl}<a class="text-brand underline" href={p.eventLocationUrl} target="_blank" rel="noreferrer">{p.eventLocation}</a>{:else}{p.eventLocation}{/if}
+						</p>
+					{/if}
+					{#if p.eventAddress}<p class="whitespace-pre-line text-sm text-ink-soft">{p.eventAddress}</p>{/if}
+					{#if p.eventMeetingPoint}<p class="mt-2 text-sm text-ink"><strong>Point de rendez-vous :</strong> {p.eventMeetingPoint}</p>{/if}
+				</div>
+
+				{#if p.eventManagerPeople.length}
+					<div class="sm:col-span-2">
+						<h2 class="text-lg font-extrabold text-ink">Responsable{p.eventManagerPeople.length > 1 ? 's' : ''}</h2>
+						<p class="mt-2 text-ink-soft">
+							{#each p.eventManagerPeople as personne, index (personne.name)}
+								{index > 0 ? ', ' : ''}{#if personne.profileUrl}<a class="font-semibold text-brand underline" href={personne.profileUrl}>{personne.name}</a>{:else}{personne.name}{/if}
+							{/each}
+						</p>
+					</div>
+				{/if}
+			</div>
+
+			{#if p.eventMapEmbedUrl}
+				<figure>
+					<iframe
+						src={p.eventMapEmbedUrl}
+						title="Carte du lieu de l’action"
+						class="aspect-video w-full rounded-xl border border-line shadow-sm"
+						loading="lazy"
+						referrerpolicy="strict-origin-when-cross-origin"
+						allowfullscreen
+					></iframe>
+					{#if p.eventLocationUrl}
+						<figcaption class="mt-2 text-center text-xs">
+							<a class="font-semibold text-brand underline" href={p.eventLocationUrl} target="_blank" rel="noreferrer">Ouvrir la carte dans Google Maps</a>
+						</figcaption>
+					{/if}
+				</figure>
+			{:else if p.eventMap}
+				<figure>
+					{#if p.eventLocationUrl}
+						<a href={p.eventLocationUrl} target="_blank" rel="noreferrer" aria-label="Ouvrir le lieu sur la carte">
+							<img src={p.eventMap.url} alt={p.eventMap.alt} class="aspect-video w-full rounded-xl border border-line object-cover shadow-sm" loading="lazy" />
+						</a>
+					{:else}
+						<img src={p.eventMap.url} alt={p.eventMap.alt} class="aspect-video w-full rounded-xl border border-line object-cover shadow-sm" loading="lazy" />
+					{/if}
+					<figcaption class="mt-2 text-center text-xs text-ink-faint">
+						{p.eventLocationUrl ? 'Cliquez sur la carte pour ouvrir l’itinéraire.' : 'Carte du lieu de l’action.'}
+					</figcaption>
+				</figure>
+			{/if}
+
+			{#if p.eventSignupUrl}
+				<p class="rounded-lg bg-brand-soft px-4 py-3 text-sm text-ink">
+					Prévenez-nous sur <a class="font-bold text-brand underline" href={p.eventSignupUrl} target="_blank" rel="noreferrer">Action populaire</a> si vous venez.
+				</p>
+			{/if}
+		</section>
+	{:else}
+		{#if p.eventAt && p.eventManagerPeople.length}
+			<p class="mt-5 text-sm text-ink-soft">
+				<strong>Responsable{p.eventManagerPeople.length > 1 ? 's' : ''} :</strong>
+				{#each p.eventManagerPeople as personne, index (personne.name)}
+					{index > 0 ? ', ' : ''}{#if personne.profileUrl}<a class="font-semibold text-brand underline" href={personne.profileUrl}>{personne.name}</a>{:else}{personne.name}{/if}
+				{/each}
+			</p>
+		{/if}
+		<!-- Contenu Markdown rendu côté serveur. `html: false` dans markdown.ts
+		     garantit qu'aucune balise brute ne peut être injectée ici. -->
+		<div class="contenu mx-auto mt-6 max-w-2xl">
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html data.corpsHtml}
+		</div>
+	{/if}
 </article>
 
 {#if p.kind === 'apero'}

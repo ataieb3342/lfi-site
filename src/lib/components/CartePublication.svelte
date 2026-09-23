@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { COULEUR_KIND, formatDate, formatDateCourte, LIBELLE_EVENEMENT, LIBELLE_KIND, lienPublication } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateCourte, libellePublication, lienPublication } from '$lib/format';
 	import type { PublicationVue } from '$lib/types';
 
 	let { publication, avecImage = true }: { publication: PublicationVue; avecImage?: boolean } = $props();
@@ -22,22 +22,16 @@
 	<div class="min-w-0 flex-1">
 		<p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-faint">
 			<span class="font-semibold tracking-wide uppercase {COULEUR_KIND[publication.kind]}">
-				{LIBELLE_KIND[publication.kind]}
+				{libellePublication(publication.kind, publication.eventCategory)}
 			</span>
 			{#if publication.pinned}
 				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">Épinglé</span>
 			{/if}
 			{#if publication.eventAt && publication.aVenir}
-				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">
-					{LIBELLE_EVENEMENT[publication.eventCategory]}
-				</span>
 				<span class="rounded bg-accent-soft px-1.5 py-0.5 font-semibold text-accent-dark">
 					{formatDateCourte(publication.eventAt)}
 				</span>
 			{:else if publication.eventAt}
-				<span class="rounded bg-surface-alt px-1.5 py-0.5 font-semibold text-ink-soft">
-					{LIBELLE_EVENEMENT[publication.eventCategory]}
-				</span>
 				<span class="rounded bg-surface-alt px-1.5 py-0.5 font-semibold text-ink-faint">
 					Rendez-vous passé
 				</span>
@@ -45,8 +39,10 @@
 			{#if publication.status === 'draft'}
 				<span class="rounded bg-surface-alt px-1.5 py-0.5 font-semibold text-ink-soft">Brouillon</span>
 			{/if}
-			<span>·</span>
-			<time datetime={publication.publishedAt ?? undefined}>{formatDate(publication.publishedAt)}</time>
+			{#if !publication.eventAt}
+				<span>·</span>
+				<time datetime={publication.publishedAt ?? undefined}>{formatDate(publication.publishedAt)}</time>
+			{/if}
 		</p>
 
 		<h2 class="mt-1 text-lg font-bold text-ink sm:text-xl">
@@ -54,13 +50,20 @@
 		</h2>
 
 		{#if publication.summary}
-			<p class="mt-1.5 line-clamp-3 text-sm text-ink-soft">{publication.summary}</p>
+			<p class="mt-1.5 line-clamp-3 whitespace-pre-line text-sm text-ink-soft">{publication.summary}</p>
 		{/if}
 
-		{#if publication.authorName || publication.commentCount > 0}
+		{#if (!publication.eventAt && publication.authorName) || publication.eventManagerPeople.length || publication.commentCount > 0}
 			<p class="mt-2 text-xs text-ink-faint">
-				{#if publication.authorName}{publication.authorName}{/if}
-				{#if publication.authorName && publication.commentCount > 0} · {/if}
+				{#if publication.eventAt && publication.eventManagerPeople.length}
+					Responsable{publication.eventManagerPeople.length > 1 ? 's' : ''} :
+					{#each publication.eventManagerPeople as personne, index (personne.name)}
+						{index > 0 ? ', ' : ''}{#if personne.profileUrl}<a class="hover:text-brand hover:underline" href={personne.profileUrl}>{personne.name}</a>{:else}{personne.name}{/if}
+					{/each}
+				{:else if !publication.eventAt && publication.authorName}
+					{#if publication.authorProfileUrl}<a class="hover:text-brand hover:underline" href={publication.authorProfileUrl}>{publication.authorName}</a>{:else}{publication.authorName}{/if}
+				{/if}
+				{#if ((!publication.eventAt && publication.authorName) || publication.eventManagerPeople.length) && publication.commentCount > 0} · {/if}
 				{#if publication.commentCount > 0}
 					{publication.commentCount}
 					{publication.commentCount > 1 ? 'commentaires' : 'commentaire'}

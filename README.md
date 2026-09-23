@@ -7,8 +7,9 @@ double authentification.
 - **Hébergement** : VPS français (OVH ou Scaleway), Docker + Caddy.
 - **Données** : un fichier SQLite, les images et les PDF de la bibliothèque.
   Sauvegarder revient à copier `data/`.
-- **Vie privée** : aucun cookie chez les visiteurs, aucun service tiers, aucune
-  adresse IP conservée en clair.
+- **Vie privée** : aucun cookie de mesure d'audience et aucune adresse IP
+  conservée en clair. Une carte Google Maps peut être intégrée à une action ;
+  son affichage contacte alors Google.
 
 ## Démarrer en local
 
@@ -42,8 +43,8 @@ scripts/           sauvegarde et restauration
 | Je veux… | Où |
 | --- | --- |
 | Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
-| Ajouter un évènement | Administration → Publications → Nouvelle publication, puis renseigner sa date et sa catégorie |
-| Classer un rendez-vous | Choisir parmi « Action », « Réunion », « Apéro », « Formation » ou « Autre » |
+| Ajouter une action | Choisir « Action », puis collage, porte-à-porte ou tractage |
+| Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
@@ -59,6 +60,11 @@ scripts/           sauvegarde et restauration
 Les publications s'écrivent en **Markdown** : `## Titre`, `**gras**`,
 `*italique*`, `[lien](https://…)`, `> citation`, listes à tirets. Le HTML n'est
 pas interprété, c'est une protection volontaire.
+
+Pour une action, le titre et le chapô sont préparés à partir de la date, des
+horaires et du lieu, puis restent modifiables. Les responsables se choisissent
+parmi les comptes ou se saisissent librement ; leur nom ouvre leur fiche si
+elle est publique. Une capture ou une carte Google Maps peut compléter le lieu.
 
 ## Navigation et agenda
 

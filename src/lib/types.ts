@@ -18,11 +18,26 @@ export type PublicationVue = {
 	publishedAt: string | null;
 	updatedAt: string;
 	authorName: string;
+	authorAdminId: number | null;
+	authorProfileUrl: string | null;
 	commentCount: number;
 	/** Date de l'action annoncée (AAAA-MM-JJ), si la publication en annonce une. */
 	eventAt: string | null;
 	/** Catégorie utilisée pour la couleur et le filtrage dans l'agenda. */
 	eventCategory: 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
+	actionCategory: 'porte-a-porte' | 'tractage' | 'collage' | 'mobilisation' | 'collecte' | 'autre';
+	eventStartTime: string;
+	eventEndTime: string;
+	eventLocation: string;
+	eventAddress: string;
+	eventLocationUrl: string;
+	eventManagers: string;
+	eventManagerAdminIds: number[];
+	eventManagerPeople: { name: string; profileUrl: string | null }[];
+	eventSignupUrl: string;
+	eventMeetingPoint: string;
+	eventMap: { url: string; alt: string } | null;
+	eventMapEmbedUrl: string;
 	/** Vrai tant que la date de l'action n'est pas passée. */
 	aVenir: boolean;
 	cover: { url: string; alt: string } | null;

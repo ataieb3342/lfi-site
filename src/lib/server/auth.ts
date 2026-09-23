@@ -54,6 +54,22 @@ export function listAdmins(): AdminRow[] {
 	return db().prepare('select * from admins order by created_at').all() as AdminRow[];
 }
 
+/** Noms proposés dans les formulaires de publication, sans donnée de connexion. */
+export function listAdminChoices() {
+	return db()
+		.prepare(
+			`select id, coalesce(nullif(profile_name, ''), display_name) as name,
+			        case when profile_visible = 1 and profile_name != '' then 1 else 0 end as profile_public
+			 from admins where disabled_at is null order by name collate nocase`
+		)
+		.all() as { id: number; name: string; profile_public: number }[];
+}
+
+/** Ancre publique stable sans exposer l'identifiant interne du compte. */
+export function publicProfileAnchor(admin: Pick<AdminRow, 'username'>): string {
+	return `membre-${sha256(admin.username).slice(0, 12)}`;
+}
+
 export function countAdmins(): number {
 	return (db().prepare('select count(*) as n from admins where disabled_at is null').get() as { n: number }).n;
 }
@@ -113,14 +129,18 @@ export function updateProfile(
 }
 
 export function listPublicProfiles() {
-	return db().prepare(
-		`select a.profile_name as name, a.profile_role as role, a.profile_bio as bio,
+	const profils = db().prepare(
+		`select a.username, a.profile_name as name, a.profile_role as role, a.profile_bio as bio,
 		        a.profile_emoji as emoji, m.filename as image
 		 from admins a
 		 left join media m on m.id = a.profile_media_id
 		 where a.profile_visible = 1 and a.disabled_at is null and a.profile_name != ''
 		 order by a.created_at`
-	).all() as { name: string; role: string; bio: string; emoji: string; image: string | null }[];
+	).all() as { username: string; name: string; role: string; bio: string; emoji: string; image: string | null }[];
+	return profils.map(({ username, ...profil }) => ({
+		...profil,
+		anchor: publicProfileAnchor({ username })
+	}));
 }
 
 /* -------------------------------------------------------------------- TOTP */

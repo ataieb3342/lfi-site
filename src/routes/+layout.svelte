@@ -256,7 +256,7 @@
 	</div>
 	<div class="border-t border-white/15">
 		<p class="mx-auto max-w-5xl px-4 py-4 text-xs text-white/60">
-			© {annee} — Ce site ne dépose aucun cookie de mesure d'audience et n'utilise aucun service tiers.
+			© {annee} — Ce site ne dépose aucun cookie de mesure d'audience.
 		</p>
 	</div>
 </footer>

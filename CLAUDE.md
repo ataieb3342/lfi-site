@@ -22,7 +22,8 @@ vérification manuelle dans le navigateur tiennent ce rôle.
 ## Architecture
 
 SvelteKit 2 (Svelte 5, runes) + SQLite + Tailwind 4. Un seul processus Node,
-aucun service externe, aucune dépendance native.
+aucun service externe nécessaire au fonctionnement du serveur, aucune dépendance
+native. Une fiche d’action peut toutefois afficher une carte Google Maps intégrée.
 
 | Chemin | Rôle |
 | --- | --- |
@@ -81,8 +82,11 @@ faille connue.
    jamais interprété. Un compte administrateur compromis ne peut donc pas
    injecter de script dans les pages.
 2. **La CSP de `vite.config.ts` reste en `default-src 'none'`.** Ne jamais
-   ajouter `'unsafe-inline'` à `script-src`, ni de domaine externe. Pas de
-   polices Google, pas de CDN, pas d'outil de mesure d'audience.
+	 ajouter `'unsafe-inline'` à `script-src`. Pas de polices Google, pas de CDN,
+	 pas d'outil de mesure d'audience. La seule exception externe autorisée est
+	 `https://www.google.com` dans `frame-src`, pour les cartes Google Maps des
+	 fiches d’action. Leur URL est validée côté serveur : aucun HTML libre n’est
+	 interprété.
 3. **Aucune adresse IP en clair en base.** On stocke `hmac('ip', adresse)`.
    Cela suffit pour limiter le spam et bloquer quelqu'un, sans conserver de
    donnée personnelle exploitable en cas de fuite.

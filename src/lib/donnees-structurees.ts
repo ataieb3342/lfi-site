@@ -145,6 +145,40 @@ export function evenementApero(
 	return fiche;
 }
 
+/** Une action de terrain avec ses horaires et son lieu propres. */
+export function evenementAction(
+	origine: string,
+	adresse: string,
+	p: PublicationVue,
+	resume: string,
+	identite: Identite
+) {
+	const fiche: Record<string, unknown> = {
+		'@type': 'Event',
+		name: p.title,
+		description: resume,
+		inLanguage: 'fr-FR',
+		url: adresse,
+		eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+		eventStatus: 'https://schema.org/EventScheduled',
+		organizer: { '@id': `${origine}/#organisation` },
+		isAccessibleForFree: true
+	};
+	if (p.eventAt) {
+		fiche.startDate = p.eventStartTime ? `${p.eventAt}T${p.eventStartTime}` : p.eventAt;
+		if (p.eventEndTime) fiche.endDate = `${p.eventAt}T${p.eventEndTime}`;
+	}
+	if (p.eventLocation || p.eventAddress) {
+		fiche.location = {
+			'@type': 'Place',
+			name: p.eventLocation || p.eventAddress,
+			address: p.eventAddress
+		};
+	}
+	if (p.cover) fiche.image = origine + p.cover.url;
+	return fiche;
+}
+
 /**
  * Le fil d'Ariane, affiché par Google sous le titre du résultat à la place de
  * l'adresse brute : « Accueil › Articles › Le titre » se lit, pas « /articles/… ».

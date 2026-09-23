@@ -331,6 +331,40 @@ const MIGRATIONS: string[] = [
 	alter table admins add column profile_media_id integer references media(id) on delete set null;
 	alter table admins add column profile_visible integer not null default 0 check (profile_visible in (0, 1));
 	create index admins_profiles_publics on admins(profile_visible, created_at);
+	`,
+	// 010 — fiche structurée des actions (nature, horaires, responsables et lieu)
+	`
+	alter table publications add column action_category text not null default 'autre'
+		check (action_category in ('porte-a-porte', 'tractage', 'collage', 'mobilisation', 'collecte', 'autre'));
+	alter table publications add column event_start_time text not null default '';
+	alter table publications add column event_end_time text not null default '';
+	alter table publications add column event_location text not null default '';
+	alter table publications add column event_address text not null default '';
+	alter table publications add column event_location_url text not null default '';
+	alter table publications add column event_managers text not null default '';
+	alter table publications add column event_signup_url text not null default '';
+	`,
+	// 011 — précision facultative à l'intérieur du lieu (entrée, sortie, kiosque…)
+	`
+	alter table publications add column event_meeting_point text not null default '';
+	`,
+	// 012 — aperçu local de la carte, cliquable vers le service cartographique
+	`
+	alter table publications add column event_map_media_id integer references media(id) on delete set null;
+	`,
+	// 013 — auteur choisi et responsables reliés aux comptes du groupe
+	`
+	alter table publications add column byline_admin_id integer references admins(id) on delete set null;
+	create table publication_managers (
+		publication_id integer not null references publications(id) on delete cascade,
+		admin_id integer not null references admins(id) on delete cascade,
+		primary key (publication_id, admin_id)
+	) without rowid;
+	create index publication_managers_admin on publication_managers(admin_id, publication_id);
+	`,
+	// 014 — carte Google Maps intégrée à partir du code fourni par Google
+	`
+	alter table publications add column event_map_embed_url text not null default '';
 	`
 ];
 

@@ -36,11 +36,9 @@
 	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<!-- Clé sur le rang et non sur le nom : deux membres homonymes sont
 		     possibles (rien ne rend `profile_name` unique en base), et Svelte
-		     lève alors une erreur de clé dupliquée qui casse la page publique.
-		     L'identifiant du compte ferait une clé stable, mais le publier
-		     donnerait le nombre de comptes d'administration. -->
+		     lève alors une erreur de clé dupliquée qui casse la page publique. -->
 		{#each data.profils as membre, index (index)}
-			<article class="rounded-2xl border border-line bg-carte p-4">
+			<article id={membre.anchor} class="scroll-mt-6 rounded-2xl border border-line bg-carte p-4">
 				{#if membre.image}
 					<img src={membre.image} alt="Portrait de {membre.name}" class="aspect-square w-full rounded-xl object-cover" />
 				{:else}

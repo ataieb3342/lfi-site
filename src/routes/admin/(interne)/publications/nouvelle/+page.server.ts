@@ -1,8 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { createPublication } from '$lib/server/content';
 import { apercuPublication, ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
-import { audit } from '$lib/server/auth';
+import { audit, listAdminChoices } from '$lib/server/auth';
+
+export const load: PageServerLoad = async () => ({
+	admins: listAdminChoices().map(({ id, name, profile_public }) => ({
+		id,
+		name,
+		profilePublic: !!profile_public
+	}))
+});
 
 export const actions: Actions = {
 	creer: async ({ request, locals }) => {

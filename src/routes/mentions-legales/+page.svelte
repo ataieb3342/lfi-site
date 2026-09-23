@@ -59,7 +59,8 @@
 
 	<h2>Données personnelles</h2>
 	<p>
-		Ce site ne dépose aucun traceur publicitaire, n'utilise aucun service tiers et ne conserve
-		aucune adresse IP en clair. Le détail est sur la page <a href="/confidentialite">Confidentialité</a>.
+		Ce site ne dépose aucun traceur publicitaire et ne conserve aucune adresse IP en clair. Certaines
+		fiches d’action peuvent intégrer une carte Google Maps. Le détail est sur la page
+		<a href="/confidentialite">Confidentialité</a>.
 	</p>
 </div>
