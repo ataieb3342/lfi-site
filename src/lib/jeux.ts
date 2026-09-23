@@ -23,6 +23,12 @@ export const JEUX = [
 		dossier: 'space-invaders',
 		titre: 'Space Invaders',
 		description: 'Le classique : détruire les vagues d’envahisseurs avant qu’elles ne descendent.'
+	},
+	{
+		dossier: 'space-shooter',
+		titre: 'Space Shooter',
+		description:
+			'Survivre aux vagues, monter de niveau et choisir ses améliorations — projectiles, bouclier ou points de vie.'
 	}
 ] as const;
 
