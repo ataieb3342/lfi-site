@@ -126,12 +126,35 @@ Pour restaurer : `./scripts/restauration.sh sauvegardes/site-….tar.gz`
 
 ## 6. Mettre à jour le site
 
+**C'est automatique.** `scripts/deployer.sh` tourne toutes les cinq minutes
+(`/etc/cron.d/deploiement-site`) : il regarde si `main` a bougé et, seulement
+dans ce cas, sauvegarde, récupère le code et redémarre. Pousser sur `main`
+suffit donc à mettre le site à jour.
+
 ```bash
-cd /srv/lfi-site
-./scripts/sauvegarde.sh          # d'abord une sauvegarde
-git pull
-docker compose -f docker/compose.yml up -d --build
+# Installation, une seule fois :
+cat > /etc/cron.d/deploiement-site <<'FIN'
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+*/5 * * * * root /srv/lfi-site/scripts/deployer.sh >> /var/log/deploiement-site.log 2>&1
+FIN
+
+# Pour déployer tout de suite sans attendre, ou pour voir ce qui se passe :
+ssh lfi '/srv/lfi-site/scripts/deployer.sh'
+
+# Ce qu'ont donné les derniers passages :
+ssh lfi 'tail -30 /var/log/deploiement-site.log'
 ```
+
+Trois choses que le script gère et qu'on oublie en le faisant à la main : la
+**sauvegarde préalable** (une migration ne se rejoue pas à l'envers), le
+**verrou** (une compilation dure plus de cinq minutes, cron relancerait par
+dessus), et la **recréation du conteneur Caddy** quand `docker/Caddyfile` a
+changé — le fichier est monté dans le conteneur, qui garde l'ancien sinon.
+
+Si la compilation échoue, les conteneurs en place continuent de servir la
+version précédente : un commit cassé ne coupe pas le site, il empêche
+seulement la mise à jour. Le journal le dit.
 
 Les migrations de base de données s'appliquent toutes seules au démarrage.
 
