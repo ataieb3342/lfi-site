@@ -36,23 +36,43 @@ const defaultImage =
 	md.renderer.rules.image ??
 	((tokens, idx, options, _env, self) => self.renderToken(tokens, idx, options));
 
+function personnageDepuisAlt(altBrut: string, nomParDefaut: string) {
+	const [nomSaisi, ...description] = altBrut.split('|');
+	if (description.length === 0) {
+		return {
+			nom: escapeHtml(nomParDefaut),
+			alt: escapeHtml(altBrut || `${nomParDefaut}, illustration à l’aquarelle`)
+		};
+	}
+
+	const nom = nomSaisi.trim() || nomParDefaut;
+	const detail = description.join('|').trim() || 'illustration à l’aquarelle';
+	return { nom: escapeHtml(nom), alt: escapeHtml(`${nom}, ${detail}`) };
+}
+
 md.renderer.rules.image = (tokens, idx, options, env, self) => {
 	const src = String(tokens[idx].attrGet('src') ?? '');
-	const alt = escapeHtml(tokens[idx].content || 'Illustration à l’aquarelle');
+	const altBrut = tokens[idx].content || 'Illustration à l’aquarelle';
+	const alt = escapeHtml(altBrut);
+	const stickerR = src === '/images/articles/sticker-rita.png' || /^R\s*\|/i.test(altBrut);
+	const stickerRaissa =
+		src === '/images/articles/zaza-fond-bleu.png' || /^Raïssa\s*\|/i.test(altBrut);
 
-	if (src === '/images/articles/sticker-rita.png') {
+	if (stickerR) {
+		const personnage = personnageDepuisAlt(altBrut, 'R');
 		return `<aside class="personnage-amfis personnage-amfis-rita">
 			<blockquote class="bulle-amfis">Et si… et si tu devenais coordinatrice du groupe d’action de Dijon Centre-Ville ?</blockquote>
-			<img src="${src}" alt="${alt}">
-			<p class="nom-amfis">Rita</p>
+			<img src="${src}" alt="${personnage.alt}">
+			<p class="nom-amfis">${personnage.nom}</p>
 		</aside>\n`;
 	}
 
-	if (src === '/images/articles/zaza-fond-bleu.png') {
+	if (stickerRaissa) {
+		const personnage = personnageDepuisAlt(altBrut, 'Raïssa');
 		return `<aside class="personnage-amfis personnage-amfis-zaza">
 			<blockquote class="bulle-amfis">Tu crois que je suis la bonne personne ? J’ai des avis tranchés. Je pense être clivante.</blockquote>
-			<img src="${src}" alt="${alt}">
-			<p class="nom-amfis">Zaza</p>
+			<img src="${src}" alt="${personnage.alt}">
+			<p class="nom-amfis">${personnage.nom}</p>
 		</aside>\n`;
 	}
 

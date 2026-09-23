@@ -191,7 +191,7 @@ const FICHES: Fiche[] = [
 		publieIlYa: 0,
 		layoutStyle: 'carnet-aquarelle',
 		auteur: 'Zaza',
-		body: `![Rita faisant un signe de la main, dessinée à l’aquarelle](/images/articles/sticker-rita.png)
+		body: `![R | faisant un signe de la main, dessinée à l’aquarelle](/images/articles/sticker-r-web.png)
 
 Et si, et si ! Je racontais les Amfis 2026. Mon premier.
 
@@ -209,7 +209,7 @@ Rita, qui est bénévole aux Amfis, nous attend à la sortie de la réglementair
 
 ## Mais quel monde !
 
-![Zaza, le bras levé, dessinée à l’aquarelle](/images/articles/zaza-fond-bleu.png)
+![Raïssa | le bras levé, dessinée à l’aquarelle](/images/articles/sticker-raissa-web.png)
 
 On se balade, mais quel monde ! Et le pire reste à venir : nous ne sommes que vendredi.
 
