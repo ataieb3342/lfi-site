@@ -278,9 +278,10 @@ l'avance, puis publie un résumé des échanges. Sur le site :
   est dans les réglages (`apero_*`), pas dans le code : changer de bar ne doit
   pas demander de redéploiement. Il est exposé à toutes les pages par
   `+layout.server.ts` sous `data.apero`.
-- Le prochain apéro ouvre l'accueil, en bandeau (`prochainApero` dans
-  `src/routes/+page.server.ts`), sur la surface pourpre `.fond-apero`. Il est
-  aussi dans le flux RSS et dans le plan du site.
+- Le prochain apéro a sa fiche dans le fil « Les prochains jours » de
+  l'accueil, comme les autres rendez-vous (voir « L'accueil »). Il est aussi
+  dans le flux RSS et dans le plan du site. `BandeauApero.svelte` n'est plus
+  utilisé sur l'accueil.
 - **Pas de calcul automatique des dates** tous les quinze jours : un apéro
   sauté ou déplacé casserait la mécanique. Créer une fiche par apéro prend une
   minute et laisse la main aux humains.
@@ -384,18 +385,37 @@ de l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
 `agenda`) ; les retours d’action restent chronologiques et la bibliothèque est
 dans l'en-tête.
 
-La page tient donc en quatre blocs, de haut en bas :
+Le carrousel avait été remplacé par un grand bandeau d'ouverture (devise,
+boutons, prochain rendez-vous), une rangée de trois cartes de navigation et le
+bandeau du prochain apéro : ensemble, ils repoussaient l'article à la une à
+878 pixels sur téléphone. Ils ont été retirés à leur tour (septembre 2026).
 
-1. **Le prochain apéro**, en bandeau (`BandeauApero.svelte`, surface pourpre
-   `.fond-apero`) : c'est la seule chose qui ne figure nulle part ailleurs sur
-   cette page, il change toutes les deux semaines, et c'est le rendez-vous le
-   plus concret pour quelqu'un qui découvre le groupe. Masqué s'il n'y a pas
-   d'apéro annoncé.
+La page tient maintenant en quatre blocs, de haut en bas :
+
+1. **L'ouverture**, sur la surface `.fond-degrade` — le seul pavé coloré de la
+   page : une ligne d'identité, la devise en `h1`, puis le **fil « Les
+   prochains jours »**. Une fiche claire par rendez-vous des quinze prochains
+   jours (`HORIZON` dans `+page.server.ts`), événements, formations et apéros
+   confondus (`listAgenda`, qui écarte les retours d'action), huit au plus. Chaque fiche porte
+   « Aujourd'hui » ou « Demain » quand c'est le cas, l'heure, le titre, le
+   type et le lieu, et un liseré dans la couleur de sa catégorie (les classes
+   `agenda-*` de la page agenda). Sur téléphone, le fil défile au doigt
+   (`scroll-snap`, aucun script) ; la fiche suivante qui dépasse à droite dit
+   qu'on peut faire glisser. L'article à la une commence vers 340 pixels.
 2. **L'article à la une**, puis les articles récents.
-3. **La colonne « Actualités »**, rendez-vous à venir en tête.
+3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
+   comptes rendus et rendez-vous plus lointains, cinq au plus.
 4. **Le bandeau Action populaire**, tout en bas — jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
    arrive.
+
+**Un rendez-vous qui revient n'est affiché qu'une fois** (`regrouperRepetitions`
+dans `+page.server.ts`). Le site n'a pas de récurrence : le rassemblement de
+chaque samedi est une fiche par date, et six fois le même titre remplissaient
+la page. Seule la prochaine date est montrée ; si toutes les dates à venir
+sont espacées d'une semaine, la fiche dit « Chaque samedi », sinon « Et 3
+autres dates ». Le regroupement se fait sur le titre exact : pour qu'il
+fonctionne, les fiches d'un même rendez-vous doivent porter le même titre.
 
 `BandeauApero.svelte` n'est pas construit sur `Encart.svelte` : celui-ci porte un
 texte fixe, alors qu'ici la date, le lieu et l'image de couverture viennent de la

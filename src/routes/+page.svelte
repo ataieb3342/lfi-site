@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import BandeauApero from '$lib/components/BandeauApero.svelte';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { formatDate, formatDateCourte, lienPublication } from '$lib/format';
+	import { formatDate, formatDateCourte, formatHeure, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	const une = $derived(data.articles[0] ?? null);
 	const suite = $derived(data.articles.slice(1));
-	const prochainRendezVous = $derived(data.actus.find((actu) => actu.aVenir) ?? null);
 </script>
 
 <!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
@@ -25,71 +23,64 @@
 />
 
 <!--
-	Le bandeau d'ouverture. Il occupait 475 pixels — soit davantage que le
-	carrousel de 425 qu'on avait retiré précisément pour cela : l'accueil
-	s'ouvrait sur un écran entier de surface colorée et le premier article
-	passait sous la ligne de flottaison.
+	L'accueil s'ouvre sur ce qui se passe, pas sur un slogan : un titre d'une
+	ligne, puis le fil des quinze prochains jours. Une fiche par rendez-vous,
+	événements, formations et apéros confondus, dans la couleur de sa
+	catégorie (celle de l'agenda). Le fil défile au doigt sur téléphone
+	(`scroll-snap`, aucun script, aucun défilement automatique) et tient sur
+	une seule bande : les articles restent dans le premier écran.
 
-	Il dit la même chose sur deux cents pixels, au gabarit des autres bandeaux
-	du site (voir BandeauApero.svelte) : même rembourrage, même échelle de
-	titre, mêmes boutons. La surface est `.fond-degrade` et non un aplat de
-	violet, comme partout ailleurs sur le site.
+	Le tout est posé sur la surface violette du site : c'est le seul pavé
+	coloré de la page, et les fiches claires y ressortent comme des cartes
+	posées dessus. Elles gardent `bg-carte` et les couleurs de l'agenda,
+	lisibles dans les deux thèmes ; seul le texte hors des fiches est blanc.
+
+	Il remplace le grand bandeau d'ouverture, les trois cartes de navigation
+	et le bandeau du prochain apéro, qui repoussaient ensemble l'article à la
+	une à près de neuf cents pixels sur téléphone.
 -->
-<section class="fond-degrade overflow-hidden rounded-2xl px-4 py-5 sm:px-6 sm:py-6">
-	<div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8">
-		<div>
-			<p class="text-[0.6875rem] font-bold tracking-[0.18em] text-white/75 uppercase">
-				Groupe d’action · Dijon Centre
-			</p>
-			<h1 class="titre-affiche mt-1 max-w-2xl text-2xl text-white sm:text-3xl">
-				Agir ici, discuter ensemble, changer les choses.
-			</h1>
-			<p class="mt-2 max-w-2xl leading-snug text-white/85">{data.settings.description}</p>
-			<div class="mt-4 flex flex-wrap gap-2">
-				<a class="bouton-sur-fond" href="/agenda">Voir l’agenda</a>
-				<a class="bouton-sur-fond bouton-sur-fond-creux" href="/nous-rejoindre">Nous rejoindre</a>
-			</div>
+<section aria-labelledby="titre-accueil" class="fond-degrade overflow-hidden rounded-2xl px-4 py-5 sm:px-6">
+	<p class="text-xs font-bold tracking-[0.14em] text-white/75 uppercase">Groupe d’action · Dijon Centre</p>
+	<h1 id="titre-accueil" class="titre-affiche mt-1 text-2xl text-white sm:text-3xl">
+		Agir ici, discuter ensemble, changer les choses.
+	</h1>
+
+	{#if data.prochainsJours.length}
+		<div class="mt-5 flex items-baseline justify-between gap-4">
+			<h2 class="text-xs font-bold tracking-[0.14em] text-white/75 uppercase">Les prochains jours</h2>
+			<a class="text-sm font-semibold text-white underline-offset-2 hover:underline" href="/agenda">Tout l’agenda →</a>
 		</div>
-
-		<!-- Le prochain rendez-vous, en vignette et non en colonne pleine hauteur :
-		     c'est un raccourci, pas une seconde moitié de page. -->
-		{#if prochainRendezVous}
-			<a
-				href={lienPublication(prochainRendezVous.kind, prochainRendezVous.slug)}
-				class="group block rounded-xl bg-black/15 px-4 py-3 hover:bg-black/25 lg:w-64"
-			>
-				<p class="text-[0.6875rem] font-bold tracking-[0.18em] text-white/75 uppercase">
-					Prochain rendez-vous{' · '}{formatDateCourte(prochainRendezVous.eventAt)}
-				</p>
-				<h2 class="mt-1 leading-snug font-bold text-white group-hover:underline">
-					{prochainRendezVous.title}
-				</h2>
-			</a>
-		{/if}
-	</div>
+		<ol class="fil-jours mt-2 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+			{#each data.prochainsJours as rdv (rdv.id)}
+				{@const lieu = rdv.eventLocation || (rdv.kind === 'apero' ? data.apero.lieu : '')}
+				{@const heure = rdv.eventStartTime || (rdv.kind === 'apero' ? data.apero.heure : '')}
+				<li class="agenda-{rdv.eventCategory} w-60 shrink-0 snap-start">
+					<a
+						href={lienPublication(rdv.kind, rdv.slug)}
+						class="group flex h-full flex-col rounded-xl border-t-4 border-current bg-carte px-3.5 py-3 transition hover:-translate-y-0.5"
+					>
+						<span class="text-xs font-bold">
+							{rdv.jour ?? formatDateCourte(rdv.eventAt)}{heure ? ` · ${formatHeure(heure)}` : ''}
+						</span>
+						<span class="mt-1 line-clamp-2 leading-snug font-bold text-ink group-hover:underline">{rdv.title}</span>
+						<span class="mt-auto pt-1.5 text-xs text-ink-faint">
+							<span class="font-semibold">{LIBELLE_EVENEMENT[rdv.eventCategory]}</span>{lieu ? ` · ${lieu}` : ''}
+						</span>
+						{#if rdv.rythme}
+							<span class="text-xs text-ink-faint">{rdv.rythme}</span>
+						{:else if rdv.autresDates}
+							<span class="text-xs text-ink-faint">Et {rdv.autresDates} autre{rdv.autresDates > 1 ? 's' : ''} date{rdv.autresDates > 1 ? 's' : ''}</span>
+						{/if}
+					</a>
+				</li>
+			{/each}
+		</ol>
+	{:else}
+		<p class="mt-3 text-white/85">
+			Pas de rendez-vous annoncé dans les quinze prochains jours. <a class="font-semibold text-white underline" href="/agenda">Voir l’agenda</a>
+		</p>
+	{/if}
 </section>
-
-<nav class="mt-4 grid gap-3 sm:grid-cols-3" aria-label="Découvrir le site">
-	<a class="carte group block p-5 hover:border-brand" href="/agenda">
-		<span class="text-xs font-bold tracking-wide text-brand uppercase">Quand ?</span>
-		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">L’agenda</strong>
-		<span class="mt-1 block text-sm text-ink-soft">Événements, manifestations, apéros et formations.</span>
-	</a>
-	<a class="carte group block p-5 hover:border-brand" href="/actualites?categorie=action">
-		<span class="text-xs font-bold tracking-wide text-brand uppercase">Sur le terrain</span>
-		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Nos retours d’action</strong>
-		<span class="mt-1 block text-sm text-ink-soft">Ce que le groupe a déjà réalisé sur le terrain.</span>
-	</a>
-	<a class="carte group block p-5 hover:border-brand" href="/le-groupe">
-		<span class="text-xs font-bold tracking-wide text-brand uppercase">Avec qui ?</span>
-		<strong class="mt-1 block text-lg text-ink group-hover:text-brand">Qui sommes-nous ?</strong>
-		<span class="mt-1 block text-sm text-ink-soft">Le groupe, son fonctionnement et ses membres.</span>
-	</a>
-</nav>
-
-{#if data.prochainApero}
-	<BandeauApero apero={data.prochainApero} cadre={data.apero} />
-{/if}
 
 {#if une}
 	<section class="border-b border-line py-6">
@@ -166,28 +157,39 @@
 		</div>
 
 		{#if data.actus.length}
-			<ul class="space-y-4">
+			<!-- Une ligne par rendez-vous, la date en colonne à gauche : la liste
+			     se parcourt d'un coup d'œil, comme un agenda de poche. Le titre est
+			     coupé à deux lignes, la fiche complète est à un clic. -->
+			<ul>
 				{#each data.actus as actu (actu.id)}
-					<li class="border-b border-line pb-4 last:border-0">
-						<a href="/actualites/{actu.slug}" class="block hover:text-brand">
+					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
+						<a href="/actualites/{actu.slug}" class="flex gap-3 hover:text-brand">
 							{#if actu.aVenir}
 								<!-- Rendez-vous à venir : la date de l'action prime sur celle de
 								     publication, c'est l'information utile au lecteur. -->
 								<span
-									class="inline-block rounded bg-accent-soft px-1.5 py-0.5 text-xs font-bold text-accent-dark"
+									class="w-24 shrink-0 self-start rounded whitespace-nowrap bg-accent-soft px-1.5 py-0.5 text-center text-xs font-bold text-accent-dark"
 								>
 									{formatDateCourte(actu.eventAt)}
 								</span>
-							{:else if actu.eventAt}
-								<span class="block text-xs text-ink-faint">Rendez-vous du {formatDate(actu.eventAt)}</span>
 							{:else}
-								<time class="block text-xs text-ink-faint" datetime={actu.publishedAt ?? undefined}>{formatDate(actu.publishedAt)}</time>
+								<span class="w-24 shrink-0 whitespace-nowrap pt-0.5 text-center text-xs text-ink-faint">
+									{formatDateCourte(actu.eventAt ?? actu.publishedAt?.slice(0, 10))}
+								</span>
 							{/if}
-							<span class="mt-1 block font-semibold">{actu.title}</span>
+							<span class="min-w-0">
+								<span class="line-clamp-2 text-sm leading-snug font-semibold">{actu.title}</span>
+								{#if actu.autresDates}
+									<span class="block text-xs text-ink-faint">
+										+ {actu.autresDates} autre{actu.autresDates > 1 ? 's' : ''} date{actu.autresDates > 1 ? 's' : ''}
+									</span>
+								{/if}
+							</span>
 						</a>
 					</li>
 				{/each}
 			</ul>
+			<a class="mt-3 inline-block text-sm font-semibold text-brand hover:underline" href="/agenda">Tout l’agenda</a>
 		{:else}
 			<p class="text-sm text-ink-soft">Aucune actualité pour le moment.</p>
 		{/if}

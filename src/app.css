@@ -659,6 +659,9 @@ main > :first-child {
 	font-size: 0.7rem;
 }
 .agenda-filtre-inactif { color: var(--color-ink-faint) !important; opacity: 0.65; text-decoration: line-through; }
+/* Le fil des prochains jours de l'accueil : la barre de défilement reste
+   discrète, et la première fiche se cale sur le bord du contenu. */
+.fil-jours { scrollbar-width: thin; scroll-padding-inline: 0; }
 .agenda-action { color: var(--color-accent); }
 .agenda-reunion { color: var(--color-brand); }
 .agenda-apero { color: var(--color-pourpre); }
