@@ -84,6 +84,16 @@
 		zone.focus();
 	}
 
+	/**
+	 * Ajoute une mise en forme éditoriale sûre. Le serveur n'accepte que les
+	 * noms de police et de couleur connus : ce menu ne permet donc jamais
+	 * d'injecter du CSS ou du HTML dans une publication.
+	 */
+	function appliquerStyle(type: 'police' | 'couleur', valeur: string) {
+		if (!valeur) return;
+		entourer(`[[${type}:${valeur}|`, ']]', 'texte à mettre en forme');
+	}
+
 	const outils = [
 		{ label: 'Gras', titre: 'Mettre en gras', action: () => entourer('**') },
 		{ label: 'Italique', titre: 'Mettre en italique', action: () => entourer('*') },
@@ -262,7 +272,7 @@
 		<div>
 			<label class="etiquette" for="body">Texte</label>
 			{#if scriptActif}
-				<div class="mb-1 flex flex-wrap gap-1" role="toolbar" aria-label="Mise en forme du texte" aria-controls="body">
+				<div class="mb-1 flex flex-wrap items-center gap-1" role="toolbar" aria-label="Mise en forme du texte" aria-controls="body">
 					{#each outils as outil (outil.label)}
 						<button
 							type="button"
@@ -271,6 +281,41 @@
 							onclick={outil.action}>{outil.label}</button
 						>
 					{/each}
+					<label class="sr-only" for="outil-police">Police du passage sélectionné</label>
+					<select
+						id="outil-police"
+						class="rounded border border-line-forte bg-carte px-2 py-1 text-xs font-semibold text-ink"
+						aria-label="Choisir une police pour le passage sélectionné"
+						onchange={(event) => {
+							appliquerStyle('police', event.currentTarget.value);
+							event.currentTarget.value = '';
+						}}
+					>
+						<option value="">Police…</option>
+						<option value="public-sans">Public Sans</option>
+						<option value="gowun-batang">Gowun Batang</option>
+						<option value="union-gothic">Union Gothic</option>
+						<option value="stack-sans">Stack Sans Headline</option>
+						<option value="condensee">Titre condensé</option>
+					</select>
+					<label class="sr-only" for="outil-couleur">Couleur du passage sélectionné</label>
+					<select
+						id="outil-couleur"
+						class="rounded border border-line-forte bg-carte px-2 py-1 text-xs font-semibold text-ink"
+						aria-label="Choisir une couleur pour le passage sélectionné"
+						onchange={(event) => {
+							appliquerStyle('couleur', event.currentTarget.value);
+							event.currentTarget.value = '';
+						}}
+					>
+						<option value="">Couleur…</option>
+						<option value="violet">Violet LFI</option>
+						<option value="rouge">Rouge LFI</option>
+						<option value="turquoise">Turquoise</option>
+						<option value="vert">Vert</option>
+						<option value="rose">Rose</option>
+						<option value="jaune">Jaune sur fond sombre</option>
+					</select>
 				</div>
 			{/if}
 			<textarea id="body" name="body" class="champ font-mono text-sm" rows="22" bind:this={zone} bind:value={corps}></textarea>
@@ -279,6 +324,17 @@
 				<code>*italique*</code>, <code>[lien](https://…)</code>, <code>&gt; citation</code>, une
 				liste avec des tirets. Le HTML n'est pas interprété, c'est volontaire.
 			</p>
+			<div class="mt-3 rounded-lg border border-brand/25 bg-brand-soft/40 px-3 py-2 text-sm text-ink">
+				<p class="font-bold text-brand">Conseil aux administrateurs</p>
+				<p class="mt-1">
+					La hiérarchie est automatique : Public Sans pour le texte, Union Gothic pour les titres
+					<code>##</code>, Stack Sans pour les sous-titres <code>###</code> et Gowun Batang pour les
+					citations <code>&gt;</code>. Utilisez le menu Police seulement pour une exception. Réservez
+					les couleurs à quelques mots :
+					violet pour le féminisme, vert pour l’écologie, rouge pour le social. Vérifiez toujours avec
+					« Aperçu du texte », notamment en mode sombre.
+				</p>
+			</div>
 			<div class="mt-3 flex flex-wrap items-center gap-3">
 				<!-- L'aperçu est rendu par le serveur, avec exactement le code qui
 				     affiche les pages publiques : ce qu'on voit est ce qu'on aura.
@@ -455,7 +511,10 @@
 
 			<label class="flex items-start gap-2 text-sm text-ink">
 				<input type="checkbox" name="pinned" value="1" checked={v.pinned} class="mt-0.5" />
-				<span>Épingler en haut des listes</span>
+				<span>
+					Épingler à la une
+					<span class="mt-0.5 block text-xs font-normal text-ink-faint">Plusieurs publications peuvent être à la une en même temps.</span>
+				</span>
 			</label>
 		</div>
 

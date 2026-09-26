@@ -4,13 +4,12 @@
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { formatDate, formatDateCourte, formatHeure, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
+	import { COULEUR_KIND, formatDate, formatDateCourte, formatHeure, libellePublication, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	const une = $derived(data.articles[0] ?? null);
-	const suite = $derived(data.articles.slice(1));
+	const premiereUne = $derived(data.aLaUne[0] ?? null);
 </script>
 
 <!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
@@ -18,7 +17,7 @@
 <Metadonnees
 	titre="{data.settings.siteName} — {data.settings.tagline}"
 	description={data.settings.description}
-	image={une?.cover?.url ?? null}
+	image={premiereUne?.cover?.url ?? null}
 	donnees={organisation(page.url.origin, data.settings, data.apero)}
 />
 
@@ -82,45 +81,46 @@
 	{/if}
 </section>
 
-{#if une}
+{#if data.aLaUne.length}
 	<section class="border-b border-line py-6">
-		<h2 class="sr-only">À la une</h2>
-		<a href="/articles/{une.slug}" class="group grid gap-6 sm:grid-cols-2 sm:items-center">
-			<!-- Format plus large sur téléphone : là, la grille passe en une seule
-			     colonne et l'image occupe toute la largeur. En 16/10 elle mangeait
-			     un quart de l'écran avant même le titre ; en 21/9 elle fait une
-			     bande, qui illustre sans repousser le texte hors de vue. -->
-			{#if une.cover}
-				<img
-					src={une.cover.url}
-					alt={une.cover.alt}
-					class="aspect-[21/9] w-full rounded-lg object-cover sm:aspect-[16/10]"
-				/>
-			{/if}
-			<!-- Sans image de couverture, le titre monte de deux crans et prend le
-			     style d'affiche : c'est la seule chose qui distingue « à la une »
-			     des titres de la liste juste en dessous, et sans elle l'accueil
-			     n'a plus de point d'entrée. Avec une image, celle-ci porte déjà
-			     le poids. -->
-			<div class={une.cover ? '' : 'sm:col-span-2'}>
-				<p class="text-xs font-semibold tracking-wide text-brand uppercase">À la une</p>
-				<h3
-					class="titre-affiche mt-2 text-ink group-hover:text-brand
-						{une.cover ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'}"
+		<h2 class="mb-4 text-xs font-bold tracking-[0.14em] text-brand uppercase">À la une</h2>
+		<div class="grid gap-5 {data.aLaUne.length > 1 ? 'md:grid-cols-2' : ''}">
+			{#each data.aLaUne as publication (publication.id)}
+				<a
+					href={lienPublication(publication.kind, publication.slug)}
+					class="group min-w-0 overflow-hidden rounded-xl border border-line bg-carte transition hover:-translate-y-0.5 hover:border-brand"
 				>
-					{une.title}
-				</h3>
-				{#if une.summary}
-					<!-- Le résumé ne grossit qu'à partir de `sm` : sur téléphone, le
-					     titre occupe déjà quatre lignes, un chapeau en 18 px par-dessus
-					     alourdit au lieu de hiérarchiser. -->
-					<p class="mt-3 text-ink-soft {une.cover ? '' : 'max-w-2xl sm:text-lg'}">{une.summary}</p>
-				{/if}
-				<p class="mt-3 text-xs text-ink-faint">
-					{formatDate(une.publishedAt)}{une.authorName ? ` · ${une.authorName}` : ''}
-				</p>
-			</div>
-		</a>
+					{#if publication.cover}
+						<div class="grid aspect-video w-full min-w-0 place-items-center overflow-hidden bg-surface-alt">
+							<img
+								src={publication.cover.url}
+								alt={publication.cover.alt}
+								class="block h-full max-h-full w-full max-w-full object-contain"
+							/>
+						</div>
+					{/if}
+					<div class="p-4 sm:p-5">
+						<p class="text-xs font-bold tracking-wide uppercase {COULEUR_KIND[publication.kind]}">
+							{libellePublication(publication.kind, publication.eventCategory)}
+							{#if publication.eventAt}
+								<span class="text-ink-faint"> · {formatDateCourte(publication.eventAt)}</span>
+							{/if}
+						</p>
+						<h3 class="titre-affiche mt-2 text-2xl text-ink group-hover:text-brand sm:text-3xl">
+							{publication.title}
+						</h3>
+						{#if publication.summary}
+							<p class="mt-3 line-clamp-3 text-ink-soft">{publication.summary}</p>
+						{/if}
+						{#if !publication.eventAt}
+							<p class="mt-3 text-xs text-ink-faint">
+								{formatDate(publication.publishedAt)}{publication.authorName ? ` · ${publication.authorName}` : ''}
+							</p>
+						{/if}
+					</div>
+				</a>
+			{/each}
+		</div>
 	</section>
 {/if}
 
@@ -129,16 +129,16 @@
 <div class="grid gap-8 pt-6 lg:grid-cols-[1fr_20rem]">
 	<!-- Masquée quand le seul article existant est déjà « à la une » :
 	     un titre de section suivi du vide fait plus négligé qu'utile. -->
-	{#if suite.length || !une}
+	{#if data.articles.length || !data.aLaUne.length}
 		<section>
 			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
 				<h2 class="text-xl font-extrabold text-ink">Articles récents</h2>
 				<a class="text-sm font-semibold text-brand hover:underline" href="/articles">Tout voir</a>
 			</div>
 
-			{#if suite.length}
+			{#if data.articles.length}
 				<div class="space-y-6">
-					{#each suite as article (article.id)}
+					{#each data.articles as article (article.id)}
 						<CartePublication publication={article} />
 					{/each}
 				</div>

@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import type { PublicationVue } from '$lib/types';
-import { listAgenda, listPublished } from '$lib/server/content';
+import { listAgenda, listPinnedPublished, listPublished } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
 
 /** Nombre de jours couverts par le fil « Les prochains jours ». */
@@ -49,7 +49,13 @@ function joursEntre(avant: string, apres: string): number {
 }
 
 export const load: PageServerLoad = async () => {
-	const articles = listPublished({ kind: 'article', limit: 6 });
+	const articles = listPublished({ kind: 'article', limit: 12 }).map(presentPublication);
+	const epinglees = listPinnedPublished().map(presentPublication);
+	// Tant que rien n'est explicitement épinglé, l'article le plus récent garde
+	// le rôle historique de une. Dès qu'une ou plusieurs fiches sont choisies,
+	// elles prennent toutes place dans la section, quel que soit leur type.
+	const aLaUne = epinglees.length ? epinglees : articles.slice(0, 1);
+	const idsALaUne = new Set(aLaUne.map((publication) => publication.id));
 
 	// Le fil des prochains jours : actions, événements, formations et apéros
 	// confondus, dans l'ordre du calendrier.
@@ -62,6 +68,7 @@ export const load: PageServerLoad = async () => {
 	const aVenir = regrouperRepetitions(listAgenda(aujourdhui, '9999-12-31').map(presentPublication));
 	const prochainsJours = aVenir
 		.filter((rdv) => rdv.eventAt! < fin)
+		.filter((rdv) => !idsALaUne.has(rdv.id))
 		.slice(0, 8)
 		.map((rdv) => ({
 			...rdv,
@@ -73,10 +80,11 @@ export const load: PageServerLoad = async () => {
 	const dansLeFil = new Set(prochainsJours.map((rdv) => rdv.title));
 	const actus = regrouperRepetitions(
 		listPublished({ kind: 'actu', limit: 30, ordre: 'agenda' }).map(presentPublication)
-	).filter((actu) => !dansLeFil.has(actu.title));
+	).filter((actu) => !dansLeFil.has(actu.title) && !idsALaUne.has(actu.id));
 
 	return {
-		articles: articles.map(presentPublication),
+		aLaUne,
+		articles: articles.filter((article) => !idsALaUne.has(article.id)).slice(0, 5),
 		prochainsJours,
 		actus: actus.slice(0, 5)
 	};

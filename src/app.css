@@ -1,5 +1,50 @@
 @import 'tailwindcss';
 
+/* Polices locales : aucune requête n'est envoyée à Google ou à un CDN. */
+@font-face {
+	font-family: 'Public Sans';
+	src: url('/fonts/public-sans/PublicSans-Regular.woff2') format('woff2');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 400;
+}
+@font-face {
+	font-family: 'Public Sans';
+	src: url('/fonts/public-sans/PublicSans-Bold.woff2') format('woff2');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 700 900;
+}
+@font-face {
+	font-family: 'Gowun Batang';
+	src: url('/fonts/gowun-batang/GowunBatang-Regular.woff2') format('woff2');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 400;
+}
+@font-face {
+	font-family: 'Gowun Batang';
+	src: url('/fonts/gowun-batang/GowunBatang-Bold.woff2') format('woff2');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 700;
+}
+@font-face {
+	font-family: 'Union Gothic';
+	src: url('/fonts/union-gothic/union_gothic-variable.ttf') format('truetype-variations');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 400 1000;
+	font-stretch: 50% 200%;
+}
+@font-face {
+	font-family: 'Stack Sans Headline';
+	src: url('/fonts/stack-sans/StackSansHeadline-Variable.ttf') format('truetype-variations');
+	font-display: swap;
+	font-style: normal;
+	font-weight: 200 700;
+}
+
 /*
  * Jetons de couleur du site. Tout passe par des variables : changer l'identité
  * visuelle se fait ici, en un seul endroit, sans toucher aux composants.
@@ -264,6 +309,7 @@ h1, h2, h3, h4 {
 	line-height: 1.75;
 	font-size: 1.0625rem;
 	color: var(--color-ink);
+	font-family: 'Public Sans', var(--font-sans);
 }
 .contenu > * + * { margin-top: 1.15em; }
 .contenu h2 {
@@ -271,11 +317,17 @@ h1, h2, h3, h4 {
 	font-size: 1.5rem;
 	font-weight: 700;
 	line-height: 1.25;
+	font-family: 'Union Gothic', 'Arial Narrow', var(--font-sans);
+	font-stretch: condensed;
+	letter-spacing: -0.015em;
+	text-transform: uppercase;
 }
 .contenu h3 {
 	margin-top: 1.75em;
 	font-size: 1.2rem;
 	font-weight: 700;
+	font-family: 'Stack Sans Headline', 'Public Sans', var(--font-sans);
+	letter-spacing: -0.018em;
 }
 .contenu a {
 	color: var(--color-brand);
@@ -293,7 +345,15 @@ h1, h2, h3, h4 {
 	border-left: 3px solid var(--color-brand);
 	padding: 0.25rem 0 0.25rem 1.15rem;
 	color: var(--color-ink-soft);
+	font-family: 'Gowun Batang', var(--font-serif);
 	font-style: italic;
+}
+
+/* Hiérarchie automatique des publications : le titre principal se distingue
+   du corps sans obliger les administrateurs à ajouter une balise spéciale. */
+.titre-publication {
+	font-family: 'Stack Sans Headline', 'Public Sans', var(--font-sans);
+	letter-spacing: -0.025em;
 }
 .contenu img {
 	border-radius: 0.5rem;
@@ -318,6 +378,61 @@ h1, h2, h3, h4 {
 .contenu hr { border: 0; border-top: 1px solid var(--color-line); margin: 2.5em 0; }
 .contenu table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
 .contenu th, .contenu td { border: 1px solid var(--color-line); padding: 0.5rem 0.75rem; text-align: left; }
+
+/* Styles éditoriaux insérés depuis la barre d'outils de l'administration. */
+.texte-police-public-sans { font-family: 'Public Sans', var(--font-sans); }
+.texte-police-gowun-batang { font-family: 'Gowun Batang', var(--font-serif); }
+.texte-police-union-gothic {
+	font-family: 'Union Gothic', 'Arial Narrow', var(--font-sans);
+	font-stretch: condensed;
+	font-weight: 800;
+	letter-spacing: -0.015em;
+	text-transform: uppercase;
+}
+.texte-police-stack-sans {
+	font-family: 'Stack Sans Headline', 'Public Sans', var(--font-sans);
+	font-weight: 650;
+	letter-spacing: -0.018em;
+}
+.texte-police-condensee {
+	font-family: 'Arial Narrow', 'Avenir Next Condensed', 'Public Sans', var(--font-sans);
+	font-weight: 800;
+	letter-spacing: -0.025em;
+}
+.texte-couleur-jaune {
+	border-radius: 0.15em;
+	background: #ffec00;
+	padding-inline: 0.12em;
+	color: #212320;
+}
+:root {
+	--texte-violet-editorial: #5a2582;
+	--texte-rouge-editorial: #c92d30;
+	--texte-turquoise-editorial: #087f91;
+	--texte-vert-editorial: #23764f;
+	--texte-rose-editorial: #c51c78;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='clair']) {
+		--texte-violet-editorial: #c9a8f2;
+		--texte-rouge-editorial: #ff8792;
+		--texte-turquoise-editorial: #59cfdf;
+		--texte-vert-editorial: #74d3a7;
+		--texte-rose-editorial: #ff83c1;
+	}
+}
+:root[data-theme='sombre'] {
+	--texte-violet-editorial: #c9a8f2;
+	--texte-rouge-editorial: #ff8792;
+	--texte-turquoise-editorial: #59cfdf;
+	--texte-vert-editorial: #74d3a7;
+	--texte-rose-editorial: #ff83c1;
+}
+.texte-couleur-violet { color: var(--texte-violet-editorial); }
+.texte-couleur-rouge { color: var(--texte-rouge-editorial); }
+.texte-couleur-turquoise { color: var(--texte-turquoise-editorial); }
+.texte-couleur-vert { color: var(--texte-vert-editorial); }
+.texte-couleur-rose { color: var(--texte-rose-editorial); }
 
 /* Mise en page éditoriale « Carnet aquarelle ». En mode automatique, cette
    page reste claire ; un choix explicite « Sombre » reste prioritaire. */
@@ -403,7 +518,7 @@ h1, h2, h3, h4 {
 }
 :is(.article-aquarelle .contenu, .article-carnet-apercu) {
 	color: var(--color-ink);
-	font-family: var(--font-sans);
+	font-family: 'Public Sans', var(--font-sans);
 }
 :is(.article-aquarelle .contenu, .article-carnet-apercu) h2 {
 	position: relative;

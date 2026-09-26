@@ -124,6 +124,21 @@ export function listPublished(
 		.all(kind ?? null, kind ?? null, eventCategory ?? null, eventCategory ?? null, limit, offset) as PublicationListItem[];
 }
 
+/**
+ * Toutes les publications choisies pour l'accueil, quel que soit leur type.
+ * Plusieurs fiches peuvent être épinglées en même temps : l'ordre suit leur
+ * première date de publication, de la plus récente à la plus ancienne.
+ */
+export function listPinnedPublished() {
+	return db()
+		.prepare(
+			`${PUBLIC_SELECT}
+			 where p.status = 'published' and p.pinned = 1
+			 order by p.published_at desc, p.id desc`
+		)
+		.all() as PublicationListItem[];
+}
+
 export function countPublished(kind?: Kind, eventCategory?: CategorieEvenement): number {
 	return (
 		db()

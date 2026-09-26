@@ -8,6 +8,12 @@ node_modules
 /.svelte-kit
 /build
 
+# Fichiers de travail générés localement par les outils de création
+/.codex-build
+/.codex-finalizer
+/output
+/tmp
+
 # OS
 .DS_Store
 Thumbs.db

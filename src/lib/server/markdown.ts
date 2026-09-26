@@ -15,6 +15,83 @@ const md = new MarkdownIt({
 	breaks: true
 });
 
+/*
+ * Mises en forme proposées dans l'administration.
+ *
+ * Elles passent par une syntaxe volontairement fermée :
+ *   [[police:public-sans|une accroche]]
+ *   [[couleur:violet|quelques mots]]
+ * Les balises peuvent être imbriquées pour cumuler les styles :
+ *   [[couleur:violet|[[police:union-gothic|un titre court]]]]
+ *
+ * Les classes viennent exclusivement des listes ci-dessous. Une valeur libre
+ * n'est jamais recopiée dans le HTML, ce qui préserve la règle `html: false`.
+ */
+const CLASSES_POLICES: Record<string, string> = {
+	'public-sans': 'texte-police-public-sans',
+	'gowun-batang': 'texte-police-gowun-batang',
+	'union-gothic': 'texte-police-union-gothic',
+	'stack-sans': 'texte-police-stack-sans',
+	condensee: 'texte-police-condensee'
+};
+const CLASSES_COULEURS: Record<string, string> = {
+	violet: 'texte-couleur-violet',
+	rouge: 'texte-couleur-rouge',
+	turquoise: 'texte-couleur-turquoise',
+	vert: 'texte-couleur-vert',
+	rose: 'texte-couleur-rose',
+	jaune: 'texte-couleur-jaune'
+};
+
+md.inline.ruler.before('emphasis', 'style_editorial', (state, silencieux) => {
+	const debut = state.pos;
+	if (state.src.slice(debut, debut + 2) !== '[[') return false;
+
+	// Cherche la fermeture correspondante, en tenant compte d'une éventuelle
+	// seconde mise en forme à l'intérieur de la première.
+	let profondeur = 1;
+	let curseur = debut + 2;
+	let fin = -1;
+	while (curseur < state.src.length - 1) {
+		const paire = state.src.slice(curseur, curseur + 2);
+		if (paire === '[[') {
+			profondeur += 1;
+			curseur += 2;
+			continue;
+		}
+		if (paire === ']]') {
+			profondeur -= 1;
+			if (profondeur === 0) {
+				fin = curseur;
+				break;
+			}
+			curseur += 2;
+			continue;
+		}
+		curseur += 1;
+	}
+	if (fin === -1) return false;
+
+	const expression = state.src.slice(debut + 2, fin);
+	const trouve = /^(police|couleur):([a-z0-9-]+)\|([^\n]+)$/.exec(expression);
+	if (!trouve) return false;
+
+	const [, type, valeur, texte] = trouve;
+	const classe = type === 'police' ? CLASSES_POLICES[valeur] : CLASSES_COULEURS[valeur];
+	if (!classe || !texte.trim()) return false;
+
+	if (!silencieux) {
+		const ouverture = state.push('span_style_ouverture', 'span', 1);
+		ouverture.attrSet('class', classe);
+		// Analyse aussi le contenu : une seconde balise sûre peut ainsi être
+		// appliquée au même passage sans être affichée comme du texte brut.
+		state.md.inline.parse(texte, state.md, state.env, state.tokens);
+		state.push('span_style_fermeture', 'span', -1);
+	}
+	state.pos = fin + 2;
+	return true;
+});
+
 // Les liens sortants s'ouvrent dans un nouvel onglet, sans fuite de référent.
 const defaultLinkOpen =
 	md.renderer.rules.link_open ??
@@ -161,7 +238,20 @@ export function renderMarkdown(source: string): string {
 
 /** Version texte brut, pour les résumés, le flux RSS et les métadonnées. */
 export function toPlainText(source: string, maxLength = 300): string {
-	const text = (source ?? '')
+	// Plusieurs mises en forme peuvent entourer le même passage. Les retirer
+	// de l'intérieur vers l'extérieur évite de laisser une balise dans les
+	// résumés, le flux RSS ou les métadonnées.
+	let sansStyles = source ?? '';
+	let precedent = '';
+	do {
+		precedent = sansStyles;
+		sansStyles = sansStyles.replace(
+			/\[\[(?:police|couleur):[a-z0-9-]+\|([^\[\]\n]+)\]\]/g,
+			'$1'
+		);
+	} while (sansStyles !== precedent);
+
+	const text = sansStyles
 		.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
 		.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
 		.replace(/[#*_>`~|-]/g, ' ')

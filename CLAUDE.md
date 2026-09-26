@@ -402,7 +402,12 @@ La page tient maintenant en quatre blocs, de haut en bas :
    `agenda-*` de la page agenda). Sur téléphone, le fil défile au doigt
    (`scroll-snap`, aucun script) ; la fiche suivante qui dépasse à droite dit
    qu'on peut faire glisser. L'article à la une commence vers 340 pixels.
-2. **L'article à la une**, puis les articles récents.
+2. **Les publications à la une**, puis les articles récents. Toute publication
+   publiée peut être épinglée depuis l'administration : article, actualité,
+   retour d'action, événement, formation, apéro ou revue de presse. Plusieurs
+   fiches peuvent être épinglées en même temps ; elles forment alors une grille
+   et ne sont pas répétées dans les listes situées juste en dessous. Si rien
+   n'est épinglé, l'article le plus récent sert de une, comme auparavant.
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
 4. **Le bandeau Action populaire**, tout en bas — jamais en tête : on propose

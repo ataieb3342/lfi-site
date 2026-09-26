@@ -85,7 +85,7 @@
 			<p class="sur-titre-aquarelle">Carnet illustré</p>
 		{/if}
 		<p class="text-xs font-semibold tracking-wide uppercase {COULEUR_KIND[p.kind]}">{libellePublication(p.kind, p.eventCategory)}</p>
-		<h1 class="mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
+		<h1 class="titre-publication mt-2 text-3xl leading-tight font-extrabold text-ink sm:text-4xl">{p.title}</h1>
 		{#if !p.eventAt && (p.publishedAt || p.authorName)}
 			<p class="mt-3 text-sm text-ink-faint">
 				{#if p.publishedAt}<time datetime={p.publishedAt}>{formatDate(p.publishedAt)}</time>{/if}
