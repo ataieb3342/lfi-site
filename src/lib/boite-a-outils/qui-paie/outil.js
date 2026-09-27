@@ -46,7 +46,7 @@ var PART_NETTE_DU_BRUT = 0.78;
 
 // Poids de la TVA dans le revenu disponible, mesuré par l'Insee : environ 12 %
 // pour les ménages les plus modestes, 5 % pour les plus aisés. On interpole
-// entre ces deux repères — c'est un ordre de grandeur, pas un relevé d'achats.
+// entre ces deux repères - c'est un ordre de grandeur, pas un relevé d'achats.
 var TVA_REVENU_BAS = 1000;
 var TVA_TAUX_BAS = 0.12;
 var TVA_REVENU_HAUT = 3500;
@@ -62,7 +62,7 @@ var SOMMET = [
 	},
 	{
 		titre: 'Les 0,0002 % les plus riches',
-		detail: 'Les 75 foyers les plus fortunés de France — 20 points de moins.',
+		detail: 'Les 75 foyers les plus fortunés de France - 20 points de moins.',
 		taux: 0.26
 	}
 ];
@@ -82,7 +82,7 @@ function pourcent(part, decimales) {
 /* --- Calculs ------------------------------------------------------------ */
 
 /**
- * La décote, qui réduit — souvent jusqu'à zéro — l'impôt des foyers modestes.
+ * La décote, qui réduit - souvent jusqu'à zéro - l'impôt des foyers modestes.
  * On considère qu'un foyer de deux parts ou plus est imposé en commun : c'est
  * l'approximation habituelle, elle se trompe pour un parent isolé de deux
  * enfants, cas que ce module ne cherche pas à couvrir au centime près.
@@ -194,8 +194,8 @@ var listeDetail = document.getElementById('detail');
 var texteCotisations = document.getElementById('cotisations');
 
 function nomDesParts(parts) {
-	if (parts === 1) return '1 part — une personne seule';
-	if (parts === 2) return '2 parts — un couple sans enfant';
+	if (parts === 1) return '1 part - une personne seule';
+	if (parts === 2) return '2 parts - un couple sans enfant';
 	var mot = parts > 1 ? ' parts' : ' part';
 	return String(parts).replace('.', ',') + mot;
 }
@@ -248,14 +248,14 @@ function rafraichir() {
 			r.tva / maximum,
 			'Payée sans la voir, à chaque achat. Elle pèse ' +
 				pourcent(tauxDeTva(netMensuel)) +
-				' de votre revenu — d’autant plus lourd qu’on dépense tout ce qu’on gagne.'
+				' de votre revenu - d’autant plus lourd qu’on dépense tout ce qu’on gagne.'
 		)
 	);
 
 	texteCotisations.textContent = euros.format(r.cotisations / 12);
 }
 
-/* Les deux champs du salaire — le curseur et la case — restent synchronisés. */
+/* Les deux champs du salaire - le curseur et la case - restent synchronisés. */
 champSalaire.addEventListener('input', function () {
 	champSalaireNombre.value = champSalaire.value;
 	rafraichir();

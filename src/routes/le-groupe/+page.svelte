@@ -9,7 +9,7 @@
 </script>
 
 <Metadonnees
-	titre="Qui sommes-nous ? — {data.settings.siteName}"
+	titre="Qui sommes-nous ? - {data.settings.siteName}"
 	description="Qui nous sommes, comment fonctionne un groupe d'action de La France insoumise, et où nous trouver dans le centre de Dijon."
 	donnees={filAriane(page.url.origin, [
 		{ nom: 'Accueil', chemin: '/' },

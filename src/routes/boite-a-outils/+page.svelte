@@ -12,7 +12,7 @@
 </script>
 
 <Metadonnees
-	titre="Boîte à outils — {data.settings.siteName}"
+	titre="Boîte à outils - {data.settings.siteName}"
 	description="Des outils interactifs pour comprendre l’économie française à partir des chiffres officiels : impôts, budget de l’État, patrimoine, budget des ménages."
 	donnees={filAriane(page.url.origin, [
 		{ nom: 'Accueil', chemin: '/' },

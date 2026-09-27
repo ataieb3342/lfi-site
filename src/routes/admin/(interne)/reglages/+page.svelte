@@ -5,7 +5,7 @@
 	const r = $derived(data.reglages);
 </script>
 
-<svelte:head><title>Réglages — Administration</title></svelte:head>
+<svelte:head><title>Réglages - Administration</title></svelte:head>
 
 <h1 class="text-2xl font-extrabold text-ink">Réglages</h1>
 

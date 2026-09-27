@@ -15,7 +15,7 @@
 <!-- Le titre de l'accueil porte la devise en plus du nom : c'est la ligne que
      Google affiche, et « LFI Dijon Centre » seul ne dit pas ce qu'on y trouve. -->
 <Metadonnees
-	titre="{data.settings.siteName} — {data.settings.tagline}"
+	titre="{data.settings.siteName} - {data.settings.tagline}"
 	description={data.settings.description}
 	image={premiereUne?.cover?.url ?? null}
 	donnees={organisation(page.url.origin, data.settings, data.apero)}

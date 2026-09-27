@@ -5,7 +5,7 @@
  * deux variables --accent et --accent-fort changent, pour donner sa couleur à
  * chaque outil. Les pages d'outil sont servies une par dossier
  * (/boite-a-outils/<dossier>/style.css), il n'y a donc pas de fichier partagé
- * possible sans compliquer la route — et la duplication d'un fichier de style
+ * possible sans compliquer la route - et la duplication d'un fichier de style
  * se relit sans difficulté.
  *
  * La palette est celle du site (src/app.css), y compris le thème sombre.
@@ -399,7 +399,7 @@ button.bouton {
 /*
  * Le pied de page : de quoi enchaîner sur un autre outil, et de quoi faire
  * quelque chose de ce qu'on vient de lire. Il est écrit par
- * `scripts/pieds-outils.js` — voir la note dans `src/lib/boite-a-outils.ts`.
+ * `scripts/pieds-outils.js` - voir la note dans `src/lib/boite-a-outils.ts`.
  *
  * Il est volontairement sobre : après les sources et les avertissements, une
  * grande surface colorée ferait publicité. Un filet, deux liens en cartes, une

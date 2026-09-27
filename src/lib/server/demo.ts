@@ -244,9 +244,9 @@ Et ce n’était que le premier jour…
 ### Sources
 
 - [Programme officiel des Amfis 2026](https://amfis.fr/programme/)
-- [Baromètre des mobilités 2026 — Wimoov](https://wimoov.org/barometre-des-mobilites/etude-barometre-precarite-mobilites-2026/)
-- [Mobilité et accès à l’emploi — rapport public](https://www.vie-publique.fr/files/rapport/pdf/174000685.pdf)
-- [Temps de transport et vitesse — Forum Vies Mobiles](https://forumviesmobiles.org/regards-croises/464/temps-de-transport-et-vitesse)`
+- [Baromètre des mobilités 2026 - Wimoov](https://wimoov.org/barometre-des-mobilites/etude-barometre-precarite-mobilites-2026/)
+- [Mobilité et accès à l’emploi - rapport public](https://www.vie-publique.fr/files/rapport/pdf/174000685.pdf)
+- [Temps de transport et vitesse - Forum Vies Mobiles](https://forumviesmobiles.org/regards-croises/464/temps-de-transport-et-vitesse)`
 	},
 	{
 		kind: 'actu',
@@ -492,13 +492,13 @@ Une participante a proposé de dresser la liste des campagnes de boycott en cour
 
 ## Logement : les loyers dijonnais au-dessus de la moyenne régionale
 
-L’observatoire local des loyers publie ses chiffres annuels. Le loyer médian au mètre carré progresse plus vite que les salaires, et l’écart se creuse surtout sur les petites surfaces — celles que louent les étudiants et les jeunes actifs.
+L’observatoire local des loyers publie ses chiffres annuels. Le loyer médian au mètre carré progresse plus vite que les salaires, et l’écart se creuse surtout sur les petites surfaces - celles que louent les étudiants et les jeunes actifs.
 
 **Ce que nous en retenons :** la question du logement n’est pas un ressenti, elle est mesurée. C’est le premier poste de dépense des ménages, et le premier obstacle pour s’installer ici.
 
 ## Budget municipal : les arbitrages de l’automne
 
-La presse locale détaille les choix budgétaires présentés en conseil. Les dépenses d’investissement sont maintenues, celles de fonctionnement contenues — ce qui se traduit, concrètement, par des horaires d’équipements publics revus à la baisse.
+La presse locale détaille les choix budgétaires présentés en conseil. Les dépenses d’investissement sont maintenues, celles de fonctionnement contenues - ce qui se traduit, concrètement, par des horaires d’équipements publics revus à la baisse.
 
 **Ce que nous en retenons :** « contenir le fonctionnement » n’est jamais neutre. Ce sont des heures d’ouverture de bibliothèque, des postes de médiathèque, des créneaux de piscine.
 

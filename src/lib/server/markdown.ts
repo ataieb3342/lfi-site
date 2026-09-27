@@ -172,7 +172,7 @@ md.renderer.rules.image = (tokens, idx, options, env, self) => {
  * en `default-src 'none'` (vite.config.ts) : une iframe YouTube exigerait d'y
  * inscrire un domaine de Google, donc que chaque visiteur d'un article soit
  * annoncé à Google avant même d'avoir cliqué. Le bloc ci-dessous ne charge
- * rien de l'extérieur — c'est du texte et une forme dessinée par nous — et la
+ * rien de l'extérieur - c'est du texte et une forme dessinée par nous - et la
  * lecture se fait sur YouTube, après un clic délibéré.
  */
 const VIDEO =
@@ -227,7 +227,7 @@ md.renderer.rules.bloc_video = (tokens, idx) => {
 		`<svg viewBox="0 0 24 24" width="22" height="22" focusable="false">` +
 		`<path d="M8 5.2v13.6L19 12z" fill="currentColor" /></svg></span>` +
 		`<span class="video-texte"><span class="video-titre">${libelle}</span>` +
-		`<span class="video-source">Vidéo YouTube — la lecture se fait sur youtube.com</span>` +
+		`<span class="video-source">Vidéo YouTube - la lecture se fait sur youtube.com</span>` +
 		`</span></a>\n`
 	);
 };

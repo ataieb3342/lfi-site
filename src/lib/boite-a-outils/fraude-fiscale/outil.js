@@ -6,7 +6,7 @@
  *
  * Choix de construction : l'argument repose sur les résultats publiés par
  * l'administration fiscale, pas sur l'estimation syndicale de la fraude totale.
- * Cette estimation existe et elle est citée, mais elle est contestée — et le
+ * Cette estimation existe et elle est citée, mais elle est contestée - et le
  * curseur laisse le visiteur choisir son hypothèse plutôt que de lui en imposer
  * une. Un raisonnement qui tient avec les chiffres de l'adversaire est un
  * raisonnement qu'on ne peut pas nous retirer.
@@ -143,7 +143,7 @@ function rafraichir() {
 	/* D'où vient le chiffre que le visiteur vient de choisir. */
 	if (estimation <= ESTIMATION_INSEE_HAUTE) {
 		estimationLegende.textContent =
-			'Vous êtes dans la fourchette de l’Insee, qui ne chiffre que la fraude à la TVA — un seul impôt sur la quarantaine qui existe. C’est l’hypothèse la plus prudente possible, et elle suffit déjà à la démonstration.';
+			'Vous êtes dans la fourchette de l’Insee, qui ne chiffre que la fraude à la TVA - un seul impôt sur la quarantaine qui existe. C’est l’hypothèse la plus prudente possible, et elle suffit déjà à la démonstration.';
 	} else if (estimation < ESTIMATION_SYNDICALE_BASSE) {
 		estimationLegende.textContent =
 			'Vous êtes entre les deux estimations publiées : au-dessus de la seule fraude à la TVA chiffrée par l’Insee, en dessous de l’estimation syndicale portant sur tous les impôts. Aucune institution ne défend précisément ce niveau.';
@@ -163,7 +163,7 @@ function rafraichir() {
 		milliards(ENCAISSE) +
 		'. Il en manque ' +
 		milliards(manque) +
-		' — chaque année, et sans effet de rattrapage l’année suivante.';
+		' - chaque année, et sans effet de rattrapage l’année suivante.';
 
 	/* Ce que le manque représente, poste par poste. */
 	listeManque.textContent = '';

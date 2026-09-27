@@ -28,7 +28,7 @@ export const JEUX = [
 		dossier: 'space-shooter',
 		titre: 'Space Shooter',
 		description:
-			'Survivre aux vagues, monter de niveau et choisir ses améliorations — projectiles, bouclier ou points de vie.'
+			'Survivre aux vagues, monter de niveau et choisir ses améliorations - projectiles, bouclier ou points de vie.'
 	}
 ] as const;
 

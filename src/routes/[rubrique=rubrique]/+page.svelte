@@ -67,7 +67,7 @@
 </script>
 
 <Metadonnees
-	titre="{titreAffiche}{suffixe} — {data.settings.siteName}"
+	titre="{titreAffiche}{suffixe} - {data.settings.siteName}"
 	description={chapoAffiche}
 	canonique={chemin}
 	donnees={filAriane(page.url.origin, etapes)}

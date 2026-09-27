@@ -18,8 +18,8 @@
 	 *
 	 * Il n'est pas construit sur `Encart.svelte` : celui-ci porte un texte fixe,
 	 * alors qu'ici la date, le lieu et l'image viennent de la fiche de l'apéro.
-	 * Les deux suivent en revanche le même gabarit — même rembourrage, même
-	 * taille de titre, même marge — pour qu'un visiteur ne voie qu'une seule
+	 * Les deux suivent en revanche le même gabarit - même rembourrage, même
+	 * taille de titre, même marge - pour qu'un visiteur ne voie qu'une seule
 	 * sorte de bandeau sur tout le site.
 	 */
 	let {
@@ -55,7 +55,7 @@
 			</p>
 			<!-- Un cran au-dessus des titres d'article de la liste en dessous : c'est
 			     le rendez-vous récurrent du groupe, il ne doit pas être l'élément le
-			     plus discret de l'accueil. Le bandeau reste une bande — on monte le
+			     plus discret de l'accueil. Le bandeau reste une bande - on monte le
 			     titre, pas la hauteur. -->
 			<h2 class="titre-affiche mt-1 text-lg text-white sm:text-xl">
 				<!-- Le lien du titre est étendu à tout le bandeau par son ::after :

@@ -6,7 +6,7 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
-<svelte:head><title>Nouvelle publication — Administration</title></svelte:head>
+<svelte:head><title>Nouvelle publication - Administration</title></svelte:head>
 
 <header class="mb-6">
 	<a class="text-sm font-semibold text-brand hover:underline" href="/admin/publications">← Publications</a>

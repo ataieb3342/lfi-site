@@ -10,7 +10,7 @@ systématiquement la robustesse et la lisibilité sur la sophistication.
 
 ```bash
 npm run dev      # développement sur http://localhost:5173
-npm run check    # vérification TypeScript + Svelte — À LANCER APRÈS CHAQUE MODIFICATION
+npm run check    # vérification TypeScript + Svelte - À LANCER APRÈS CHAQUE MODIFICATION
 npm run build    # compilation de production
 
 npm run outils:pages   # regénère la tête et le pied des pages d'outils (voir « La boîte à outils »)
@@ -38,7 +38,7 @@ native.
 | `src/lib/components/Logo.svelte` | Le phi officiel, en dégradé ou en monochrome |
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
 | `src/lib/components/Encart.svelte` | Le gabarit unique des encarts d'appel |
-| `src/lib/components/Metadonnees.svelte` | Titre, description, adresse canonique et aperçus — sur **toutes** les pages publiques |
+| `src/lib/components/Metadonnees.svelte` | Titre, description, adresse canonique et aperçus - sur **toutes** les pages publiques |
 | `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
 | `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites`, `/revue-de-presse` et la fiche d'un apéro |
@@ -118,7 +118,7 @@ fois, le numéro appliqué étant conservé dans `pragma user_version`.
 Moderne et sobre, pas « affiche de campagne ». Concrètement :
 
 - Les surfaces fortes (`.fond-degrade`) sont un violet profond éclairé par deux
-  lueurs radiales, l'une rouge, l'autre violette — pas le dégradé diagonal du
+  lueurs radiales, l'une rouge, l'autre violette - pas le dégradé diagonal du
   logo en aplat. Le dégradé pur ne sert qu'en filet fin (`.filet-degrade`).
 - **Chaque type de publication a sa couleur**, prise aux trois couleurs du
   logo : violet pour les articles, rouge pour les actualités, pourpre pour les
@@ -131,7 +131,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 - `.titre-affiche` est très gras, serré, **en casse normale** : ni italique ni
   majuscules.
 - **Le rythme vertical suit une échelle de quatre valeurs, et pas d'autres.**
-  Chaque page avait les siennes — `mt-8`, `mt-10`, `mt-12`, `mt-14`, `mt-16` —
+  Chaque page avait les siennes - `mt-8`, `mt-10`, `mt-12`, `mt-14`, `mt-16` -
   et l'ensemble était à la fois trop aéré et irrégulier : on ne retrouvait pas
   le même espacement d'une page à l'autre.
 
@@ -149,7 +149,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 
   Le principe qui revient partout : **deux marges ne s'additionnent jamais pour
   un même écart.** Quand un bloc porte déjà sa marge, celui d'à côté n'en met
-  pas — c'est la raison du `main > :first-child` d'`app.css`, du `pt-6` (et non
+  pas - c'est la raison du `main > :first-child` d'`app.css`, du `pt-6` (et non
   `py-6`) de la grille d'accueil au-dessus du bandeau Action populaire, et du
   pied de page sans marge.
 - **Quand un bandeau suit l'en-tête, le filet passe dessous.** La surface
@@ -162,7 +162,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   Deux pièges. Le filet va sur un **conteneur**, jamais sur la surface colorée
   elle-même : elle est arrondie, la bordure s'y dessinerait par-dessus au lieu
   de faire un trait en dessous. Et sur les actualités, le bandeau Action
-  populaire disparaît quand l'application est désactivée dans les réglages — le
+  populaire disparaît quand l'application est désactivée dans les réglages - le
   filet est donc conditionné par `aBandeau`, sans quoi la page afficherait un
   trait tout seul. L'accueil, lui, n'a pas de filet : son bandeau ouvre la page
   et le contenu qui suit a son propre en-tête.
@@ -188,7 +188,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   plus clair : `--color-surface` est la page, `--color-carte` est ce qui se pose
   dessus (cartes, en-tête, menu déroulant, champs de saisie), `--color-surface-alt`
   est ce qui s'y creuse (étiquettes, encadrés discrets). Cette hiérarchie donne
-  le relief sans une seule ombre portée — en thème sombre aussi, où la carte est
+  le relief sans une seule ombre portée - en thème sombre aussi, où la carte est
   plus claire que la page. Un panneau posé sur la page prend donc `bg-carte`,
   jamais `bg-surface`, sinon il disparaît dans le fond.
 - `--color-line` est le filet décoratif ; `--color-line-forte`
@@ -215,14 +215,14 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 
 Une seule table `publications`, distinguée par la colonne `kind` :
 
-- **`article`** — analyses, comptes rendus, prises de position. Classés du plus
+- **`article`** - analyses, comptes rendus, prises de position. Classés du plus
   récent au plus ancien.
-- **`actu`** — actualités : annonces de rendez-vous, mobilisations, réactions à
+- **`actu`** - actualités : annonces de rendez-vous, mobilisations, réactions à
   chaud. Elles ont une colonne `event_at` facultative (date de l'action, au
   format `AAAA-MM-JJ`).
-- **`apero`** — apéros thématiques (voir plus bas). `event_at` y est
+- **`apero`** - apéros thématiques (voir plus bas). `event_at` y est
   obligatoire : c'est la date de la soirée.
-- **`revue`** — revues de presse : ce qu'on a lu ailleurs, rassemblé et
+- **`revue`** - revues de presse : ce qu'on a lu ailleurs, rassemblé et
   commenté. C'est un article ordinaire du point de vue de la base ; seuls sa
   rubrique (`/revue-de-presse`), son étiquette et l'encart qui y mène le
   distinguent. Les liens vont dans le corps du texte, chacun avec sa source et
@@ -243,7 +243,7 @@ page, par le menu mobile et par l'encart en tête de la liste des articles.
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
 rendez-vous dont la date n'est pas passée remontent en tête, de la plus proche à la
 plus lointaine, puis viennent les autres par date de publication. La comparaison
-se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now')` — c'est exact et
+se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now')` - c'est exact et
 sans piège de fuseau horaire.
 
 Une actualité sans `event_at` se comporte comme une simple brève d'information.
@@ -317,8 +317,8 @@ sont limités à 50 Mo, identifiés par leur signature `%PDF-`, stockés sous un
 aléatoire dans `data/bibliotheque/` et toujours soumis à modération. La personne
 qui propose un PDF doit préciser la licence ou l'autorisation de republication.
 
-La page `/bibliotheque` porte **les ressources** — les sources approuvées des
-apéros — et rien d'autre. Les **outils interactifs** (`/boite-a-outils`) et les
+La page `/bibliotheque` porte **les ressources** - les sources approuvées des
+apéros - et rien d'autre. Les **outils interactifs** (`/boite-a-outils`) et les
 **jeux** (`/jeux`) ont chacun leur page : ils sont appelés à se multiplier, et
 faire tourner un simulateur n'est pas la même chose que consulter un lien. Une
 version antérieure empilait les trois sur la même page, qui devenait
@@ -327,7 +327,7 @@ interminable.
 Les deux pages voisines sont atteintes par **deux cartes côte à côte en bas de
 la bibliothèque**, sous « Aussi dans la bibliothèque ». En bas et non en tête :
 on y arrive après avoir parcouru les ressources. C'est pour cela que la
-pagination est courte — voir ci-dessous.
+pagination est courte - voir ci-dessous.
 
 **Les ressources sont paginées**, huit par page (`PAR_PAGE` dans
 `bibliotheque/+page.server.ts`). Le nombre est petit exprès : les deux cartes du
@@ -341,14 +341,14 @@ navigateur ne porterait que sur les huit lignes affichées, ce qui est pire que
 pas de recherche du tout. Elle passe par l'adresse (`?q=`), donc elle fonctionne
 sans JavaScript et un résultat se partage. Chaque mot doit apparaître quelque
 part, six mots au plus. `lower()` de SQLite ignore les accents : « economie » ne
-trouve pas « économie », et on s'en contente — corriger cela demanderait une
+trouve pas « économie », et on s'en contente - corriger cela demanderait une
 colonne normalisée et une migration.
 
 **Les ressources sont en liste, pas en cartes** : une ressource est un lien, pas
 un produit en vitrine, et la liste en montre quinze là où la grille en montrait
 quatre. Les outils et les jeux, eux, sont en cartes.
 
-Les cartes du site — outils comme jeux — **n'ont pas de bouton** : le lien du
+Les cartes du site - outils comme jeux - **n'ont pas de bouton** : le lien du
 titre est étendu à toute la carte par son `::after`. Un bouton sous chaque carte,
 répété une dizaine de fois, n'ajoutait rien.
 
@@ -358,7 +358,7 @@ qui donne du texte blanc sur fond blanc. La surface porte déjà son fond et son
 texte ; il ne lui manque que le rembourrage et l'arrondi.
 
 Les ressources ont un champ de recherche qui filtre la liste **dans le
-navigateur**, sur les données déjà chargées — titre, note, auteur, nom du site
+navigateur**, sur les données déjà chargées - titre, note, auteur, nom du site
 et titre de l'apéro, plus le mot « pdf » pour les documents. La comparaison se
 fait en minuscules et sans accents des deux côtés, sinon « economie » ne
 trouverait pas « économie ». Le champ n'est affiché **que si le script est
@@ -379,7 +379,7 @@ L'accueil s'ouvrait sur un **carrousel** de sept diapositives de 425 pixels :
 un écran entier de surface colorée avant le premier article. Il a été retiré, et
 `CarrouselAccueil.svelte` avec lui. La raison n'était pas seulement sa hauteur :
 six diapositives sur sept répétaient ce qui se trouvait déjà ailleurs sur la même
-page ou dans l'en-tête — l'identité du groupe est dans l'en-tête, le pied de page
+page ou dans l'en-tête - l'identité du groupe est dans l'en-tête, le pied de page
 et « Le groupe » ; les rendez-vous publics sont dans la colonne « Actualités »
 de l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
 `agenda`) ; les retours d’action restent chronologiques et la bibliothèque est
@@ -392,7 +392,7 @@ bandeau du prochain apéro : ensemble, ils repoussaient l'article à la une à
 
 La page tient maintenant en quatre blocs, de haut en bas :
 
-1. **L'ouverture**, sur la surface `.fond-degrade` — le seul pavé coloré de la
+1. **L'ouverture**, sur la surface `.fond-degrade` - le seul pavé coloré de la
    page : une ligne d'identité, la devise en `h1`, puis le **fil « Les
    prochains jours »**. Une fiche claire par rendez-vous des quinze prochains
    jours (`HORIZON` dans `+page.server.ts`), événements, formations et apéros
@@ -410,7 +410,7 @@ La page tient maintenant en quatre blocs, de haut en bas :
    n'est épinglé, l'article le plus récent sert de une, comme auparavant.
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
-4. **Le bandeau Action populaire**, tout en bas — jamais en tête : on propose
+4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
    arrive.
 
@@ -424,8 +424,8 @@ fonctionne, les fiches d'un même rendez-vous doivent porter le même titre.
 
 `BandeauApero.svelte` n'est pas construit sur `Encart.svelte` : celui-ci porte un
 texte fixe, alors qu'ici la date, le lieu et l'image de couverture viennent de la
-fiche de l'apéro. Les deux suivent en revanche **le même gabarit** — même
-rembourrage, même taille de titre, même marge — pour qu'un visiteur ne voie
+fiche de l'apéro. Les deux suivent en revanche **le même gabarit** - même
+rembourrage, même taille de titre, même marge - pour qu'un visiteur ne voie
 qu'une seule sorte de bandeau sur tout le site. Retoucher l'un sans l'autre se
 remarque immédiatement.
 
@@ -442,22 +442,22 @@ contenu et déborder sur mobile).
 ## Le bandeau Action populaire
 
 Affiché en tête de la liste des actualités, au bas de chaque actualité et au bas
-de l'accueil — pas ailleurs : c'est là que le visiteur cherche les prochains
+de l'accueil - pas ailleurs : c'est là que le visiteur cherche les prochains
 rendez-vous, donc le moment où proposer l'application a du sens. Sur l'accueil il
 est **tout en bas**, jamais en tête. Pour l'étendre à tout le site, déplacer le
 composant dans `src/routes/+layout.svelte`, juste avant le `<footer>`.
 
 C'est un `Encart` ordinaire, au même gabarit que ceux des articles et de la revue
-de presse — mais il porte les couleurs de l'application
+de presse - mais il porte les couleurs de l'application
 (jaune `#f0e80d`, bleu nuit `#0b0b33`) et non celles du site, écrites en dur
 plutôt que prises dans les jetons : elles ne doivent bouger ni avec le thème
-sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu — c'est ce qui
+sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu - c'est ce qui
 fait remarquer le bandeau.
 
 Les adresses des magasins d'applications sont dans les réglages
 (`app_url_android`, `app_url_ios`) et non dans le code : un lien de magasin
 change, et le modifier ne doit pas demander de redéploiement. Elles sont filtrées
-à l'enregistrement pour n'accepter que `https://` — sans ce filtre, un
+à l'enregistrement pour n'accepter que `https://` - sans ce filtre, un
 `javascript:…` saisi dans le formulaire s'exécuterait au clic du visiteur.
 
 Quand les deux champs sont vides, le bandeau renvoie vers actionpopulaire.fr
@@ -481,7 +481,7 @@ section ordinaire.
 Un encart est une surface colorée (`.fond-degrade`, `.fond-actu`, `.fond-apero`,
 ou un `style` en dur pour Action populaire), un surlignage en petites capitales,
 un titre d'affiche, un paragraphe, et **au choix** un lien étendu à toute la
-surface (`href`) ou des boutons (`actions`) — jamais les deux : le lien étendu
+surface (`href`) ou des boutons (`actions`) - jamais les deux : le lien étendu
 passerait derrière les boutons.
 
 Ne jamais ajouter `.carte` à une surface : `.carte` est déclarée après dans
@@ -503,7 +503,7 @@ fin de page. Deux surfaces colorées sur la même page se font concurrence.
 directement dans le composant. Deux variantes :
 
 - `variante="couleur"` (par défaut) : le dégradé officiel, pour les fonds clairs
-- `variante="mono"` : une seule couleur héritée du parent — mettre `text-white`
+- `variante="mono"` : une seule couleur héritée du parent - mettre `text-white`
   sur un fond coloré
 
 Il est en format portrait : le dimensionner par la hauteur (`h-10 w-auto`), pas
@@ -516,7 +516,7 @@ Les couleurs du dégradé de `app.css` sont celles, exactes, de ce fichier.
 ## Les vidéos
 
 Un paragraphe qui ne contient **que** le lien d'une vidéo YouTube devient un
-bloc cliquable — règle `bloc_video` de `src/lib/server/markdown.ts` :
+bloc cliquable - règle `bloc_video` de `src/lib/server/markdown.ts` :
 
     https://youtu.be/cW1Yay_1XaQ                 → « Regarder la vidéo »
     [Le titre de la vidéo](https://youtu.be/…)   → « Le titre de la vidéo »
@@ -529,7 +529,7 @@ transformer en une pile de pavés.
 **La vidéo n'est pas jouée dans la page, et ce n'est pas un oubli.** Une iframe
 YouTube obligerait à inscrire un domaine de Google dans la CSP (règle n° 2 des
 règles de sécurité), donc à annoncer à Google chaque visiteur d'un article
-avant même qu'il ait cliqué — sur un site dont le pied de page promet de
+avant même qu'il ait cliqué - sur un site dont le pied de page promet de
 n'utiliser aucun service tiers. Le bloc ne charge rien de l'extérieur : c'est
 du texte et un triangle dessiné en SVG. La lecture se fait sur YouTube, après
 un clic délibéré.
@@ -558,7 +558,7 @@ texte tapé restent en place.
 ## L'en-tête
 
 La navigation de bureau se limite à quatre rubriques de contenu (Actualités,
-Articles, Apéros, Bibliothèque — qui couvre les outils, les lectures et les
+Articles, Apéros, Bibliothèque - qui couvre les outils, les lectures et les
 jeux) et un bouton « Nous rejoindre ». Le logo ramène
 à l'accueil ; « Le groupe » est dans le pied de page. Le menu mobile, lui,
 liste tout (`liensMobile` dans `src/routes/+layout.svelte`). Ajouter un lien
@@ -614,8 +614,8 @@ décrédibiliserait l'outil avant même qu'on l'ouvre.
 
 ### Le parcours
 
-Les trois maillons — comment on entre, comment on choisit, ce qu'on fait ensuite
-— ont été repris ensemble ; les traiter séparément avait produit un annuaire
+Les trois maillons - comment on entre, comment on choisit, ce qu'on fait ensuite
+- ont été repris ensemble ; les traiter séparément avait produit un annuaire
 sans entrée ni sortie.
 
 - **On entre** par la carte en bas de la bibliothèque, par le pied de page ou
@@ -624,7 +624,7 @@ sans entrée ni sortie.
 - **On choisit** : deux outils sont mis en avant sous « Pour commencer »
   (`enAvant: true` dans `OUTILS`, avec une `accroche` plus longue que la
   description). Onze cartes égales ne disent pas par où entrer. Ils sont
-  choisis pour être les plus contre-intuitifs — un sur soi, un sur le pays — et
+  choisis pour être les plus contre-intuitifs - un sur soi, un sur le pays - et
   `rubriquesGarnies()` les **retire de leur rubrique** : les revoir dix
   centimètres plus bas se lit comme un bug.
 - **On ressort** par le pied de page de l'outil (voir plus bas). Avant, la page
@@ -636,10 +636,10 @@ chaque outil portant un champ `rubrique`). Elles sont **deux** et ne doivent pas
 se multiplier : la première version en comptait cinq pour onze outils, dont
 trois n'avaient qu'un seul outil, si bien que la page affichait plus de titres de
 rubrique que de contenu. Le partage retenu est celui que fait le visiteur
-lui-même — « est-ce que ça parle de moi, ou du pays ? ». Une rubrique sans outil
+lui-même - « est-ce que ça parle de moi, ou du pays ? ». Une rubrique sans outil
 n'est pas affichée, on peut donc en déclarer une à l'avance. Le `satisfies` sur
 `OUTILS` fait échouer `npm run check` si un outil pointe vers une rubrique qui
-n'existe pas — une faute de frappe est attrapée à la compilation, pas par un trou
+n'existe pas - une faute de frappe est attrapée à la compilation, pas par un trou
 dans la page.
 
 ### La tête et le pied de page d'un outil
@@ -668,7 +668,7 @@ La description reprise dans la tête est l'`accroche` de l'outil quand elle
 existe, sa `description` sinon. C'est une raison de plus d'écrire une accroche
 pour chaque outil et pas seulement pour les deux mis en avant : ces pages sont
 celles que quelqu'un qui ne connaît pas le groupe a le plus de chances de
-trouver — on ne cherche pas « LFI Dijon », on cherche « combien d'impôts je
+trouver - on ne cherche pas « LFI Dijon », on cherche « combien d'impôts je
 paie ». Le nom du site y est écrit en dur, repris de `DEFAULTS` : le renommer
 dans l'administration demande de relancer le script.
 
@@ -681,7 +681,7 @@ Quatre règles, dont la première n'est pas négociable :
    trouvée discrédite tous les autres.
 2. **Ne jamais « arrondir dans le bon sens ».** L'outil sur l'impôt applique
    la décote, qui annule l'impôt sur le revenu autour du SMIC : sans elle, il
-   surestimait de moitié ce que paient les foyers modestes — précisément ceux
+   surestimait de moitié ce que paient les foyers modestes - précisément ceux
    à qui il s'adresse. Un chiffre gonflé en notre faveur est un chiffre faux.
 3. **Rien de ce que saisit le visiteur ne quitte son navigateur.** Aucun envoi
    au serveur, aucun stockage : il n'y a donc aucune donnée à protéger, et la
@@ -725,7 +725,7 @@ Deux sujets demandent une vigilance particulière :
 - **Les chiffres contestés.** Quand une estimation ne fait pas consensus (le
   rendement de l'impôt plancher sur les très hauts patrimoines, le montant de la
   fraude fiscale), l'outil affiche la **fourchette** publiée, et non le chiffre
-  qui nous arrange — quitte à laisser le visiteur choisir son hypothèse au
+  qui nous arrange - quitte à laisser le visiteur choisir son hypothèse au
   curseur. De même, l'outil sur la proportionnelle affiche que ce scrutin aurait
   donné une cinquantaine de sièges de plus au RN en 2024. Un argument qui ne
   tient que lorsqu'il nous arrange n'est pas un argument, et une seule erreur
@@ -783,7 +783,7 @@ assouplir.
   et le moteur écarterait la fiche entière.
 - **Une fiche ne doit jamais annoncer autre chose que ce que la page affiche.**
   C'est traité comme une tromperie, et cela fait perdre le bénéfice de
-  l'ensemble — pas seulement de la page fautive.
+  l'ensemble - pas seulement de la page fautive.
 
 ### Ce que le code ne peut pas faire
 
@@ -821,7 +821,7 @@ La fiche portant `illustree: true` reçoit une **image de couverture**, encodée
 en base64 dans `demo-image.ts`. Elle est dans le code et non dans
 `data/uploads/` parce que ce dossier est le stockage du site en fonctionnement :
 il est dans `.gitignore` et n'existe pas au démarrage d'un conteneur neuf. Sur
-Render, la démo repart d'une base vide à chaque déploiement — sans cette copie,
+Render, la démo repart d'une base vide à chaque déploiement - sans cette copie,
 l'article à la une y serait sans illustration. Même raisonnement que pour les
 jeux et les outils : ce qui doit survivre au déploiement vit dans le dépôt, pas
 dans les données. **Le vrai site n'a rien à faire ici** : il reçoit ses images
@@ -835,11 +835,11 @@ Voir `DEPLOIEMENT.md`. VPS français, Docker + Caddy, sauvegarde quotidienne par
 **Pousser sur `main` met le site à jour.** `scripts/deployer.sh` tourne toutes
 les cinq minutes sur le serveur : si `main` a bougé, il sauvegarde, récupère le
 code et redémarre ; sinon il ne fait rien. C'est le serveur qui interroge
-GitHub, et non l'inverse — aucune clé d'accès à la machine de production ne
+GitHub, et non l'inverse - aucune clé d'accès à la machine de production ne
 traîne donc chez un tiers.
 
 Deux conséquences à garder en tête. Un commit poussé part **en production dans
 les cinq minutes**, sans relecture : `npm run check` avant de pousser n'est pas
 une politesse. Et si la compilation échoue, les conteneurs en place continuent
-de servir la version précédente — le site ne tombe pas, il cesse simplement de
+de servir la version précédente - le site ne tombe pas, il cesse simplement de
 se mettre à jour, ce que seul `/var/log/deploiement-site.log` dira.

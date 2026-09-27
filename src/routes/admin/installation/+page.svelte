@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-	<title>Installation — Administration</title>
+	<title>Installation - Administration</title>
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 

@@ -27,7 +27,7 @@
      autant que de mots qu'on peut taper, elles ne contiennent rien d'original,
      et elles diluent la bibliothèque elle-même. Les liens restent suivis. -->
 <Metadonnees
-	titre="Bibliothèque{suffixe} — {data.settings.siteName}"
+	titre="Bibliothèque{suffixe} - {data.settings.siteName}"
 	description="Les liens et documents PDF partagés autour des apéros thématiques du groupe."
 	indexable={!data.recherche}
 	canonique={chemin}
@@ -41,7 +41,7 @@
 	<p class="text-xs font-bold tracking-[0.2em] text-pourpre uppercase">Ressources partagées</p>
 	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Bibliothèque</h1>
 	<p class="mt-3 max-w-2xl text-lg text-ink-soft">
-		Ce que nous lisons, regardons et écoutons — proposé autour de nos apéros et relu par le groupe.
+		Ce que nous lisons, regardons et écoutons - proposé autour de nos apéros et relu par le groupe.
 		Chacun peut en proposer depuis la fiche d’un apéro.
 	</p>
 </header>
@@ -153,7 +153,7 @@
 <!-- Les outils et les jeux ont chacun leur page : ils sont appelés à se
      multiplier, et faire tourner un simulateur n'est pas la même chose que
      consulter un lien. Ces deux cartes sont leur porte d'entrée, en bas parce
-     qu'on y arrive après avoir parcouru les ressources — d'où la pagination
+     qu'on y arrive après avoir parcouru les ressources - d'où la pagination
      courte au-dessus, qui les garde à portée de vue.
 
      Pas de `border-t` ici : la liste des ressources se ferme déjà par le filet

@@ -37,7 +37,7 @@ export const RUBRIQUES = [
 		id: 'votre-situation',
 		titre: 'Votre situation',
 		description:
-			'Vous entrez vos chiffres — salaire, loyer, patrimoine — et l’outil vous dit où vous vous situez.'
+			'Vous entrez vos chiffres - salaire, loyer, patrimoine - et l’outil vous dit où vous vous situez.'
 	},
 	{
 		id: 'le-pays',
@@ -53,8 +53,8 @@ export type RubriqueId = Rubrique['id'];
 /**
  * `enAvant` désigne les deux outils proposés en premier, sous « Pour
  * commencer ». Onze cartes côte à côte ne disent pas par où entrer ; ces
- * deux-là le disent. Ils sont choisis pour être les plus contre-intuitifs — un
- * sur soi, un sur le pays — et non pour être les plus récents.
+ * deux-là le disent. Ils sont choisis pour être les plus contre-intuitifs - un
+ * sur soi, un sur le pays - et non pour être les plus récents.
  *
  * `accroche` n'est écrite que pour eux : c'est la phrase plus longue de la
  * carte mise en avant.
@@ -103,10 +103,10 @@ export const OUTILS = [
 		dossier: 'budget',
 		rubrique: 'le-pays',
 		titre: 'Où va l’argent public ?',
-		description: 'Les 1 672 milliards, poste par poste — et sur votre contribution.',
+		description: 'Les 1 672 milliards, poste par poste - et sur votre contribution.',
 		enAvant: true,
 		accroche:
-			'« L’État dépense trop » — mais en quoi, exactement ? Les 1 672 milliards de dépense publique poste par poste, et la part que votre propre contribution finance.'
+			'« L’État dépense trop » - mais en quoi, exactement ? Les 1 672 milliards de dépense publique poste par poste, et la part que votre propre contribution finance.'
 	},
 	{
 		dossier: 'tres-hauts-patrimoines',
@@ -186,7 +186,7 @@ export function rubriquesGarnies(): { rubrique: Rubrique; modules: Outil[] }[] {
  * On prend les suivants de la même rubrique, en tournant sur la liste : après
  * le dernier, on revient au premier. Quelqu'un qui enchaîne fait donc le tour
  * de sa rubrique sans jamais tomber sur une fin. Si la rubrique est trop
- * courte, on complète avec l'autre — un outil ne doit jamais rester seul.
+ * courte, on complète avec l'autre - un outil ne doit jamais rester seul.
  *
  * Cette fonction sert au script `scripts/pieds-outils.js`, qui écrit ces liens
  * dans les `index.html` : ces pages sont du HTML statique servi tel quel, elles

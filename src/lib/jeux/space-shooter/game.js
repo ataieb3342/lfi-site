@@ -1,4 +1,4 @@
-// @ts-nocheck — jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
+// @ts-nocheck - jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -456,7 +456,7 @@ function drawBoss() {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 13px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(`BOSS ${boss.number} — ${Math.max(0, boss.hp)} / ${boss.maxHp} PV`, canvas.width / 2, y + 29);
+  ctx.fillText(`BOSS ${boss.number} - ${Math.max(0, boss.hp)} / ${boss.maxHp} PV`, canvas.width / 2, y + 29);
 }
 
 function spawnObstacle() {

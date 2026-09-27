@@ -6,7 +6,7 @@
 
 <!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
 <Metadonnees
-	titre="Confidentialité — {data.settings.siteName}"
+	titre="Confidentialité - {data.settings.siteName}"
 	description="Ce site n'utilise aucun traceur publicitaire et ne conserve aucune adresse IP en clair."
 	indexable={false}
 />

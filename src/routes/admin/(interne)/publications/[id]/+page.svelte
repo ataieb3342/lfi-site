@@ -11,7 +11,7 @@
 	const valeurs = $derived(form ? { ...form } : { body: data.corps });
 </script>
 
-<svelte:head><title>{data.publication.title} — Administration</title></svelte:head>
+<svelte:head><title>{data.publication.title} - Administration</title></svelte:head>
 
 <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
 	<div>

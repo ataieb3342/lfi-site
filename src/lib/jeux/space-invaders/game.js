@@ -1,4 +1,4 @@
-// @ts-nocheck — jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
+// @ts-nocheck - jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 

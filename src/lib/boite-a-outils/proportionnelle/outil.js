@@ -8,7 +8,7 @@
  * Particularité de cet outil : ses données ne vieillissent pas. Les résultats
  * des législatives de 2024 sont définitifs et publiés par le ministère de
  * l'Intérieur. Rien ici n'est une estimation, une projection ou une moyenne.
- * C'est ce qui le rend difficile à attaquer — à condition de ne pas arranger le
+ * C'est ce qui le rend difficile à attaquer - à condition de ne pas arranger le
  * calcul, y compris quand il ne nous arrange pas.
  */
 
@@ -32,7 +32,7 @@ var EXPRIMES = 32057946;
  *
  * « Autres listes » est un reste : extrême gauche, écologistes hors NFP,
  * régionalistes, divers. Ce n'est pas un parti. On l'écarte donc du calcul des
- * extrêmes — sinon c'est lui qui ferait le titre, pour une raison qui n'a rien
+ * extrêmes - sinon c'est lui qui ferait le titre, pour une raison qui n'a rien
  * de politique.
  */
 var BLOCS = [
@@ -127,7 +127,7 @@ function repartirRestes(exacts, total) {
  * L'Assemblée avec une « dose » de proportionnelle, de 0 (le scrutin actuel)
  * à 100 (la proportionnelle intégrale). Entre les deux, on mélange les deux
  * répartitions dans cette proportion, puis on arrondit à la plus forte moyenne
- * des restes — la somme fait toujours 577.
+ * des restes - la somme fait toujours 577.
  */
 function siegesAvecDose(dose) {
 	var part = dose / 100;
@@ -321,7 +321,7 @@ function rafraichir() {
 			'Majorité absolue',
 			'289 sièges',
 			289 / SIEGES,
-			'Aucun bloc ne l’atteint, dans aucune des configurations — c’est vrai du scrutin actuel comme de la proportionnelle.'
+			'Aucun bloc ne l’atteint, dans aucune des configurations - c’est vrai du scrutin actuel comme de la proportionnelle.'
 		)
 	);
 }
@@ -337,7 +337,7 @@ function afficherAbstention() {
 	videsPhrase.textContent =
 		'resteraient vides si l’on réservait des sièges aux ' +
 		nombres.format(sansVoix) +
-		' inscrits qui n’ont pas voté, ou dont le bulletin était blanc ou nul — soit ' +
+		' inscrits qui n’ont pas voté, ou dont le bulletin était blanc ou nul - soit ' +
 		pourcent(sansVoix / INSCRITS) +
 		' du corps électoral. C’est davantage que n’importe quel bloc politique : le premier parti de France, à ' +
 		nombres.format(abstention) +

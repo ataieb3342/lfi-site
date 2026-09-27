@@ -12,8 +12,8 @@
  *
  *  - dans le `<head>`, le titre et la description que Google affiche dans ses
  *    résultats. Ces pages sont les plus susceptibles d'être trouvées par
- *    quelqu'un qui ne connaît pas le groupe — on ne cherche pas « LFI Dijon »,
- *    on cherche « combien d'impôts je paie » — et sans description, le moteur
+ *    quelqu'un qui ne connaît pas le groupe - on ne cherche pas « LFI Dijon »,
+ *    on cherche « combien d'impôts je paie » - et sans description, le moteur
  *    affiche à la place la première phrase qu'il trouve dans la page ;
  *  - en bas de page, les liens « et maintenant ? ».
  *
@@ -35,10 +35,10 @@ const { OUTILS, outilsSuivants, urlOutil } = await import(
 // faut relancer ce script.
 const { DEFAULTS } = await import(join(racine, 'src/lib/server/settings.ts'));
 
-const DEBUT = '\t\t<!-- pied : écrit par scripts/pages-outils.js — ne pas modifier à la main -->';
+const DEBUT = '\t\t<!-- pied : écrit par scripts/pages-outils.js - ne pas modifier à la main -->';
 const FIN = '\t\t<!-- /pied -->';
 
-const DEBUT_TETE = '\t<!-- tête : écrite par scripts/pages-outils.js — ne pas modifier à la main -->';
+const DEBUT_TETE = '\t<!-- tête : écrite par scripts/pages-outils.js - ne pas modifier à la main -->';
 const FIN_TETE = '\t<!-- /tête -->';
 
 /** Le HTML n'accepte pas ces trois caractères tels quels dans du texte. */
@@ -54,13 +54,13 @@ function attribut(texte) {
 /**
  * Le titre et la description de la page.
  *
- * La description est l'`accroche` quand elle existe — c'est la phrase longue,
- * celle qui explique — et la `description` sinon. Écrire une accroche pour
+ * La description est l'`accroche` quand elle existe - c'est la phrase longue,
+ * celle qui explique - et la `description` sinon. Écrire une accroche pour
  * chaque outil, et pas seulement pour les deux mis en avant, donne donc aussi
  * une meilleure description dans les résultats de recherche.
  */
 function tete(outil) {
-	const titre = `${outil.titre} — ${DEFAULTS.site_name}`;
+	const titre = `${outil.titre} - ${DEFAULTS.site_name}`;
 	const resume = outil.accroche ?? outil.description;
 	return `${DEBUT_TETE}
 	<title>${echapper(titre)}</title>
@@ -75,7 +75,7 @@ ${FIN_TETE}`;
 
 /**
  * Le pied d'un outil : de quoi enchaîner, et de quoi faire quelque chose de ce
- * qu'on vient de lire. Avant, la page s'arrêtait sur ses sources — on avait
+ * qu'on vient de lire. Avant, la page s'arrêtait sur ses sources - on avait
  * fait le calcul, on était convaincu, et on fermait l'onglet.
  */
 function pied(outil) {
@@ -145,7 +145,7 @@ for (const outil of OUTILS) {
 		apres = apres.slice(0, debut) + nouveau + apres.slice(fin + FIN.length);
 	} else {
 		// Le pied se glisse après le contenu de la page, juste avant le `</div>`
-		// qui ferme `.page` — donc à la toute fin, avant le chargement du script.
+		// qui ferme `.page` - donc à la toute fin, avant le chargement du script.
 		const ancre = '\t</div>\n';
 		const place = apres.lastIndexOf(ancre);
 		if (place === -1) throw new Error(`${outil.dossier} : pas de </div> fermant la page`);

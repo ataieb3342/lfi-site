@@ -19,7 +19,7 @@
 <!-- « à Dijon » dans le titre : c'est ce que les gens tapent, et « Les apéros »
      seul ne rattache la page à aucun lieu. -->
 <Metadonnees
-	titre="Les apéros thématiques à Dijon — {data.settings.siteName}"
+	titre="Les apéros thématiques à Dijon - {data.settings.siteName}"
 	description={CHAPO_RUBRIQUE.aperos}
 	image={prochain?.cover?.url ?? null}
 	donnees={filAriane(page.url.origin, [

@@ -50,7 +50,7 @@ export function db(): DatabaseSync {
  * elles ne s'exécutent qu'une fois.
  */
 const MIGRATIONS: string[] = [
-	// 001 — schéma initial
+	// 001 - schéma initial
 	`
 	create table admins (
 		id integer primary key,
@@ -158,7 +158,7 @@ const MIGRATIONS: string[] = [
 	) without rowid;
 	`
 	,
-	// 002 — « brève » devient « actualité », et gagne une date d'action
+	// 002 - « brève » devient « actualité », et gagne une date d'action
 	//
 	// SQLite ne sait pas modifier une contrainte CHECK : il faut reconstruire la
 	// table. C'est la procédure officielle en 12 étapes, d'où le détour par une
@@ -203,7 +203,7 @@ const MIGRATIONS: string[] = [
 	create index publications_agenda on publications(kind, status, event_at);
 	`
 	,
-	// 003 — un troisième type de publication : l'apéro thématique
+	// 003 - un troisième type de publication : l'apéro thématique
 	//
 	// Même procédure que la 002 : SQLite ne sait pas modifier une contrainte
 	// CHECK, la table est reconstruite à l'identique avec la nouvelle valeur.
@@ -237,7 +237,7 @@ const MIGRATIONS: string[] = [
 	create index publications_agenda on publications(kind, status, event_at);
 	`
 	,
-	// 004 — les sources partagées avant un apéro
+	// 004 - les sources partagées avant un apéro
 	//
 	// Un dossier collectif par apéro : livres, vidéos, articles, sites… que
 	// chacun peut proposer depuis la fiche. Même mécanique que les commentaires
@@ -263,7 +263,7 @@ const MIGRATIONS: string[] = [
 	create index sources_moderation on sources(status, created_at desc);
 	`
 	,
-	// 005 — un lien ou un PDF dans le dossier d'un apéro et la bibliothèque commune
+	// 005 - un lien ou un PDF dans le dossier d'un apéro et la bibliothèque commune
 	`
 	alter table sources add column pdf_filename text;
 	alter table sources add column pdf_original_name text not null default '';
@@ -273,12 +273,12 @@ const MIGRATIONS: string[] = [
 		where url != '' or pdf_filename is not null;
 	`
 	,
-	// 006 — justification des droits de republication d'un PDF
+	// 006 - justification des droits de republication d'un PDF
 	`
 	alter table sources add column droits_diffusion text not null default '';
 	`
 	,
-	// 007 — un quatrième type de publication : la revue de presse
+	// 007 - un quatrième type de publication : la revue de presse
 	//
 	// Même procédure que les 002 et 003 : SQLite ne sait pas modifier une
 	// contrainte CHECK, la table est reconstruite à l'identique avec la nouvelle
@@ -314,7 +314,7 @@ const MIGRATIONS: string[] = [
 	create index publications_agenda on publications(kind, status, event_at);
 	`
 	,
-	// 008 — catégorie visuelle des rendez-vous dans l'agenda
+	// 008 - catégorie visuelle des rendez-vous dans l'agenda
 	`
 	alter table publications add column event_category text not null default 'autre'
 		check (event_category in ('action', 'reunion', 'apero', 'formation', 'autre'));
@@ -322,7 +322,7 @@ const MIGRATIONS: string[] = [
 	update publications set event_category = 'action' where kind = 'actu' and event_at is not null;
 	create index publications_calendrier on publications(status, event_at, event_category);
 	`,
-	// 009 — fiche publique facultative des comptes administrateurs
+	// 009 - fiche publique facultative des comptes administrateurs
 	`
 	alter table admins add column profile_name text not null default '';
 	alter table admins add column profile_role text not null default '';
@@ -332,7 +332,7 @@ const MIGRATIONS: string[] = [
 	alter table admins add column profile_visible integer not null default 0 check (profile_visible in (0, 1));
 	create index admins_profiles_publics on admins(profile_visible, created_at);
 	`,
-	// 010 — fiche structurée des actions (nature, horaires, responsables et lieu)
+	// 010 - fiche structurée des actions (nature, horaires, responsables et lieu)
 	`
 	alter table publications add column action_category text not null default 'autre'
 		check (action_category in ('porte-a-porte', 'tractage', 'collage', 'mobilisation', 'collecte', 'autre'));
@@ -344,15 +344,15 @@ const MIGRATIONS: string[] = [
 	alter table publications add column event_managers text not null default '';
 	alter table publications add column event_signup_url text not null default '';
 	`,
-	// 011 — précision facultative à l'intérieur du lieu (entrée, sortie, kiosque…)
+	// 011 - précision facultative à l'intérieur du lieu (entrée, sortie, kiosque…)
 	`
 	alter table publications add column event_meeting_point text not null default '';
 	`,
-	// 012 — aperçu local de la carte, cliquable vers le service cartographique
+	// 012 - aperçu local de la carte, cliquable vers le service cartographique
 	`
 	alter table publications add column event_map_media_id integer references media(id) on delete set null;
 	`,
-	// 013 — auteur choisi et responsables reliés aux comptes du groupe
+	// 013 - auteur choisi et responsables reliés aux comptes du groupe
 	`
 	alter table publications add column byline_admin_id integer references admins(id) on delete set null;
 	create table publication_managers (
@@ -362,11 +362,11 @@ const MIGRATIONS: string[] = [
 	) without rowid;
 	create index publication_managers_admin on publication_managers(admin_id, publication_id);
 	`,
-	// 014 — carte Google Maps intégrée à partir du code fourni par Google
+	// 014 - carte Google Maps intégrée à partir du code fourni par Google
 	`
 	alter table publications add column event_map_embed_url text not null default '';
 	`,
-	// 015 — les actions ne sont plus annoncées : les anciennes fiches doivent
+	// 015 - les actions ne sont plus annoncées : les anciennes fiches doivent
 	// être relues avant de devenir d’éventuels retours d’action.
 	`
 	delete from publication_managers
@@ -378,7 +378,7 @@ const MIGRATIONS: string[] = [
 	 event_meeting_point = '', event_map_media_id = null, event_map_embed_url = ''
 	 where event_category = 'action';
 	`,
-	// 016 — choix facultatif d'une mise en page éditoriale pour les articles
+	// 016 - choix facultatif d'une mise en page éditoriale pour les articles
 	`
 	alter table publications add column layout_style text not null default 'standard'
 		check (layout_style in ('standard', 'carnet-aquarelle'));

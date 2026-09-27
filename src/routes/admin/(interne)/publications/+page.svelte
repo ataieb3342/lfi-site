@@ -5,7 +5,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head><title>Publications — Administration</title></svelte:head>
+<svelte:head><title>Publications - Administration</title></svelte:head>
 
 <header class="flex flex-wrap items-center justify-between gap-4">
 	<h1 class="text-2xl font-extrabold text-ink">Publications</h1>

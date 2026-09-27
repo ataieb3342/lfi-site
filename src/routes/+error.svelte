@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 </script>
 
-<svelte:head><title>{page.status} — Page introuvable</title></svelte:head>
+<svelte:head><title>{page.status} - Page introuvable</title></svelte:head>
 
 <div class="py-20 text-center">
 	<p class="text-6xl font-extrabold text-brand">{page.status}</p>

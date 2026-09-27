@@ -150,7 +150,7 @@ function rafraichir() {
 			'Reste à vivre',
 			euros.format(Math.max(0, libre)),
 			revenu > 0 ? Math.max(0, libre) / revenu : 0,
-			'Tout le reste, y compris la nourriture et les transports — et c’est là, et seulement là, que « mieux gérer son budget » a un sens.'
+			'Tout le reste, y compris la nourriture et les transports - et c’est là, et seulement là, que « mieux gérer son budget » a un sens.'
 		)
 	);
 
@@ -201,7 +201,7 @@ function rafraichir() {
 		euros.format(gain * 12) +
 		' sur l’année. Avec votre loyer, cela représente ' +
 		(progression > 0 ? '+' + Math.round(progression * 100) + ' %' : 'une hausse') +
-		' de reste à vivre — parce que le loyer, lui, ne bouge pas : tout l’écart va au reste à vivre.';
+		' de reste à vivre - parce que le loyer, lui, ne bouge pas : tout l’écart va au reste à vivre.';
 }
 
 /* Les curseurs et les cases restent synchronisés dans les deux sens. */

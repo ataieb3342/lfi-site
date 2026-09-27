@@ -45,7 +45,7 @@
 	// Les « < » du JSON sont échappés avant d'être écrits dans la page : un
 	// titre contenant une balise de fermeture refermerait le bloc, et le reste
 	// passerait en HTML. C'est la même précaution que `html: false` côté
-	// Markdown — un compte compromis ne doit pas pouvoir injecter de script.
+	// Markdown - un compte compromis ne doit pas pouvoir injecter de script.
 	const jsonld = $derived(
 		donnees
 			? JSON.stringify({ '@context': 'https://schema.org', '@graph': [donnees].flat() }).replace(
@@ -62,7 +62,7 @@
 	<link rel="canonical" href={adresse} />
 	{#if !indexable}
 		<!-- « follow » : la page n'est pas indexée, mais les liens qu'elle porte
-		     sont suivis — sinon les publications listées deviendraient invisibles. -->
+		     sont suivis - sinon les publications listées deviendraient invisibles. -->
 		<meta name="robots" content="noindex, follow" />
 	{/if}
 

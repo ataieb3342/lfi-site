@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-	<title>Connexion — Administration</title>
+	<title>Connexion - Administration</title>
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -21,7 +21,7 @@
 				<dt>Mot de passe</dt>
 				<dd><code class="font-mono">{data.demo.motDePasse}</code></dd>
 				<dt>Code du moment</dt>
-				<dd><code class="font-mono text-base font-bold">{data.demo.code ?? '—'}</code></dd>
+				<dd><code class="font-mono text-base font-bold">{data.demo.code ?? '-'}</code></dd>
 			</dl>
 			<p class="mt-2 text-xs">
 				Le code change toutes les 30 secondes : si la connexion échoue, rechargez cette page et recopiez le

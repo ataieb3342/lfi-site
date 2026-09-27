@@ -5,8 +5,8 @@
  * Tout est calculé dans le navigateur : l'année de naissance saisie n'est
  * envoyée nulle part.
  *
- * L'outil ne calcule pas une pension. Il répond à une seule question — à partir
- * de quel âge, et avec combien de trimestres — sous les trois régimes qui se
+ * L'outil ne calcule pas une pension. Il répond à une seule question - à partir
+ * de quel âge, et avec combien de trimestres - sous les trois régimes qui se
  * superposent aujourd'hui. Les dispositifs particuliers (carrières longues,
  * pénibilité, invalidité, handicap, régimes spéciaux) ne sont pas traités : ils
  * sont trop nombreux pour être résumés sans mentir, et l'avertissement de la
@@ -30,7 +30,7 @@
  *    suspend cette montée pour les pensions prenant effet à compter du
  *    1er septembre 2026. L'âge reste figé à 62 ans et 9 mois jusqu'en janvier
  *    2028, puis la progression reprend, pour atteindre 64 ans à la génération
- *    1969 — et non 1968.
+ *    1969 - et non 1968.
  *
  * Les générations 1961 et 1965 sont partagées en cours d'année selon le mois de
  * naissance. On retient ici la situation de la majorité de la génération, et
@@ -115,7 +115,7 @@ function ageEnTexte(mois) {
 	return annees + ' ans et ' + reste + ' mois';
 }
 
-/** « 2 ans », « 9 mois », « 2 ans et 3 mois » — pour une durée, pas un âge. */
+/** « 2 ans », « 9 mois », « 2 ans et 3 mois » - pour une durée, pas un âge. */
 function dureeEnTexte(mois) {
 	if (mois === 0) return 'rien';
 	var annees = Math.floor(mois / ANS);
@@ -139,7 +139,7 @@ function trimestresEnTexte(trimestres) {
 
 /*
  * Une ligne de comparaison : un intitulé, une valeur, une explication. On
- * réutilise les classes des barres sans la barre elle-même — ici, aucune
+ * réutilise les classes des barres sans la barre elle-même - ici, aucune
  * proportion n'a de sens : deux ans d'écart sur soixante-quatre donneraient
  * trois barres identiques.
  */
@@ -215,7 +215,7 @@ function rafraichir() {
 	departPhrase.textContent =
 		'au plus tôt, soit en ' +
 		(annee + Math.floor(ageActuel / ANS)) +
-		' — et à condition d’avoir cotisé ' +
+		' - et à condition d’avoir cotisé ' +
 		trimestresEnTexte(dureeActuelle) +
 		'. Sans cette durée, partir à cet âge veut dire une pension réduite à vie.';
 
@@ -260,7 +260,7 @@ function rafraichir() {
 	} else {
 		cout.textContent = dureeEnTexte(moisEnPlus);
 		coutPhrase.textContent =
-			'de travail en plus avant de pouvoir partir — donc autant de pension que vous ne toucherez pas. Sur une retraite, ce sont ' +
+			'de travail en plus avant de pouvoir partir - donc autant de pension que vous ne toucherez pas. Sur une retraite, ce sont ' +
 			dureeEnTexte(moisEnPlus) +
 			' de vie libre en moins, à l’âge où l’on en profite le mieux.';
 	}
@@ -288,12 +288,12 @@ function rafraichir() {
 		santePhrase.textContent =
 			'Vous partirez à ' +
 			ageEnTexte(ageActuel) +
-			' : au-delà de l’âge jusqu’auquel une personne née aujourd’hui peut espérer vivre sans être limitée par un problème de santé — 64,1 ans pour les femmes, 63,7 ans pour les hommes. Ce chiffre décrit une moyenne, pas votre cas : il ne dit pas que vous serez malade à cet âge. Il dit qu’en repoussant l’âge de départ au-delà de ce seuil, on a cessé de promettre une retraite en bonne santé.';
+			' : au-delà de l’âge jusqu’auquel une personne née aujourd’hui peut espérer vivre sans être limitée par un problème de santé - 64,1 ans pour les femmes, 63,7 ans pour les hommes. Ce chiffre décrit une moyenne, pas votre cas : il ne dit pas que vous serez malade à cet âge. Il dit qu’en repoussant l’âge de départ au-delà de ce seuil, on a cessé de promettre une retraite en bonne santé.';
 	} else if (departAns >= SANS_INCAPACITE_HOMMES) {
 		santePhrase.textContent =
 			'Vous partirez à ' +
 			ageEnTexte(ageActuel) +
-			' : au-delà de l’espérance de vie sans incapacité des hommes (63,7 ans), tout juste en deçà de celle des femmes (64,1 ans). Ce chiffre décrit une moyenne, pas votre cas — mais il situe exactement où l’on a placé la barre.';
+			' : au-delà de l’espérance de vie sans incapacité des hommes (63,7 ans), tout juste en deçà de celle des femmes (64,1 ans). Ce chiffre décrit une moyenne, pas votre cas - mais il situe exactement où l’on a placé la barre.';
 	} else {
 		var marge = SANS_INCAPACITE_HOMMES - departAns;
 		santePhrase.textContent =

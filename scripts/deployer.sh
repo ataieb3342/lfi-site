@@ -5,7 +5,7 @@
 # utilisable à la main :
 #     ssh lfi '/srv/lfi-site/scripts/deployer.sh'
 #
-# S'il n'y a rien de neuf, il ne fait rien et ne dit rien — il peut donc
+# S'il n'y a rien de neuf, il ne fait rien et ne dit rien - il peut donc
 # tourner en boucle sans remplir le journal ni sauvegarder pour rien.
 
 set -eu
@@ -30,7 +30,7 @@ if [ "$AVANT" = "$APRES" ]; then
 	exit 0
 fi
 
-echo "=== $(date '+%Y-%m-%d %H:%M') — déploiement $(echo "$AVANT" | cut -c1-7) → $(echo "$APRES" | cut -c1-7) ==="
+echo "=== $(date '+%Y-%m-%d %H:%M') - déploiement $(echo "$AVANT" | cut -c1-7) → $(echo "$APRES" | cut -c1-7) ==="
 
 # La sauvegarde d'abord : une migration de base ne se rejoue pas à l'envers.
 "$RACINE/scripts/sauvegarde.sh"

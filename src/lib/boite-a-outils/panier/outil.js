@@ -14,7 +14,7 @@
 
 /*
  * Insee, indice des prix à la consommation, hausses CUMULÉES de janvier 2021 à
- * janvier 2026 — et non des taux annuels. C'est la distinction qui compte : une
+ * janvier 2026 - et non des taux annuels. C'est la distinction qui compte : une
  * inflation « retombée à 2 % » s'ajoute au niveau déjà atteint, elle ne le
  * réduit pas.
  */
@@ -130,7 +130,7 @@ function rafraichir() {
 			euros.format(salaire2021) +
 			' vous permettaient d’acheter début 2021, il vous faudrait ' +
 			euros.format(salaireNecessaire) +
-			' — vous en gagnez ' +
+			' - vous en gagnez ' +
 			euros.format(salaireActuel) +
 			'.';
 	} else if (ecart < 1) {
@@ -188,11 +188,11 @@ function rafraichir() {
 	panierPhrase.textContent =
 		'C’est ce que coûtait, début 2021, le panier que vous payez aujourd’hui ' +
 		euros.format(courses) +
-		'. La différence — ' +
+		'. La différence - ' +
 		euros.format(surcout) +
 		' par mois, ' +
 		euros.format(surcout * 12) +
-		' par an — n’a rien acheté de plus : même chariot, même contenu.';
+		' par an - n’a rien acheté de plus : même chariot, même contenu.';
 
 	panierDetails.textContent = '';
 	panierDetails.appendChild(boite('Votre panier aujourd’hui', euros.format(courses)));

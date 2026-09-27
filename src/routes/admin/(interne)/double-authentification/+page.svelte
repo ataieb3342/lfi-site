@@ -3,13 +3,13 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
-<svelte:head><title>Double authentification — Administration</title></svelte:head>
+<svelte:head><title>Double authentification - Administration</title></svelte:head>
 
 <div class="max-w-xl">
 	<h1 class="text-2xl font-extrabold text-ink">Activer la double authentification</h1>
 	<p class="mt-2 text-sm text-ink-soft">
-		Obligatoire pour administrer le site. Sans elle, un mot de passe volé — par hameçonnage ou
-		parce qu'il est réutilisé ailleurs — suffirait à prendre le contrôle du site.
+		Obligatoire pour administrer le site. Sans elle, un mot de passe volé - par hameçonnage ou
+		parce qu'il est réutilisé ailleurs - suffirait à prendre le contrôle du site.
 	</p>
 
 	<ol class="mt-6 space-y-6">

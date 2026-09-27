@@ -5,7 +5,7 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
-<svelte:head><title>Comptes — Administration</title></svelte:head>
+<svelte:head><title>Comptes - Administration</title></svelte:head>
 
 <h1 class="text-2xl font-extrabold text-ink">Comptes administrateurs</h1>
 <p class="mt-1 text-sm text-ink-soft">
@@ -98,8 +98,8 @@
 		<div>
 			<label class="etiquette" for="role">Rôle</label>
 			<select id="role" name="role" class="champ">
-				<option value="admin">Administrateur — publie et modère</option>
-				<option value="owner">Responsable — gère aussi les comptes</option>
+				<option value="admin">Administrateur - publie et modère</option>
+				<option value="owner">Responsable - gère aussi les comptes</option>
 			</select>
 		</div>
 		<button class="bouton" type="submit">Créer le compte</button>

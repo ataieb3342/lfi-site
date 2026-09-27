@@ -629,7 +629,7 @@ export function detachPendingPdfsFromIpHash(ipHash: string): string[] {
  * fonctionne alors sans JavaScript.
  *
  * `lower()` ne connaît pas les accents en SQLite : « economie » ne trouve donc
- * pas « économie ». On s'en contente — la seule façon d'y remédier serait
+ * pas « économie ». On s'en contente - la seule façon d'y remédier serait
  * d'ajouter une colonne normalisée et une migration, pour un site dont la
  * bibliothèque compte quelques dizaines d'entrées.
  */

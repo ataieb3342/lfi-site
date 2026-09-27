@@ -9,7 +9,7 @@ pas des piratages.
 ## 1. Préparer le serveur
 
 **Debian 13**, en root. Sur une image OVH, on se connecte d'abord avec
-l'utilisateur `debian`, puis `sudo -i` — le mot de passe initial est envoyé par
+l'utilisateur `debian`, puis `sudo -i` - le mot de passe initial est envoyé par
 courriel et le système impose de le changer à la première connexion.
 
 Le nom du paquet Compose change d'une distribution à l'autre : c'est
@@ -35,7 +35,7 @@ ufw allow 443/tcp
 ufw --force enable
 ```
 
-Durcir l'accès SSH — dans `/etc/ssh/sshd_config` :
+Durcir l'accès SSH - dans `/etc/ssh/sshd_config` :
 
 ```
 PasswordAuthentication no
@@ -150,7 +150,7 @@ Trois choses que le script gère et qu'on oublie en le faisant à la main : la
 **sauvegarde préalable** (une migration ne se rejoue pas à l'envers), le
 **verrou** (une compilation dure plus de cinq minutes, cron relancerait par
 dessus), et la **recréation du conteneur Caddy** quand `docker/Caddyfile` a
-changé — le fichier est monté dans le conteneur, qui garde l'ancien sinon.
+changé - le fichier est monté dans le conteneur, qui garde l'ancien sinon.
 
 Si la compilation échoue, les conteneurs en place continuent de servir la
 version précédente : un commit cassé ne coupe pas le site, il empêche
@@ -158,7 +158,7 @@ seulement la mise à jour. Le journal le dit.
 
 Les migrations de base de données s'appliquent toutes seules au démarrage.
 
-## Ce que ce dispositif protège — et ce qu'il ne protège pas
+## Ce que ce dispositif protège - et ce qu'il ne protège pas
 
 **Protégé :** injection de script (CSP stricte, HTML non interprété), injection
 SQL (requêtes préparées partout), CSRF (contrôle d'origine de SvelteKit),

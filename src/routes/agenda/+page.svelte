@@ -71,18 +71,18 @@
 	}
 
 	// Le mois courant est l'agenda : c'est lui qui entre dans l'index, à
-	// l'adresse nue. Les autres mois portent `noindex, follow` — il y en a une
+	// l'adresse nue. Les autres mois portent `noindex, follow` - il y en a une
 	// infinité, le bouton « Suivant » menant toujours au suivant, et ils ne
 	// contiennent rien qui ne soit déjà listé dans /actualites et /aperos. Le
 	// `follow` reste indispensable : sans lui, les rendez-vous eux-mêmes
 	// cesseraient d'être atteints depuis cette page.
 	const moisCourant = $derived(data.mois === aujourdHuiIso.slice(0, 7));
 	const chemin = $derived(moisCourant ? '/agenda' : `/agenda?mois=${data.mois}`);
-	const suffixe = $derived(moisCourant ? '' : ` — ${calendrier.titre}`);
+	const suffixe = $derived(moisCourant ? '' : ` - ${calendrier.titre}`);
 </script>
 
 <Metadonnees
-	titre="Agenda{suffixe} — {data.settings.siteName}"
+	titre="Agenda{suffixe} - {data.settings.siteName}"
 	description="Le calendrier des actions, événements, apéros et formations du groupe d'action."
 	canonique={chemin}
 	indexable={moisCourant}

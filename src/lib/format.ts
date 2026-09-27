@@ -28,7 +28,7 @@ export function formatDateTime(iso: string | null | undefined): string {
 	return `${formatDate(iso)} à ${hh}h${mm}`;
 }
 
-/** « il y a 3 jours » — pour la file de modération. */
+/** « il y a 3 jours » - pour la file de modération. */
 export function formatRelative(iso: string | null | undefined): string {
 	if (!iso) return '';
 	const diff = Date.now() - new Date(iso).getTime();
@@ -107,7 +107,7 @@ export const COULEUR_KIND: Record<string, string> = {
 	actu: 'text-accent',
 	apero: 'text-pourpre',
 	// La revue de presse est une lecture d'articles : elle reste dans le violet,
-	// en plus soutenu. Aucune quatrième couleur n'est inventée — la palette du
+	// en plus soutenu. Aucune quatrième couleur n'est inventée - la palette du
 	// logo n'en a que trois.
 	revue: 'text-brand-dark'
 };
@@ -137,7 +137,7 @@ export function formatDateCourte(iso: string | null | undefined): string {
 	return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-/** « lundi 28 septembre 2026 » — la date d'un rendez-vous, jour de la semaine compris. */
+/** « lundi 28 septembre 2026 » - la date d'un rendez-vous, jour de la semaine compris. */
 export function formatDateLongue(iso: string | null | undefined): string {
 	if (!iso) return '';
 	const d = new Date(`${iso}T12:00:00`);

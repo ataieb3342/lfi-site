@@ -39,7 +39,7 @@
 </script>
 
 <Metadonnees
-	titre="{p.title} — {data.settings.siteName}"
+	titre="{p.title} - {data.settings.siteName}"
 	description={data.resume}
 	type="article"
 	image={p.cover?.url ?? null}
@@ -191,7 +191,7 @@
 		<h2 class="mt-1 text-xl font-extrabold text-ink">Le dossier partagé</h2>
 		<p class="mt-2 text-sm text-ink-soft">
 			Un livre, une vidéo, un podcast, un article, un site : ce que chacun a trouvé utile sur le sujet.
-			Rien d'obligatoire, rien d'exhaustif — on vient aussi sans avoir rien lu.
+			Rien d'obligatoire, rien d'exhaustif - on vient aussi sans avoir rien lu.
 		</p>
 
 		{#if data.sources.length}

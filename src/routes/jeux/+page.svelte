@@ -10,7 +10,7 @@
 </script>
 
 <Metadonnees
-	titre="Jeux — {data.settings.siteName}"
+	titre="Jeux - {data.settings.siteName}"
 	description="Des jeux faits par des militants, sans publicité et sans traçage."
 	donnees={filAriane(page.url.origin, [
 		{ nom: 'Accueil', chemin: '/' },
@@ -45,7 +45,7 @@
 
 <!-- Le seul encart du site placé après le contenu et non en tête : ce n'est pas
      une invitation vers une autre page, c'est un remerciement, et il n'a de sens
-     qu'une fois qu'on a vu ce qu'on remercie. Pas de `href` non plus — rien à
+     qu'une fois qu'on a vu ce qu'on remercie. Pas de `href` non plus - rien à
      cliquer, juste à lire. -->
 <Encart
 	sureligne="Les crédits"

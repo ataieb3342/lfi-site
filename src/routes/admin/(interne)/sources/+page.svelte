@@ -11,7 +11,7 @@
 	];
 </script>
 
-<svelte:head><title>Sources des apéros — Administration</title></svelte:head>
+<svelte:head><title>Sources des apéros - Administration</title></svelte:head>
 
 <h1 class="text-2xl font-extrabold text-ink">Sources des apéros</h1>
 <p class="mt-1 text-sm text-ink-soft">

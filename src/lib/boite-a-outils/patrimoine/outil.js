@@ -12,7 +12,7 @@
  *    toute la population française tiendrait dans son premier millimètre. Le
  *    curseur avance donc par paliers multiplicatifs (échelle logarithmique).
  * 2. L'Insee publie des seuils, pas la distribution complète. La position du
- *    visiteur est interpolée entre ces seuils — l'ordre de grandeur est juste,
+ *    visiteur est interpolée entre ces seuils - l'ordre de grandeur est juste,
  *    le pourcent exact ne l'est pas, et la page le dit.
  */
 
@@ -244,7 +244,7 @@ function rafraichir(montant) {
 	 * Les barres sont en échelle logarithmique, et la page le dit : chaque
 	 * tiers de largeur vaut environ mille fois plus. En échelle ordinaire, les
 	 * quatre premières barres seraient rigoureusement invisibles face à la
-	 * dernière — c'est d'ailleurs le propos du module, mais un graphique où
+	 * dernière - c'est d'ailleurs le propos du module, mais un graphique où
 	 * l'on ne voit rien n'apprend rien.
 	 */
 	var minimum = Math.min(montant, MEDIANE);

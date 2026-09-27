@@ -14,7 +14,7 @@
 	]);
 </script>
 
-<svelte:head><title>Tableau de bord — Administration</title></svelte:head>
+<svelte:head><title>Tableau de bord - Administration</title></svelte:head>
 
 <header class="flex flex-wrap items-center justify-between gap-4">
 	<div>

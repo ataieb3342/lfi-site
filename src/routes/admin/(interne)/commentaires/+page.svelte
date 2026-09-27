@@ -11,7 +11,7 @@
 	];
 </script>
 
-<svelte:head><title>Commentaires — Administration</title></svelte:head>
+<svelte:head><title>Commentaires - Administration</title></svelte:head>
 
 <h1 class="text-2xl font-extrabold text-ink">Commentaires</h1>
 

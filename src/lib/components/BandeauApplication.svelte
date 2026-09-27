@@ -11,7 +11,7 @@
 	 * arrive.
 	 *
 	 * C'est un encart ordinaire (voir Encart.svelte), au même gabarit que ceux des
-	 * articles et de la revue de presse — mais il garde les couleurs de
+	 * articles et de la revue de presse - mais il garde les couleurs de
 	 * l'application (jaune et bleu nuit) et non celles du site. C'est délibéré :
 	 * il renvoie vers un autre produit, et ce contraste avec le reste de la page
 	 * le fait remarquer.

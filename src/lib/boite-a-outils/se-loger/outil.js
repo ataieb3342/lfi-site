@@ -9,7 +9,7 @@
  * personne ; le prix du mètre carré dans la ville où l'on vit, si. C'est aussi
  * ce qu'un groupe de Dijon peut faire et qu'un site national ne fera pas.
  *
- * Les chiffres vieillissent — le prix du mètre carré surtout. Ils sont
+ * Les chiffres vieillissent - le prix du mètre carré surtout. Ils sont
  * regroupés ci-dessous ; si vous les changez, changez aussi les sources dans
  * index.html.
  */
@@ -183,7 +183,7 @@ function rafraichir() {
 	comparaisonPhrase.textContent =
 		'Il faut donc ' +
 		annees(anneesAujourdhui - anneesEn2000) +
-		' de revenus de plus qu’en 2000 pour le même logement — le même nombre de mètres carrés, la même ville. Ce ne sont pas les logements qui ont changé, ce sont les prix. Une génération a acheté au premier chiffre, la suivante achète au second.';
+		' de revenus de plus qu’en 2000 pour le même logement - le même nombre de mètres carrés, la même ville. Ce ne sont pas les logements qui ont changé, ce sont les prix. Une génération a acheté au premier chiffre, la suivante achète au second.';
 
 	/* La location. */
 	var effort = revenu > 0 ? loyer / revenu : 0;
@@ -224,7 +224,7 @@ function rafraichir() {
 	empruntPhrase.textContent =
 		'au maximum, soit ' +
 		euros.format(mensualite) +
-		' par mois pendant 25 ans — et encore, sans un euro d’intérêts. Cela représente ' +
+		' par mois pendant 25 ans - et encore, sans un euro d’intérêts. Cela représente ' +
 		metres(surfaceAccessible) +
 		' à Dijon. Avec les intérêts d’un vrai crédit, comptez nettement moins : ce chiffre est un plafond théorique, pas une promesse.';
 }

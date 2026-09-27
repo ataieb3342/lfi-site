@@ -10,7 +10,7 @@ import type { Kind } from '$lib/rubriques';
  *
  * Les mentions légales et la page de confidentialité n'y sont volontairement
  * pas : elles portent un `noindex`, et annoncer dans le plan du site une page
- * qu'on demande par ailleurs de ne pas indexer est contradictoire — la console
+ * qu'on demande par ailleurs de ne pas indexer est contradictoire - la console
  * de Google le signale comme une erreur.
  */
 const PAGES_FIXES = [

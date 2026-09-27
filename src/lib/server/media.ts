@@ -9,7 +9,7 @@ import { randomToken } from './crypto.ts';
  *
  * Règle de sécurité centrale : le type du fichier est déterminé en lisant ses
  * premiers octets, jamais à partir du nom du fichier ni de l'en-tête déclaré
- * par le navigateur — les deux sont contrôlés par la personne qui envoie.
+ * par le navigateur - les deux sont contrôlés par la personne qui envoie.
  *
  * Le SVG est refusé volontairement : c'est un format XML qui peut contenir du
  * JavaScript, et l'afficher reviendrait à ouvrir une faille XSS.

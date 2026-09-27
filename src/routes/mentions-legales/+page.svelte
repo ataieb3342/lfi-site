@@ -6,7 +6,7 @@
 
 <!-- Hors index : ces pages sont obligatoires, pas destinées aux moteurs. -->
 <Metadonnees
-	titre="Mentions légales — {data.settings.siteName}"
+	titre="Mentions légales - {data.settings.siteName}"
 	description="Éditeur, hébergeur et contact du site du groupe d'action de La France insoumise du centre de Dijon."
 	indexable={false}
 />
@@ -31,7 +31,7 @@
 	<p>
 		Ce site est édité à titre non professionnel par une personne physique. La loi l'autorise
 		alors à ne pas afficher publiquement son adresse postale, à condition d'avoir communiqué
-		son identité à l'hébergeur — ce qui est le cas. L'adresse est communiquée à l'autorité
+		son identité à l'hébergeur - ce qui est le cas. L'adresse est communiquée à l'autorité
 		judiciaire sur réquisition.
 	</p>
 

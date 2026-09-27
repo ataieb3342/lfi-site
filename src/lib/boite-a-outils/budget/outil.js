@@ -109,7 +109,7 @@ function valeurAffichee(poste) {
 
 function legendeDeLaVue() {
 	if (vue === 'milliards') {
-		return 'Dépenses de l’ensemble des administrations publiques — État, collectivités locales et Sécurité sociale réunis — en 2024.';
+		return 'Dépenses de l’ensemble des administrations publiques - État, collectivités locales et Sécurité sociale réunis - en 2024.';
 	}
 	if (vue === 'cent') {
 		return 'Sur 100 € d’argent public dépensé, voici ce que reçoit chaque poste.';
@@ -185,7 +185,7 @@ for (var i = 0; i < boutons.length; i++) {
 	});
 }
 
-/* Les deux champs de la contribution — le curseur et la case — restent synchronisés. */
+/* Les deux champs de la contribution - le curseur et la case - restent synchronisés. */
 champContribution.addEventListener('input', function () {
 	champContributionNombre.value = champContribution.value;
 	rafraichir();

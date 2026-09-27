@@ -29,7 +29,7 @@ var SMIC_NET = 1477.93;
 /*
  * Quelques postes de dépense publique, en milliards d'euros (Insee, dépenses de
  * 2024), pour donner une échelle au rendement. Ce sont les mêmes chiffres que
- * ceux du module « Où va l'argent public ? » — une seule source, un seul jeu de
+ * ceux du module « Où va l'argent public ? » - une seule source, un seul jeu de
  * nombres à tenir à jour.
  */
 var POSTES = [
@@ -128,7 +128,7 @@ function rafraichir() {
 	/*
 	 * On lit la case et non le curseur : le curseur s'arrête à deux millions
 	 * d'euros, sinon il serait inutilisable dans la zone où vivent les gens. La
-	 * case, elle, accepte n'importe quel montant — y compris les cent millions
+	 * case, elle, accepte n'importe quel montant - y compris les cent millions
 	 * du seuil, que l'on peut ainsi taper pour voir ce que répond la page.
 	 */
 	var patrimoine = Number(champPatrimoineNombre.value);
@@ -140,7 +140,7 @@ function rafraichir() {
 		concernePhrase.textContent =
 			'Votre patrimoine dépasse le seuil de 100 millions d’euros. Vous seriez redevable d’au moins ' +
 			euros.format(patrimoine * TAUX_PLANCHER) +
-			' par an — sauf si vous acquittez déjà davantage, auquel cas cette mesure ne change rien pour vous.';
+			' par an - sauf si vous acquittez déjà davantage, auquel cas cette mesure ne change rien pour vous.';
 	} else {
 		var facteur = patrimoine > 0 ? SEUIL / patrimoine : 0;
 
@@ -149,7 +149,7 @@ function rafraichir() {
 			patrimoine > 0
 				? 'Il faudrait multiplier votre patrimoine par ' +
 					nombres.format(Math.round(facteur)) +
-					' pour atteindre le seuil. Vous faites partie des 99,99 % de contribuables que cette mesure ne concerne pas — ce qui n’empêche pas d’avoir un avis, mais change la nature de l’avis.'
+					' pour atteindre le seuil. Vous faites partie des 99,99 % de contribuables que cette mesure ne concerne pas - ce qui n’empêche pas d’avoir un avis, mais change la nature de l’avis.'
 				: 'Comme 99,99 % des contribuables. Le seuil est fixé à 100 millions d’euros de patrimoine net.';
 	}
 
@@ -173,7 +173,7 @@ function rafraichir() {
 	echellePhrase.textContent =
 		'Atteindre 100 millions d’euros au SMIC net, en épargnant l’intégralité de son salaire et sans jamais rien dépenser, demanderait ' +
 		nombres.format(Math.round(anneesSmic)) +
-		' années de travail — soit environ ' +
+		' années de travail - soit environ ' +
 		nombres.format(Math.round(anneesSmic / 40)) +
 		' carrières complètes mises bout à bout. Ce calcul n’a évidemment aucun sens pratique : c’est précisément ce qu’il sert à montrer. À ce niveau, un patrimoine ne vient pas du salaire.';
 

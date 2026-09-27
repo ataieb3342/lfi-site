@@ -9,7 +9,7 @@
  * partir des deux seuls montants cités en sources, et l'avertissement de la page
  * explique pourquoi. Les écarts que l'on lit ailleurs (« 1 à 423 », « 1 à
  * 300 ») tiennent au choix du SMIC brut ou net, de l'année de référence, ou du
- * salaire médian plutôt que du SMIC — trois conventions défendables, qui donnent
+ * salaire médian plutôt que du SMIC - trois conventions défendables, qui donnent
  * trois nombres différents. Mieux vaut un rapport que le lecteur peut refaire
  * qu'un rapport impressionnant qu'il doit croire.
  */
@@ -247,7 +247,7 @@ function rafraichir() {
 
 /*
  * Le compteur : les deux rémunérations annuelles étalées seconde par seconde
- * depuis l'ouverture de la page. Il se met à jour une fois par seconde — il n'y
+ * depuis l'ouverture de la page. Il se met à jour une fois par seconde - il n'y
  * a rien à gagner à animer plus vite, et une page qui clignote fatigue.
  */
 function majCompteur() {

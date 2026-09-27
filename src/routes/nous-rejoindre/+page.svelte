@@ -28,7 +28,7 @@
 </script>
 
 <Metadonnees
-	titre="Nous rejoindre — {data.settings.siteName}"
+	titre="Nous rejoindre - {data.settings.siteName}"
 	description="Rejoindre le groupe d'action de La France insoumise du centre de Dijon : inscription gratuite, aucune expérience nécessaire."
 	donnees={filAriane(page.url.origin, [
 		{ nom: 'Accueil', chemin: '/' },
@@ -67,7 +67,7 @@
 </ol>
 
 <div class="contenu mt-8 max-w-2xl">
-	<h2>Ce que ça implique — et ce que ça n'implique pas</h2>
+	<h2>Ce que ça implique - et ce que ça n'implique pas</h2>
 	<p>
 		Militer dans un groupe d'action, c'est venir quand on peut. Certains membres sont là chaque
 		semaine, d'autres une fois par mois, d'autres seulement pour les grandes mobilisations. Il n'y a

@@ -3,8 +3,8 @@
  *
  * C'est un petit bloc de données, invisible pour le visiteur, que Google lit
  * en plus de la page. Il ne fait pas monter un site à lui seul, mais il dit
- * explicitement au moteur ce qu'une page contient — un article, une soirée
- * avec une date et une adresse, une organisation locale — au lieu de le lui
+ * explicitement au moteur ce qu'une page contient - un article, une soirée
+ * avec une date et une adresse, une organisation locale - au lieu de le lui
  * faire deviner. C'est ce qui permet d'apparaître avec une date, un fil
  * d'Ariane ou une fiche d'événement dans les résultats, donc d'être cliqué.
  *
@@ -76,7 +76,7 @@ export function organisation(origine: string, identite: Identite, cadre: CadreAp
  * La carte de visite du groupe, en version courte, à joindre à toute page qui
  * s'y réfère (`publisher`, `organizer`).
  *
- * Un renvoi par identifiant — « l'éditeur, c'est #organisation » — n'est
+ * Un renvoi par identifiant - « l'éditeur, c'est #organisation » - n'est
  * résolu qu'à l'intérieur d'une même page. Sans ce bloc, l'article dirait
  * « publié par » en pointant dans le vide, et le moteur écarterait la fiche
  * entière faute d'éditeur nommé.

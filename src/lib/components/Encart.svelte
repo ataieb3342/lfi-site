@@ -3,7 +3,7 @@
 
 	/**
 	 * Encart d'appel : le gabarit unique des invitations posées en tête ou en bas
-	 * d'une page — la bibliothèque depuis les apéros, la revue de presse depuis
+	 * d'une page - la bibliothèque depuis les apéros, la revue de presse depuis
 	 * les articles, Action populaire depuis les actualités.
 	 *
 	 * Il annonce toujours une **autre** page. Un encart posé en tête d'une page
@@ -19,7 +19,7 @@
 	 *
 	 * La surface est une classe de `app.css` (`.fond-degrade`, `.fond-actu`,
 	 * `.fond-apero`). Elle porte déjà son fond et sa couleur de texte : ne jamais
-	 * y ajouter `.carte`, qui est déclarée après et écraserait le fond — on
+	 * y ajouter `.carte`, qui est déclarée après et écraserait le fond - on
 	 * obtiendrait du texte blanc sur fond blanc.
 	 *
 	 * `style` sert au seul cas d'Action populaire, dont les couleurs sont celles
