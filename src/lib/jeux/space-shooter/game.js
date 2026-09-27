@@ -1,4 +1,3 @@
-// @ts-nocheck - jeu écrit en JavaScript simple, servi tel quel : pas vérifié par TypeScript.
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -33,6 +32,16 @@ let damageFlash = 0;
 let boss = null;
 let pendingBoss = false;
 let bossesDefeated = 0;
+let fireRateBoostTimer = 0;
+
+let nextSideWaveFromLeft = true;
+let playerRecoil = 0;
+let screenShake = 0;
+
+let comboCount = 0;
+let comboTimer = 0;
+const comboWindow = 2.5;
+const comboMax = 5;
 
 const player = {
   x: canvas.width / 2,
@@ -40,8 +49,8 @@ const player = {
   width: 34,
   height: 42,
   speed: 280,
-  hp: 3,
-  maxHp: 3,
+  hp: 8,
+  maxHp: 8,
   shield: 0,
   shots: 1,
   damage: 1,
@@ -56,6 +65,7 @@ let enemies = [];
 let enemyBullets = [];
 let obstacles = [];
 let particles = [];
+let drops = [];
 let stars = [];
 let score = 0;
 let level = 1;
@@ -87,8 +97,8 @@ function updateHud() {
 function resetGame() {
   player.x = canvas.width / 2;
   player.y = canvas.height - 90;
-  player.hp = 3;
-  player.maxHp = 3;
+  player.hp = 8;
+  player.maxHp = 8;
   player.shield = 0;
   player.shots = 1;
   player.damage = 1;
@@ -101,6 +111,7 @@ function resetGame() {
   enemyBullets = [];
   obstacles = [];
   particles = [];
+  drops = [];
 
   score = 0;
   level = 1;
@@ -112,6 +123,15 @@ function resetGame() {
   boss = null;
   pendingBoss = false;
   bossesDefeated = 0;
+  fireRateBoostTimer = 0;
+
+  nextSideWaveFromLeft = true;
+  playerRecoil = 0;
+  screenShake = 0;
+
+  comboCount = 0;
+  comboTimer = 0;
+
   paused = false;
   gameOver = false;
 
@@ -277,60 +297,159 @@ function shoot() {
     });
   }
 
-  player.fireCooldown = player.fireRate;
+  playerRecoil = Math.min(6, playerRecoil + 2.2);
+
+  player.fireCooldown =
+    fireRateBoostTimer > 0
+      ? player.fireRate * 0.55
+      : player.fireRate;
 }
 
-function spawnEnemy() {
-  const side = Math.floor(Math.random() * 3);
+function createEnemy(side, forcedX = null, forcedY = null, forcedPattern = null) {
   const size = 30 + Math.random() * 12;
 
   let x;
   let y;
-  let movementType;
+  let baseDirection;
 
   if (side === 0) {
-    x = 50 + Math.random() * (canvas.width - 100);
-    y = -40;
-    movementType = "down";
+    x = forcedX ?? (50 + Math.random() * (canvas.width - 100));
+    y = forcedY ?? -40;
+    baseDirection = "down";
   } else if (side === 1) {
-    x = -40;
-    y = 70 + Math.random() * (canvas.height * 0.55);
-    movementType = "right";
+    x = forcedX ?? -40;
+    y = forcedY ?? (70 + Math.random() * (canvas.height * 0.55));
+    baseDirection = "right";
   } else {
-    x = canvas.width + 40;
-    y = 70 + Math.random() * (canvas.height * 0.55);
-    movementType = "left";
+    x = forcedX ?? (canvas.width + 40);
+    y = forcedY ?? (70 + Math.random() * (canvas.height * 0.55));
+    baseDirection = "left";
   }
 
-  // Après le premier boss, certains ennemis deviennent verts et tirent en double.
-  const isGreen = bossesDefeated >= 1 && Math.random() < 0.30;
+  // 5 trajectoires possibles : droite, sinusoïde, zigzag,
+  // traversée rapide ou dérive progressive.
+  const movementPattern =
+    forcedPattern !== null
+      ? forcedPattern
+      : Math.floor(Math.random() * 5);
 
-  // Après le troisième boss, certains ennemis peuvent avoir 2 PV.
-  const enemyHp = bossesDefeated >= 3 && Math.random() < 0.30 ? 2 : 1;
+  // Les ennemis spéciaux deviennent progressivement plus fréquents.
+  const greenChance =
+    bossesDefeated >= 1
+      ? Math.min(0.60, 0.25 + bossesDefeated * 0.05)
+      : 0;
+
+  const armoredChance =
+    bossesDefeated >= 3
+      ? Math.min(0.55, 0.20 + (bossesDefeated - 2) * 0.05)
+      : 0;
+
+  const isGreen = Math.random() < greenChance;
+  const enemyHp = Math.random() < armoredChance ? 2 : 1;
 
   enemies.push({
     x,
     y,
     width: size,
     height: size,
-    speed: 85 + Math.random() * 45,
+    // La vitesse augmente doucement avec le niveau, sans dépasser un bonus de 55 %.
+    speed:
+      (85 + Math.random() * 45) *
+      Math.min(1.55, 1 + Math.max(0, level - 1) * 0.012),
     hp: enemyHp,
     maxHp: enemyHp,
     type: isGreen ? "green" : "normal",
 
-    // Ennemi vert OU ennemi à 2 PV = 2 XP.
-    // S'il cumule les deux, la récompense reste à 2 XP.
+    // Ennemi vert OU ennemi à 2 PV = 3 XP, ennemi normal = 2 XP.
     xpReward: isGreen || enemyHp > 1 ? 3 : 2,
 
     fireTimer:
       bossesDefeated >= 1
-        ? 0.35 + Math.random() * 0.55
+        ? Math.max(0.18, 0.42 - level * 0.004) + Math.random() * 0.45
         : 0.9 + Math.random() * 1.6,
-    movementType,
+
+    baseDirection,
+    movementPattern,
     movementTime: Math.random() * Math.PI * 2,
-    waveAmplitude: 18 + Math.random() * 22,
-    waveSpeed: 1.5 + Math.random() * 1.2
+    waveAmplitude: 18 + Math.random() * 26,
+    waveSpeed: 1.5 + Math.random() * 1.4,
+    zigzagDirection: Math.random() < 0.5 ? -1 : 1,
+    zigzagTimer: 0.25 + Math.random() * 0.35,
+    driftDirection: Math.random() < 0.5 ? -1 : 1
   });
+}
+
+function spawnVFormation() {
+  // Formation de 5 ennemis en V venant du haut.
+  // On force une trajectoire droite pour conserver la formation.
+  const centerX = 120 + Math.random() * (canvas.width - 240);
+
+  const positions = [
+    { x: centerX,      y: -45 },
+    { x: centerX - 45, y: -78 },
+    { x: centerX + 45, y: -78 },
+    { x: centerX - 90, y: -111 },
+    { x: centerX + 90, y: -111 }
+  ];
+
+  for (const position of positions) {
+    createEnemy(0, position.x, position.y, 0);
+  }
+}
+
+function spawnSideWave() {
+  // Après le troisième boss, les vagues latérales alternent :
+  // gauche -> droite, puis droite -> gauche, etc.
+  const fromLeft = nextSideWaveFromLeft;
+  nextSideWaveFromLeft = !nextSideWaveFromLeft;
+
+  const side = fromLeft ? 1 : 2;
+  const x = fromLeft ? -45 : canvas.width + 45;
+
+  const yPositions =
+    level >= 40
+      ? [75, 125, 175, 225, 275]
+      : [95, 155, 215, 275];
+
+  for (const y of yPositions) {
+    // Une légère sinusoïde garde la vague lisible sans être trop statique.
+    createEnemy(side, x, y, 1);
+  }
+}
+
+function spawnEnemy() {
+  // Niveau 30+ : petite chance d'avoir deux groupes simultanés.
+  // Une formation descend du haut pendant qu'une vague arrive sur le côté.
+  if (level >= 30 && Math.random() < Math.min(0.16, 0.08 + (level - 30) * 0.002)) {
+    spawnVFormation();
+    spawnSideWave();
+    return "combinedWave";
+  }
+
+  const sideWaveChance =
+    bossesDefeated >= 3
+      ? Math.min(0.34, 0.16 + (bossesDefeated - 2) * 0.03)
+      : 0;
+
+  const vFormationChance =
+    bossesDefeated >= 2
+      ? Math.min(0.38, 0.18 + (bossesDefeated - 1) * 0.03)
+      : 0;
+
+  if (Math.random() < sideWaveChance) {
+    spawnSideWave();
+    return "sideWave";
+  }
+
+  if (Math.random() < vFormationChance) {
+    spawnVFormation();
+    return "vFormation";
+  }
+
+  // Sinon apparition classique d'un seul ennemi.
+  const side = Math.floor(Math.random() * 3);
+  createEnemy(side);
+  return "single";
 }
 
 function isBossLevel(currentLevel) {
@@ -338,12 +457,17 @@ function isBossLevel(currentLevel) {
 }
 
 function spawnBoss() {
-  const bossNumber = Math.floor((level - 6) / 10) + 1;
+  // Le numéro du boss dépend simplement du nombre de boss déjà vaincus.
+  // Boss 1 au niveau 5, Boss 2 au niveau 10, Boss 3 au niveau 20, etc.
+  const bossNumber = bossesDefeated + 1;
   const maxHp = 28 + (bossNumber - 1) * 14;
 
   // On nettoie les ennemis ordinaires pour créer une vraie phase de boss.
   enemies = [];
   enemyBullets = [];
+
+  const baseSpeed = 95;
+  const baseFireRate = Math.max(0.45, 0.85 - (bossNumber - 1) * 0.04);
 
   boss = {
     x: canvas.width / 2,
@@ -353,10 +477,19 @@ function spawnBoss() {
     hp: maxHp,
     maxHp,
     targetY: 90,
-    speed: 95,
+
+    baseSpeed,
+    speed: baseSpeed,
+
     direction: 1,
+
     fireTimer: 0.18,
-    fireRate: Math.max(0.45, 0.85 - (bossNumber - 1) * 0.04),
+    baseFireRate,
+    fireRate: baseFireRate,
+
+    phase: 1,
+    phaseTime: 0,
+
     number: bossNumber
   };
 }
@@ -367,16 +500,40 @@ function bossShoot() {
   const dx = player.x - boss.x;
   const dy = player.y - boss.y;
   const baseAngle = Math.atan2(dy, dx);
-  const speed = 210;
 
-  for (const offset of [-0.24, 0, 0.24]) {
+  let offsets;
+  let bulletSpeed;
+
+  // Phase 1 : 100 % à 60 % de PV
+  // 3 tirs dirigés vers le joueur.
+  if (boss.phase === 1) {
+    offsets = [-0.24, 0, 0.24];
+    bulletSpeed = 210;
+  }
+
+  // Phase 2 : 60 % à 30 % de PV
+  // 5 tirs en éventail, un peu plus rapides.
+  else if (boss.phase === 2) {
+    offsets = [-0.36, -0.18, 0, 0.18, 0.36];
+    bulletSpeed = 235;
+  }
+
+  // Phase 3 : moins de 30 % de PV
+  // 7 tirs en éventail et projectiles encore plus rapides.
+  else {
+    offsets = [-0.48, -0.32, -0.16, 0, 0.16, 0.32, 0.48];
+    bulletSpeed = 260;
+  }
+
+  for (const offset of offsets) {
     const angle = baseAngle + offset;
+
     enemyBullets.push({
       x: boss.x,
       y: boss.y + boss.height / 2,
       radius: 5,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed
+      vx: Math.cos(angle) * bulletSpeed,
+      vy: Math.sin(angle) * bulletSpeed
     });
   }
 }
@@ -384,14 +541,41 @@ function bossShoot() {
 function updateBoss(dt) {
   if (!boss) return;
 
+  boss.phaseTime += dt;
+
+  const hpRatio = boss.hp / boss.maxHp;
+
+  // Changement de phase en fonction des PV restants.
+  if (hpRatio > 0.60) {
+    boss.phase = 1;
+    boss.speed = boss.baseSpeed;
+    boss.fireRate = boss.baseFireRate;
+  } else if (hpRatio > 0.30) {
+    boss.phase = 2;
+    boss.speed = boss.baseSpeed * 1.30;
+    boss.fireRate = Math.max(0.36, boss.baseFireRate * 0.78);
+  } else {
+    boss.phase = 3;
+    boss.speed = boss.baseSpeed * 1.60;
+    boss.fireRate = Math.max(0.26, boss.baseFireRate * 0.58);
+  }
+
   // Le boss commence à tirer dès qu'il devient visible.
   if (boss.y < boss.targetY) {
     boss.y += boss.speed * dt;
   } else {
-    // Mouvement horizontal scripté une fois en position.
+    // Mouvement horizontal scripté.
     boss.x += boss.direction * boss.speed * dt;
 
+    // En phase 3, le boss ajoute une légère oscillation verticale.
+    if (boss.phase === 3) {
+      boss.y = boss.targetY + Math.sin(boss.phaseTime * 2.4) * 18;
+    } else {
+      boss.y += (boss.targetY - boss.y) * Math.min(1, dt * 6);
+    }
+
     const margin = boss.width / 2 + 18;
+
     if (boss.x <= margin) {
       boss.x = margin;
       boss.direction = 1;
@@ -456,7 +640,7 @@ function drawBoss() {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 13px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(`BOSS ${boss.number} - ${Math.max(0, boss.hp)} / ${boss.maxHp} PV`, canvas.width / 2, y + 29);
+  ctx.fillText(`BOSS ${boss.number} — PHASE ${boss.phase} — ${Math.max(0, boss.hp)} / ${boss.maxHp} PV`, canvas.width / 2, y + 29);
 }
 
 function spawnObstacle() {
@@ -483,7 +667,7 @@ function enemyShoot(enemy) {
     // Double tir légèrement espacé.
     const perpX = -dy / len;
     const perpY = dx / len;
-    const spread = 7;
+    const spread = 10;
 
     for (const side of [-1, 1]) {
       enemyBullets.push({
@@ -527,14 +711,114 @@ function damagePlayer(amount = 1) {
   }
 }
 
+function maybeSpawnDrop(x, y) {
+  // 8 % de chance de lâcher un bonus à la mort d'un ennemi.
+  if (Math.random() >= 0.08) return;
+
+  const types = ["heal", "shield", "invulnerability", "firerate"];
+  const type = types[Math.floor(Math.random() * types.length)];
+
+  drops.push({
+    x,
+    y,
+    width: 18,
+    height: 18,
+    speed: 95,
+    type,
+    rotation: 0
+  });
+}
+
+function applyDrop(drop) {
+  if (drop.type === "heal") {
+    player.hp = Math.min(player.maxHp, player.hp + 1);
+  }
+
+  else if (drop.type === "shield") {
+    player.shield = Math.min(5, player.shield + 1);
+  }
+
+  else if (drop.type === "invulnerability") {
+    player.invulnerability = Math.max(player.invulnerability, 3);
+  }
+
+  else if (drop.type === "firerate") {
+    fireRateBoostTimer = 5;
+  }
+
+  updateHud();
+}
+
+function updateDrops(dt) {
+  for (const drop of drops) {
+    drop.y += drop.speed * dt;
+    drop.rotation += dt * 2.5;
+
+    if (rectsOverlap(drop, player)) {
+      drop.dead = true;
+      applyDrop(drop);
+    }
+  }
+
+  drops = drops.filter(drop =>
+    !drop.dead &&
+    drop.y < canvas.height + 40
+  );
+}
+
+function drawDrops() {
+  for (const drop of drops) {
+    ctx.save();
+    ctx.translate(drop.x, drop.y);
+    ctx.rotate(drop.rotation);
+
+    if (drop.type === "heal") {
+      ctx.fillStyle = "#ff6b6b";
+    } else if (drop.type === "shield") {
+      ctx.fillStyle = "#55cfff";
+    } else if (drop.type === "invulnerability") {
+      ctx.fillStyle = "#ffd95c";
+    } else {
+      ctx.fillStyle = "#c56bff";
+    }
+
+    ctx.fillRect(-drop.width / 2, -drop.height / 2, drop.width, drop.height);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 12px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    if (drop.type === "heal") {
+      ctx.fillText("+", 0, 0);
+    } else if (drop.type === "shield") {
+      ctx.fillText("S", 0, 0);
+    } else if (drop.type === "invulnerability") {
+      ctx.fillText("I", 0, 0);
+    } else {
+      ctx.fillText("F", 0, 0);
+    }
+
+    ctx.restore();
+  }
+}
+
 function gainXp(amount) {
+  // L'XP gagnée ne change pas avec le combo.
   xp += amount;
-  score += amount * 10;
+
+  // Chaque élimination rapprochée augmente le multiplicateur de score.
+  comboCount = Math.min(comboMax, comboCount + 1);
+  comboTimer = comboWindow;
+
+  score += amount * 10 * comboCount;
 
   if (xp >= xpNeeded) {
     xp -= xpNeeded;
     level += 1;
-    xpNeeded = Math.ceil(xpNeeded * 1.25 + 1);
+    // Progression plus régulière :
+    // +2 XP requis par niveau, avec un plafond à 40 XP.
+    xpNeeded = Math.min(40, xpNeeded + 2);
 
     if (isBossLevel(level)) {
       pendingBoss = true;
@@ -550,7 +834,7 @@ function openUpgradePanel() {
   paused = true;
 
   // PV maximum plafonnés à 5.
-  upgradeHp.disabled = player.maxHp >= 5;
+  upgradeHp.disabled = player.maxHp >= 15;
 
   // Le soin reste disponible même à 5 PV max,
   // mais pas si le joueur est déjà à pleine vie.
@@ -563,15 +847,21 @@ function openUpgradePanel() {
       ? "Bouclier au maximum (5/5)."
       : `Ajoute 1 PV de bouclier (${player.shield}/5 actuellement).`;
 
-  if (player.shots < 5) {
-    shotUpgradeTitle.textContent = "+1 projectile";
-    shotUpgradeText.textContent = `Ajoute un projectile (${player.shots}/5 actuellement).`;
-  } else if (player.damage < 2) {
-    shotUpgradeTitle.textContent = "+1 dégât central";
-    shotUpgradeText.textContent = "Seul le tir central passera à 2 dégâts. Les autres tirs resteront à 1 dégât.";
-  } else {
-    shotUpgradeTitle.textContent = "+1 drone";
-    shotUpgradeText.textContent = `Ajoute un drone offensif et protecteur (${player.drones} actuellement).`;
+if (player.shots < 5) {
+  upgradeShot.disabled = false;
+  shotUpgradeTitle.textContent = "+1 projectile";
+  shotUpgradeText.textContent = `Ajoute un projectile (${player.shots}/5 actuellement).`;
+} else if (player.damage < 2) {
+  upgradeShot.disabled = false;
+  shotUpgradeTitle.textContent = "+1 dégât central";
+  shotUpgradeText.textContent = "Seul le tir central passera à 2 dégâts.";
+} else {
+  upgradeShot.disabled = player.drones >= 5;
+  shotUpgradeTitle.textContent = "+1 drone";
+  shotUpgradeText.textContent =
+    player.drones >= 5
+      ? "Nombre maximum de drones atteint (5/5)."
+      : `Ajoute un drone (${player.drones}/5 actuellement).`;
   }
 
   upgradePanel.classList.remove("hidden");
@@ -594,7 +884,7 @@ function closeUpgradePanel() {
 }
 
 upgradeHp.addEventListener("click", () => {
-  if (player.maxHp >= 5) return;
+  if (player.maxHp >= 15) return;
   player.maxHp += 1;
   player.hp = Math.min(player.maxHp, player.hp + 1);
   closeUpgradePanel();
@@ -611,7 +901,7 @@ upgradeShot.addEventListener("click", () => {
     player.shots += 1;
   } else if (player.damage < 2) {
     player.damage = 2;
-  } else {
+  } else if (player.drones < 5) {
     player.drones += 1;
   }
 
@@ -693,22 +983,92 @@ function updateEnemies(dt) {
   enemySpawnTimer -= dt;
 
   if (enemySpawnTimer <= 0) {
-    spawnEnemy();
-    enemySpawnTimer = Math.max(0.5, 1.3 - level * 0.04) + Math.random() * 0.45;
+    const spawnType = spawnEnemy();
+
+    if (spawnType === "combinedWave") {
+      enemySpawnTimer = 2.35 + Math.random() * 0.55;
+    } else if (spawnType === "vFormation") {
+      enemySpawnTimer = Math.max(1.25, 2.2 - level * 0.012) + Math.random() * 0.55;
+    } else if (spawnType === "sideWave") {
+      enemySpawnTimer = Math.max(1.15, 2.0 - level * 0.012) + Math.random() * 0.5;
+    } else {
+      enemySpawnTimer =
+        Math.max(0.38, 1.25 - level * 0.018) +
+        Math.random() * Math.max(0.18, 0.42 - level * 0.004);
+    }
   }
 
   for (const enemy of enemies) {
     enemy.movementTime += dt * enemy.waveSpeed;
 
-    if (enemy.movementType === "down") {
-      enemy.y += enemy.speed * dt;
-      enemy.x += Math.sin(enemy.movementTime) * enemy.waveAmplitude * dt;
-    } else if (enemy.movementType === "right") {
-      enemy.x += enemy.speed * dt;
-      enemy.y += Math.sin(enemy.movementTime) * enemy.waveAmplitude * dt;
-    } else if (enemy.movementType === "left") {
-      enemy.x -= enemy.speed * dt;
-      enemy.y += Math.sin(enemy.movementTime) * enemy.waveAmplitude * dt;
+    let vx = 0;
+    let vy = 0;
+
+    if (enemy.baseDirection === "down") {
+      vy = enemy.speed;
+    } else if (enemy.baseDirection === "right") {
+      vx = enemy.speed;
+    } else if (enemy.baseDirection === "left") {
+      vx = -enemy.speed;
+    }
+
+    // 0 : ligne droite
+    if (enemy.movementPattern === 0) {
+      enemy.x += vx * dt;
+      enemy.y += vy * dt;
+    }
+
+    // 1 : sinusoide
+    else if (enemy.movementPattern === 1) {
+      enemy.x += vx * dt;
+      enemy.y += vy * dt;
+
+      if (enemy.baseDirection === "down") {
+        enemy.x += Math.sin(enemy.movementTime) * enemy.waveAmplitude * dt;
+      } else {
+        enemy.y += Math.sin(enemy.movementTime) * enemy.waveAmplitude * dt;
+      }
+    }
+
+    // 2 : zigzag plus marque
+    else if (enemy.movementPattern === 2) {
+      enemy.zigzagTimer -= dt;
+
+      if (enemy.zigzagTimer <= 0) {
+        enemy.zigzagDirection *= -1;
+        enemy.zigzagTimer = 0.25 + Math.random() * 0.35;
+      }
+
+      enemy.x += vx * dt;
+      enemy.y += vy * dt;
+
+      const zigzagSpeed = enemy.waveAmplitude * 2.2;
+
+      if (enemy.baseDirection === "down") {
+        enemy.x += enemy.zigzagDirection * zigzagSpeed * dt;
+      } else {
+        enemy.y += enemy.zigzagDirection * zigzagSpeed * dt;
+      }
+    }
+
+    // 3 : traversee rapide
+    else if (enemy.movementPattern === 3) {
+      enemy.x += vx * 1.55 * dt;
+      enemy.y += vy * 1.55 * dt;
+    }
+
+    // 4 : derive progressive vers un cote
+    else if (enemy.movementPattern === 4) {
+      enemy.x += vx * dt;
+      enemy.y += vy * dt;
+
+      const driftSpeed = enemy.waveAmplitude * 0.9;
+
+      if (enemy.baseDirection === "down") {
+        enemy.x += enemy.driftDirection * driftSpeed * dt;
+      } else {
+        enemy.y += enemy.driftDirection * driftSpeed * dt;
+      }
     }
 
     enemy.fireTimer -= dt;
@@ -716,10 +1076,18 @@ function updateEnemies(dt) {
     if (enemy.fireTimer <= 0) {
       enemyShoot(enemy);
 
-      enemy.fireTimer =
-        bossesDefeated >= 1
-          ? 0.75 + Math.random() * 0.65
-          : 1.5 + Math.random() * 1.5;
+      if (enemy.type === "green") {
+        // Les verts restent plus lisibles que les normaux malgré leur double tir.
+        enemy.fireTimer =
+          Math.max(0.62, 1.2 - level * 0.012) +
+          Math.random() * 0.48;
+      } else if (bossesDefeated >= 1) {
+        enemy.fireTimer =
+          Math.max(0.42, 0.82 - level * 0.009) +
+          Math.random() * 0.5;
+      } else {
+        enemy.fireTimer = 1.5 + Math.random() * 1.5;
+      }
     }
 
     if (rectsOverlap(enemy, player)) {
@@ -729,9 +1097,10 @@ function updateEnemies(dt) {
     }
 
     if (
-      enemy.y > canvas.height + 80 ||
-      enemy.x < -100 ||
-      enemy.x > canvas.width + 100
+      enemy.y > canvas.height + 100 ||
+      enemy.y < -140 ||
+      enemy.x < -140 ||
+      enemy.x > canvas.width + 140
     ) {
       enemy.hp = 0;
     }
@@ -793,7 +1162,8 @@ function handleCollisions() {
       boss.hp -= bullet.damage;
 
       if (boss.hp <= 0) {
-        createExplosion(boss.x, boss.y, 45);
+        createExplosion(boss.x, boss.y, 60);
+        screenShake = 0.55;
         score += 500 * boss.number;
         bossesDefeated += 1;
         boss = null;
@@ -811,7 +1181,8 @@ function handleCollisions() {
         enemy.hp -= bullet.damage;
 
         if (enemy.hp <= 0) {
-          createExplosion(enemy.x, enemy.y, 16);
+          createExplosion(enemy.x, enemy.y, enemy.maxHp > 1 ? 28 : 16);
+          maybeSpawnDrop(enemy.x, enemy.y);
           gainXp(enemy.xpReward || 1);
         }
       }
@@ -841,6 +1212,17 @@ function updateParticles(dt) {
 function update(dt) {
   updateStars(dt);
   damageFlash = Math.max(0, damageFlash - dt);
+  fireRateBoostTimer = Math.max(0, fireRateBoostTimer - dt);
+  playerRecoil = Math.max(0, playerRecoil - 22 * dt);
+  screenShake = Math.max(0, screenShake - dt);
+
+  if (comboTimer > 0) {
+    comboTimer = Math.max(0, comboTimer - dt);
+
+    if (comboTimer <= 0) {
+      comboCount = 0;
+    }
+  }
 
   if (paused) {
     updateParticles(dt);
@@ -852,6 +1234,7 @@ function update(dt) {
   updateEnemies(dt);
   updateEnemyBullets(dt);
   updateObstacles(dt);
+  updateDrops(dt);
   handleCollisions();
   updateParticles(dt);
 }
@@ -867,7 +1250,7 @@ function drawStars() {
 
 function drawPlayer() {
   ctx.save();
-  ctx.translate(player.x, player.y);
+  ctx.translate(player.x, player.y + playerRecoil);
 
   if (player.invulnerability > 0 && Math.floor(player.invulnerability * 14) % 2 === 0) {
     ctx.globalAlpha = 0.35;
@@ -924,8 +1307,15 @@ function drawDrones() {
 }
 
 function drawBullets() {
-  ctx.fillStyle = "#f3f6ff";
   for (const bullet of bullets) {
+    if (!bullet.fromDrone && bullet.damage >= 2) {
+      ctx.fillStyle = "#57e6ff";
+    } else if (bullet.fromDrone) {
+      ctx.fillStyle = "#8fc8ff";
+    } else {
+      ctx.fillStyle = "#f3f6ff";
+    }
+
     ctx.fillRect(
       bullet.x - bullet.width / 2,
       bullet.y - bullet.height / 2,
@@ -940,7 +1330,24 @@ function drawEnemies() {
     ctx.save();
     ctx.translate(enemy.x, enemy.y);
 
-    ctx.fillStyle = enemy.type === "green" ? "#59d46f" : "#ff5d75";
+    const isArmored = enemy.maxHp > 1;
+
+    // Les ennemis blindés (2 PV) sont légèrement plus gros visuellement.
+    const visualScale = isArmored ? 1.16 : 1;
+    ctx.scale(visualScale, visualScale);
+
+    // Priorité visuelle :
+    // - orange = ennemi blindé 2 PV
+    // - vert = ennemi à double tir
+    // - rouge = ennemi normal
+    if (isArmored) {
+      ctx.fillStyle = "#f29b38";
+    } else if (enemy.type === "green") {
+      ctx.fillStyle = "#59d46f";
+    } else {
+      ctx.fillStyle = "#ff5d75";
+    }
+
     ctx.beginPath();
     ctx.moveTo(0, enemy.height / 2);
     ctx.lineTo(-enemy.width / 2, -enemy.height / 2);
@@ -949,17 +1356,35 @@ function drawEnemies() {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = enemy.type === "green" ? "#ddffe3" : "#ffd8df";
+    // Cockpit / détail central.
+    if (isArmored) {
+      ctx.fillStyle = "#ffe0a8";
+    } else if (enemy.type === "green") {
+      ctx.fillStyle = "#ddffe3";
+    } else {
+      ctx.fillStyle = "#ffd8df";
+    }
+
     ctx.fillRect(-4, -6, 8, 12);
 
-    if (enemy.maxHp > 1) {
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 11px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(`${enemy.hp} PV`, 0, enemy.height / 2 + 14);
+    // Marquage supplémentaire sur les ennemis blindés.
+    if (isArmored) {
+      ctx.strokeStyle = "#fff2cf";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-enemy.width * 0.23, -enemy.height * 0.28, enemy.width * 0.46, enemy.height * 0.56);
     }
 
     ctx.restore();
+
+    // Les PV restent affichés à taille normale sous l'ennemi.
+    if (isArmored) {
+      ctx.save();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(`${enemy.hp} PV`, enemy.x, enemy.y + enemy.height / 2 + 18);
+      ctx.restore();
+    }
   }
 }
 
@@ -1013,6 +1438,34 @@ function drawParticles() {
   ctx.globalAlpha = 1;
 }
 
+function drawCombo() {
+  if (comboCount < 2 || comboTimer <= 0) return;
+
+  ctx.save();
+
+  ctx.textAlign = "right";
+  ctx.textBaseline = "top";
+
+  ctx.font = "bold 22px Arial";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(`COMBO x${comboCount}`, canvas.width - 18, 18);
+
+  // Petite barre indiquant le temps restant avant la perte du combo.
+  const barWidth = 120;
+  const barHeight = 5;
+  const ratio = comboTimer / comboWindow;
+  const x = canvas.width - 18 - barWidth;
+  const y = 47;
+
+  ctx.fillStyle = "rgba(255,255,255,0.18)";
+  ctx.fillRect(x, y, barWidth, barHeight);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(x, y, barWidth * ratio, barHeight);
+
+  ctx.restore();
+}
+
 function drawDamageFlash() {
   if (damageFlash <= 0) return;
 
@@ -1038,8 +1491,19 @@ function draw() {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  ctx.save();
+
+  if (screenShake > 0) {
+    const shakePower = 7 * (screenShake / 0.55);
+    ctx.translate(
+      (Math.random() - 0.5) * shakePower,
+      (Math.random() - 0.5) * shakePower
+    );
+  }
+
   drawStars();
   drawObstacles();
+  drawDrops();
   drawBullets();
   drawEnemies();
   drawBoss();
@@ -1047,6 +1511,10 @@ function draw() {
   drawPlayer();
   drawDrones();
   drawParticles();
+
+  ctx.restore();
+
+  drawCombo();
   drawDamageFlash();
 }
 
