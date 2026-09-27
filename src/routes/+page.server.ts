@@ -57,8 +57,9 @@ export const load: PageServerLoad = async () => {
 	const aLaUne = epinglees.length ? epinglees : articles.slice(0, 1);
 	const idsALaUne = new Set(aLaUne.map((publication) => publication.id));
 
-	// Le fil des prochains jours : actions, événements, formations et apéros
-	// confondus, dans l'ordre du calendrier.
+	// Le fil des prochains jours : événements, formations et apéros
+	// confondus, dans l'ordre du calendrier. Sa fenêtre est glissante : elle
+	// part d'aujourd'hui et ne dépend ni de la semaine civile ni du mois.
 	const maintenant = new Date();
 	const aujourdhui = jourIso(maintenant);
 	const demain = jourIso(new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate() + 1));
@@ -68,7 +69,6 @@ export const load: PageServerLoad = async () => {
 	const aVenir = regrouperRepetitions(listAgenda(aujourdhui, '9999-12-31').map(presentPublication));
 	const prochainsJours = aVenir
 		.filter((rdv) => rdv.eventAt! < fin)
-		.filter((rdv) => !idsALaUne.has(rdv.id))
 		.slice(0, 8)
 		.map((rdv) => ({
 			...rdv,
