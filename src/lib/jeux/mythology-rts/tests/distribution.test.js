@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+const root=new URL('../',import.meta.url);
+const read=p=>readFileSync(new URL(p,root),'utf8');
+test('entry document runs as a local file without module fetches',()=>{const html=read('index.html');assert.match(html,/<script src="\.\/js\/game-standalone\.js" defer><\/script>/);assert.doesNotMatch(html,/type="module"|https?:\/\//);assert.match(html,/id="game"/);assert.match(html,/id="actions"/);assert.doesNotMatch(read('css/game.css'),/@import|url\(https?:/);});
+test('standalone bundle is self contained and matches modular source',()=>{const bundle=read('js/game-standalone.js');assert.doesNotMatch(bundle,/^\s*(?:import|export)\s/m);assert.match(bundle,/requestAnimationFrame/);assert.equal(bundle,execFileSync(process.execPath,['tools/build-standalone.mjs','--stdout'],{cwd:new URL('.',root),encoding:'utf8'}));});
+test('readme explains double click and complete controls',()=>{const doc=read('README.md');assert.match(doc,/double.clic.*index\.html/i);assert.match(doc,/sans Python ni PHP/i);assert.match(doc,/clic droit/i);assert.match(doc,/ZQSD/);});
+test('right clicking a friendly unfinished building dispatches resume build',()=>{const source=read('js/main.js');assert.match(source,/target\?\.team==='player'&&target\.type==='building'&&!target\.complete\)result=orderBuild\(/);});
+test('map build identifies itself and reports whether the image loaded',()=>{assert.match(read('index.html'),/id="map-status"/);const renderer=read('js/render.js');assert.match(renderer,/terrainImage\.onload/);assert.match(renderer,/terrainImage\.onerror/);});
