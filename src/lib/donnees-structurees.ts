@@ -128,6 +128,10 @@ export function evenementApero(
 	cadre: CadreApero,
 	identite: Identite
 ) {
+	const heure = p.eventStartTime || cadre.heure;
+	const lieuPersonnalise = !!(p.eventLocation || p.eventAddress);
+	const lieu = lieuPersonnalise ? p.eventLocation : cadre.lieu;
+	const adresseLieu = lieuPersonnalise ? p.eventAddress : cadre.adresse;
 	const fiche: Record<string, unknown> = {
 		'@type': 'Event',
 		name: p.title,
@@ -139,8 +143,11 @@ export function evenementApero(
 		organizer: { '@id': `${origine}/#organisation` },
 		isAccessibleForFree: true
 	};
-	if (p.eventAt) fiche.startDate = debutDeSoiree(p.eventAt, cadre.heure);
-	if (cadre.lieu) fiche.location = lieuApero(cadre);
+	if (p.eventAt) {
+		fiche.startDate = p.eventStartTime ? `${p.eventAt}T${p.eventStartTime}` : debutDeSoiree(p.eventAt, heure);
+		if (p.eventEndTime) fiche.endDate = `${p.eventAt}T${p.eventEndTime}`;
+	}
+	if (lieu || adresseLieu) fiche.location = lieuApero({ ...cadre, heure, lieu, adresse: adresseLieu });
 	if (p.cover) fiche.image = origine + p.cover.url;
 	return fiche;
 }
@@ -197,7 +204,7 @@ export function filAriane(origine: string, etapes: { nom: string; chemin: string
 
 /** Le bar où se tient l'apéro, adresse comprise. */
 function lieuApero(cadre: CadreApero) {
-	const lieu: Record<string, unknown> = { '@type': 'Place', name: cadre.lieu };
+	const lieu: Record<string, unknown> = { '@type': 'Place', name: cadre.lieu || cadre.adresse };
 	if (cadre.adresse) {
 		// L'adresse est saisie d'un bloc dans les réglages (« 6 bis rue Musette,
 		// 21000 Dijon ») : on la donne telle quelle en rue, et on répète la ville

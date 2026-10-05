@@ -23,12 +23,16 @@ function regrouperRepetitions<T extends PublicationVue>(liste: T[]) {
 	const dates = new Map<string, string[]>();
 	for (const publication of liste) {
 		const deja = publication.aVenir ? dates.get(publication.title) : undefined;
-		if (deja) {
+		// Un même intitulé à une autre date est une répétition. Deux rendez-vous
+		// réellement distincts le même jour doivent en revanche rester visibles.
+		if (deja && publication.eventAt && !deja.includes(publication.eventAt)) {
 			if (publication.eventAt) deja.push(publication.eventAt);
 			continue;
 		}
 		resultat.push({ ...publication, autresDates: 0, rythme: null });
-		if (publication.aVenir) dates.set(publication.title, publication.eventAt ? [publication.eventAt] : []);
+		if (publication.aVenir && !dates.has(publication.title)) {
+			dates.set(publication.title, publication.eventAt ? [publication.eventAt] : []);
+		}
 	}
 	for (const ligne of resultat) {
 		const toutes = dates.get(ligne.title) ?? [];
@@ -51,10 +55,9 @@ function joursEntre(avant: string, apres: string): number {
 export const load: PageServerLoad = async () => {
 	const articles = listPublished({ kind: 'article', limit: 12 }).map(presentPublication);
 	const epinglees = listPinnedPublished().map(presentPublication);
-	// Tant que rien n'est explicitement épinglé, l'article le plus récent garde
-	// le rôle historique de une. Dès qu'une ou plusieurs fiches sont choisies,
-	// elles prennent toutes place dans la section, quel que soit leur type.
-	const aLaUne = epinglees.length ? epinglees : articles.slice(0, 1);
+	// La une est un choix éditorial temporaire. Sans épinglage actif, la section
+	// disparaît au lieu d'y maintenir indéfiniment le dernier article publié.
+	const aLaUne = epinglees;
 	const idsALaUne = new Set(aLaUne.map((publication) => publication.id));
 
 	// Le fil des prochains jours : événements, formations et apéros

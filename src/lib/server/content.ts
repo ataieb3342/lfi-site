@@ -18,6 +18,7 @@ export type Publication = {
 	status: Status;
 	comments_open: number;
 	pinned: number;
+	pinned_at: string | null;
 	event_at: string | null;
 	event_category: CategorieEvenement;
 	action_category: CategorieAction;
@@ -93,16 +94,18 @@ const PUBLIC_SELECT = `
  *   complétée après, et c'est la date de la soirée qui fait sens dans l'archive.
  */
 const ORDRE = {
-	chronologique: 'order by p.pinned desc, p.published_at desc',
+	chronologique: `order by
+		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		p.published_at desc`,
 	agenda: `order by
-		p.pinned desc,
-		case when p.event_at is not null and p.event_at >= date('now') then 0 else 1 end,
-		case when p.event_at is not null and p.event_at >= date('now') then p.event_at end asc,
+		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
+		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		p.published_at desc`,
 	archives: `order by
-		p.pinned desc,
-		case when p.event_at is not null and p.event_at >= date('now') then 0 else 1 end,
-		case when p.event_at is not null and p.event_at >= date('now') then p.event_at end asc,
+		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
+		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		coalesce(p.event_at, substr(p.published_at, 1, 10)) desc,
 		p.published_at desc`
 } as const;
@@ -134,6 +137,7 @@ export function listPinnedPublished() {
 		.prepare(
 			`${PUBLIC_SELECT}
 			 where p.status = 'published' and p.pinned = 1
+			   and datetime(p.pinned_at) >= datetime('now', '-15 days')
 			 order by p.published_at desc, p.id desc`
 		)
 		.all() as PublicationListItem[];
@@ -242,8 +246,8 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			  event_at, event_category, action_category, event_start_time, event_end_time,
 			  event_location, event_address, event_location_url, event_managers, event_signup_url,
 			  event_meeting_point, event_map_media_id, event_map_embed_url, byline_admin_id,
-			  published_at, created_at, updated_at, author_id, author_name, layout_style)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			  published_at, created_at, updated_at, author_id, author_name, layout_style, pinned_at)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -274,7 +278,8 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			timestamp,
 			authorId,
 			input.authorName,
-			input.layoutStyle ?? 'standard'
+			input.layoutStyle ?? 'standard',
+			input.pinned ? timestamp : null
 		);
 	const id = Number(result.lastInsertRowid);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
@@ -292,6 +297,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 	// La date de publication est figée à la première mise en ligne.
 	const publishedAt =
 		input.status === 'published' ? (existing.published_at ?? now()) : existing.published_at;
+	const pinnedAt = input.pinned ? (existing.pinned ? existing.pinned_at ?? now() : now()) : null;
 
 	db().prepare(
 		`update publications set
@@ -300,7 +306,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		   action_category = ?, event_start_time = ?, event_end_time = ?, event_location = ?,
 		   event_address = ?, event_location_url = ?, event_managers = ?, event_signup_url = ?,
 		   event_meeting_point = ?, event_map_media_id = ?, event_map_embed_url = ?, byline_admin_id = ?, published_at = ?,
-		   updated_at = ?, author_name = ?, layout_style = ?
+		   updated_at = ?, author_name = ?, layout_style = ?, pinned_at = ?
 		 where id = ?`
 	).run(
 		input.kind,
@@ -330,6 +336,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		now(),
 		input.authorName,
 		input.layoutStyle ?? 'standard',
+		pinnedAt,
 		id
 	);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);

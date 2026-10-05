@@ -44,6 +44,7 @@ scripts/           sauvegarde et restauration
 | Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
 | Raconter une action terminée | Choisir « Retour d’action », puis collage, porte-à-porte ou tractage |
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
+| Mettre temporairement une publication à la une | Cocher « Épingler à la une » ; l’épinglage expire automatiquement après 15 jours |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
@@ -65,6 +66,13 @@ chapô sont préparés à partir du type d’action et de sa date, puis restent
 modifiables. Aucun horaire, lieu, responsable, carte ou lien d’inscription
 n’est enregistré. Une invitation vers Action populaire termine automatiquement
 la fiche.
+
+Les événements, formations et apéros peuvent partager une même date : chaque
+fiche reste distincte dans les rubriques et dans l’agenda. Ils disposent de
+leurs propres horaires, lieu, adresse, point de rendez-vous, responsables et
+lien d’inscription. Pour un apéro, les informations propres à la fiche priment
+sur le lieu et l’horaire habituels définis dans les réglages ; ces derniers ne
+servent que de valeurs de repli.
 
 ## Navigation et agenda
 
@@ -95,4 +103,14 @@ les règles de sécurité à ne pas casser. Claude Code le lit automatiquement :
 une demande du type « ajoute une page Agenda » ou « permets de trier les
 articles par thème » part donc du bon contexte.
 
-Avant tout changement : `npm run check`.
+Avant tout changement : `npm run check`. Avant livraison :
+
+```bash
+npm run check
+npm run build
+node --test src/lib/jeux/mythology-rts/tests/*.test.js
+```
+
+Les jeux sont des applications JavaScript autonomes, exclues du contrôle
+TypeScript/Svelte du site. Le jeu de stratégie possède donc sa propre suite de
+tests, exécutée par la troisième commande.

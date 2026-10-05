@@ -13,11 +13,15 @@ npm run dev      # développement sur http://localhost:5173
 npm run check    # vérification TypeScript + Svelte - À LANCER APRÈS CHAQUE MODIFICATION
 npm run build    # compilation de production
 
+node --test src/lib/jeux/mythology-rts/tests/*.test.js  # tests du jeu de stratégie
+
 npm run outils:pages   # regénère la tête et le pied des pages d'outils (voir « La boîte à outils »)
 ```
 
-Il n'y a pas de suite de tests automatisés : `npm run check` et une
-vérification manuelle dans le navigateur tiennent ce rôle.
+Le site Svelte est contrôlé par `npm run check` et `npm run build`. Les jeux
+autonomes ne passent pas dans le contrôle TypeScript/Svelte ; le jeu de
+stratégie possède une suite dédiée avec `node --test`. Une vérification
+manuelle dans le navigateur reste nécessaire pour les parcours éditoriaux.
 
 ## Architecture
 
@@ -243,8 +247,9 @@ page, par le menu mobile et par l'encart en tête de la liste des articles.
 Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
 rendez-vous dont la date n'est pas passée remontent en tête, de la plus proche à la
 plus lointaine, puis viennent les autres par date de publication. La comparaison
-se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now')` - c'est exact et
-sans piège de fuseau horaire.
+se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now', 'localtime')`,
+afin que le classement reste cohérent avec la date affichée en France autour de
+minuit.
 
 Une actualité sans `event_at` se comporte comme une simple brève d'information.
 
@@ -277,7 +282,10 @@ l'avance, puis publie un résumé des échanges. Sur le site :
 - **Le cadre habituel** (rythme, heure, lieu, adresse, texte de présentation)
   est dans les réglages (`apero_*`), pas dans le code : changer de bar ne doit
   pas demander de redéploiement. Il est exposé à toutes les pages par
-  `+layout.server.ts` sous `data.apero`.
+  `+layout.server.ts` sous `data.apero`. Une fiche peut définir ses propres
+  horaires, lieu et adresse ; dès qu'un lieu ou une adresse spécifique est
+  renseigné, le couple propre à la fiche remplace entièrement le couple
+  habituel afin de ne jamais associer un nouveau lieu à l'ancienne adresse.
 - Le prochain apéro a sa fiche dans le fil « Les prochains jours » de
   l'accueil, comme les autres rendez-vous (voir « L'accueil »). Il est aussi
   dans le flux RSS et dans le plan du site. `BandeauApero.svelte` n'est plus
@@ -406,8 +414,10 @@ La page tient maintenant en quatre blocs, de haut en bas :
    publiée peut être épinglée depuis l'administration : article, actualité,
    retour d'action, événement, formation, apéro ou revue de presse. Plusieurs
    fiches peuvent être épinglées en même temps ; elles forment alors une grille
-   et ne sont pas répétées dans les listes situées juste en dessous. Si rien
-   n'est épinglé, l'article le plus récent sert de une, comme auparavant.
+   et ne sont pas répétées dans les listes situées juste en dessous. Un
+   épinglage expire quinze jours après son activation (`pinned_at`) ; si rien
+   n'est encore épinglé, la section disparaît et les articles restent dans leur
+   liste normale.
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
@@ -419,7 +429,9 @@ dans `+page.server.ts`). Le site n'a pas de récurrence : le rassemblement de
 chaque samedi est une fiche par date, et six fois le même titre remplissaient
 la page. Seule la prochaine date est montrée ; si toutes les dates à venir
 sont espacées d'une semaine, la fiche dit « Chaque samedi », sinon « Et 3
-autres dates ». Le regroupement se fait sur le titre exact : pour qu'il
+autres dates ». Le regroupement se fait sur le titre exact, mais jamais entre
+deux fiches portant la même date : deux rendez-vous réellement distincts le
+même jour restent tous les deux visibles. Pour qu'il
 fonctionne, les fiches d'un même rendez-vous doivent porter le même titre.
 
 `BandeauApero.svelte` n'est pas construit sur `Encart.svelte` : celui-ci porte un

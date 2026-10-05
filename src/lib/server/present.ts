@@ -13,6 +13,8 @@ import type { PublicationVue, CommentaireVue, SourceVue } from '$lib/types';
  */
 
 export function presentPublication(row: PublicationListItem | Publication): PublicationVue {
+	const maintenant = new Date();
+	const aujourdHui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
 	const media = row.cover_media_id ? getMedia(row.cover_media_id) : undefined;
 	const carte = row.event_map_media_id ? getMedia(row.event_map_media_id) : undefined;
 	const auteur = row.byline_admin_id ? getAdmin(row.byline_admin_id) : undefined;
@@ -57,7 +59,7 @@ export function presentPublication(row: PublicationListItem | Publication): Publ
 		eventMapEmbedUrl: row.event_map_embed_url,
 		// Comparaison de chaînes AAAA-MM-JJ : correcte, et sans piège de fuseau
 		// horaire contrairement à un calcul sur des objets Date.
-		aVenir: !!row.event_at && row.event_at >= new Date().toISOString().slice(0, 10),
+		aVenir: !!row.event_at && row.event_at >= aujourdHui,
 		cover: media ? { url: `/media/${media.filename}`, alt: media.alt } : null
 	};
 }

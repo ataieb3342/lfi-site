@@ -4,7 +4,7 @@
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
-	import { articleStructure, editeur, evenementApero, filAriane } from '$lib/donnees-structurees';
+	import { articleStructure, editeur, evenementAction, evenementApero, filAriane } from '$lib/donnees-structurees';
 	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, LIBELLE_ACTION, libellePublication } from '$lib/format';
 	import { RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { ActionData, PageData } from './$types';
@@ -24,7 +24,11 @@
 
 	// Cadre des apéros (heure, lieu), affiché sous le titre d'un apéro.
 	const cadre = $derived(data.apero);
-	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
+	const heureApero = $derived(p.eventStartTime ? formatPlageHoraire(p.eventStartTime, p.eventEndTime) : cadre.heure);
+	const lieuPersonnalise = $derived(!!(p.eventLocation || p.eventAddress));
+	const lieuApero = $derived(lieuPersonnalise ? p.eventLocation : cadre.lieu);
+	const adresseApero = $derived(lieuPersonnalise ? p.eventAddress : cadre.adresse);
+	const lieuComplet = $derived([lieuApero, adresseApero].filter(Boolean).join(', '));
 
 	// Un apéro est un rendez-vous avec une date et une adresse, pas un article :
 	// annoncé comme un événement, il peut apparaître comme tel dans Google.
@@ -34,6 +38,8 @@
 	const fiche = $derived(
 		p.kind === 'apero'
 			? evenementApero(page.url.origin, adresse, p, data.resume, cadre, data.settings)
+			: p.eventAt && !estRetourAction
+				? evenementAction(page.url.origin, adresse, p, data.resume, data.settings)
 			: articleStructure(page.url.origin, adresse, p, data.resume, data.settings)
 	);
 </script>
@@ -103,17 +109,20 @@
 		{/if}
 
 		{#if p.eventAt && p.kind === 'apero'}
-			<!-- Un apéro : la date complète, l'heure et le lieu habituels (réglages). -->
+			<!-- Les informations propres à cet apéro priment sur les réglages habituels. -->
 			<p
 				class="mt-5 flex flex-col gap-y-1 rounded-lg px-4 py-2.5 text-sm font-bold sm:inline-flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2
 					{p.aVenir ? 'bg-accent-soft text-accent-dark' : 'bg-surface-alt text-ink-faint'}"
 			>
 				{#if p.aVenir}
-					<span>Rendez-vous le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time>{cadre.heure ? ` à ${cadre.heure}` : ''}</span>
+					<span>Rendez-vous le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time>{heureApero ? ` à ${heureApero}` : ''}</span>
 				{:else}
 					<span>Cet apéro a eu lieu le <time datetime={p.eventAt}>{formatDateLongue(p.eventAt)}</time></span>
 				{/if}
-				{#if lieuComplet}<span class="hidden sm:inline" aria-hidden="true">·</span><span class="font-semibold">{lieuComplet}</span>{/if}
+				{#if lieuComplet}
+					<span class="hidden sm:inline" aria-hidden="true">·</span>
+					{#if p.eventLocationUrl}<a class="font-semibold underline" href={p.eventLocationUrl} target="_blank" rel="noopener noreferrer">{lieuComplet}</a>{:else}<span class="font-semibold">{lieuComplet}</span>{/if}
+				{/if}
 			</p>
 		{:else if p.eventAt && estRetourAction}
 			<p class="mt-5 inline-flex items-center gap-2 rounded-lg bg-surface-alt px-4 py-2.5 text-sm font-bold text-ink-faint">
@@ -135,6 +144,14 @@
 					{#if p.eventLocationUrl}<a class="font-semibold text-brand underline" href={p.eventLocationUrl} target="_blank" rel="noreferrer">{p.eventLocation || p.eventAddress}</a>{:else}<span class="font-semibold">{p.eventLocation || p.eventAddress}</span>{/if}{p.eventLocation && p.eventAddress ? ` · ${p.eventAddress}` : ''}
 				</p>
 			{/if}
+		{/if}
+		{#if p.eventAt && !estRetourAction && p.eventMeetingPoint}
+			<p class="mt-2 text-sm text-ink-soft"><strong>Point de rendez-vous :</strong> {p.eventMeetingPoint}</p>
+		{/if}
+		{#if p.eventAt && !estRetourAction && p.eventSignupUrl}
+			<p class="mt-4">
+				<a class="bouton" href={p.eventSignupUrl} target="_blank" rel="noopener noreferrer">S’inscrire</a>
+			</p>
 		{/if}
 	</header>
 

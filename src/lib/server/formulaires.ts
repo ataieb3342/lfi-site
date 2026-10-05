@@ -14,7 +14,7 @@ export async function lirePublication(
 	form: FormData,
 	adminId: number,
 	couvertureActuelle: number | null,
-	_carteActuelle: number | null = null
+	carteActuelle: number | null = null
 ): Promise<PublicationInput> {
 	const typeAffiche = String(form.get('kind') ?? 'article');
 	const kind = ['retour-action', 'reunion', 'formation'].includes(typeAffiche) ? 'actu' : typeAffiche;
@@ -84,7 +84,9 @@ export async function lirePublication(
 	if (typeAffiche === 'retour-action' && !['porte-a-porte', 'tractage', 'collage'].includes(actionCategory)) {
 		throw new ErreurFormulaire("La catégorie de l'action est invalide.");
 	}
-	if (estRetourAction && eventAt > new Date().toISOString().slice(0, 10)) {
+	const maintenant = new Date();
+	const aujourdHui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
+	if (estRetourAction && eventAt > aujourdHui) {
 		throw new ErreurFormulaire("Un retour d’action ne peut être publié qu’après l’action.");
 	}
 	if (eventStartTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(eventStartTime)) {
@@ -123,7 +125,10 @@ export async function lirePublication(
 		}
 	}
 
-	const eventMapMediaId = null;
+	// L'interface n'ajoute plus de nouvelle image de carte, mais une ancienne
+	// fiche peut encore en posséder une. Une simple modification ne doit pas la
+	// supprimer silencieusement.
+	const eventMapMediaId = estRetourAction ? null : carteActuelle;
 
 	return {
 		kind: kind as Kind,

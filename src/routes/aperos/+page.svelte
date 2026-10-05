@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { filAriane } from '$lib/donnees-structurees';
-	import { formatDateCourte, formatDateLongue } from '$lib/format';
+	import { formatDateCourte, formatDateLongue, formatPlageHoraire } from '$lib/format';
 	import { CHAPO_RUBRIQUE, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import type { PageData } from './$types';
 
@@ -11,9 +11,13 @@
 	const prochain = $derived(data.aVenir[0] ?? null);
 	const suivants = $derived(data.aVenir.slice(1));
 	const cadre = $derived(data.apero);
+	const heureProchain = $derived(prochain?.eventStartTime ? formatPlageHoraire(prochain.eventStartTime, prochain.eventEndTime) : cadre.heure);
+	const lieuPersonnalise = $derived(!!(prochain?.eventLocation || prochain?.eventAddress));
+	const lieuProchain = $derived(lieuPersonnalise ? prochain?.eventLocation ?? '' : cadre.lieu);
+	const adresseProchain = $derived(lieuPersonnalise ? prochain?.eventAddress ?? '' : cadre.adresse);
 
 	// « Café Chez Nous, 12 rue X » ou simplement « Café Chez Nous ».
-	const lieuComplet = $derived([cadre.lieu, cadre.adresse].filter(Boolean).join(', '));
+	const lieuComplet = $derived([lieuProchain, adresseProchain].filter(Boolean).join(', '));
 </script>
 
 <!-- « à Dijon » dans le titre : c'est ce que les gens tapent, et « Les apéros »
@@ -54,7 +58,7 @@
 				{#if prochain}
 					<p class="mt-3 text-lg font-extrabold text-white sm:text-2xl">
 						<time datetime={prochain.eventAt}>{formatDateLongue(prochain.eventAt)}</time>
-						{#if cadre.heure}<span class="whitespace-nowrap text-white/80"> · {cadre.heure}</span>{/if}
+						{#if heureProchain}<span class="whitespace-nowrap text-white/80"> · {heureProchain}</span>{/if}
 					</p>
 					<h2 class="titre-affiche mt-2 text-3xl text-white sm:text-5xl">{prochain.title}</h2>
 					{#if prochain.summary}
@@ -85,9 +89,9 @@
 
 			{#if lieuComplet}
 				<address class="text-sm not-italic leading-relaxed text-white/85 sm:text-right">
-					<span class="block font-bold text-white">{cadre.lieu}</span>
-					{#if cadre.adresse}<span class="block">{cadre.adresse}</span>{/if}
-					<span class="block">{cadre.rythme}{cadre.heure ? `, ${cadre.heure}` : ''}</span>
+					<span class="block font-bold text-white">{lieuProchain}</span>
+					{#if adresseProchain}<span class="block">{adresseProchain}</span>{/if}
+					<span class="block">{cadre.rythme}{heureProchain ? `, ${heureProchain}` : ''}</span>
 				</address>
 			{/if}
 		</div>

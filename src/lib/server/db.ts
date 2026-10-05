@@ -382,6 +382,14 @@ const MIGRATIONS: string[] = [
 	`
 	alter table publications add column layout_style text not null default 'standard'
 		check (layout_style in ('standard', 'carnet-aquarelle'));
+	`,
+	// 017 - date de début de la mise à la une, pour l'expirer après quinze jours
+	`
+	alter table publications add column pinned_at text;
+	update publications
+	 set pinned_at = coalesce(published_at, updated_at)
+	 where pinned = 1;
+	create index publications_pinned on publications(status, pinned, pinned_at desc);
 	`
 ];
 
@@ -450,6 +458,9 @@ export function nettoyer() {
 	const base = connexion;
 	if (!base) return;
 	const maintenantMs = Date.now();
+	base.prepare(
+		"update publications set pinned = 0, pinned_at = null where pinned = 1 and datetime(pinned_at) < datetime('now', '-15 days')"
+	).run();
 	base.prepare('delete from sessions where expires_at < ?').run(now());
 	base.prepare('delete from rate_limits where created_at < ?').run(maintenantMs - 24 * 3600_000);
 	base.prepare('delete from used_challenges where expires_at < ?').run(maintenantMs);

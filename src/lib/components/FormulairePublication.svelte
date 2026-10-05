@@ -202,6 +202,9 @@
 	}
 
 	function actualiserTitreEtChapo(categorie = categorieActionSelectionnee) {
+		// Ces modèles ne concernent que les comptes rendus d'action. Les champs
+		// pratiques des autres rendez-vous réutilisent cette fonction.
+		if (typeSelectionne !== 'retour-action') return;
 		const automatique = textesAutomatiques(categorie);
 		if (!titre.trim() || titre === dernierTitreAutomatique) titre = automatique.titre;
 		if (!resume.trim() || resume === dernierChapoAutomatique) resume = automatique.chapo;
@@ -219,6 +222,10 @@
 	}
 
 	function choisirType(type: string) {
+		if (typeSelectionne === 'retour-action' && type !== 'retour-action') {
+			if (titre === dernierTitreAutomatique) titre = '';
+			if (resume === dernierChapoAutomatique) resume = '';
+		}
 		typeSelectionne = type;
 		if (type === 'retour-action') choisirCategorieAction(categorieActionSelectionnee);
 	}
@@ -249,7 +256,8 @@
 
 	const estRetourAction = $derived(typeSelectionne === 'retour-action');
 	const estRendezVous = $derived(['reunion', 'formation', 'apero'].includes(typeSelectionne));
-	const aujourdHui = new Date().toISOString().slice(0, 10);
+	const maintenant = new Date();
+	const aujourdHui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
 </script>
 
 {#if erreur}
@@ -478,6 +486,10 @@
 						<label class="etiquette" for="eventLocationUrl">Lien vers le lieu</label>
 						<input id="eventLocationUrl" name="eventLocationUrl" type="url" class="champ" maxlength="500" value={v.eventLocationUrl} placeholder="https://maps.app.goo.gl/…" />
 					</div>
+					<div>
+						<label class="etiquette" for="eventSignupUrl">Lien d’inscription <span class="font-normal text-ink-faint">(facultatif)</span></label>
+						<input id="eventSignupUrl" name="eventSignupUrl" type="url" class="champ" maxlength="500" value={v.eventSignupUrl} placeholder="https://…" />
+					</div>
 
 					<fieldset class="rounded border border-line bg-carte p-2.5">
 						<legend class="etiquette px-1">Responsable{admins.length > 1 ? 's' : ''}</legend>
@@ -513,7 +525,7 @@
 				<input type="checkbox" name="pinned" value="1" checked={v.pinned} class="mt-0.5" />
 				<span>
 					Épingler à la une
-					<span class="mt-0.5 block text-xs font-normal text-ink-faint">Plusieurs publications peuvent être à la une en même temps.</span>
+					<span class="mt-0.5 block text-xs font-normal text-ink-faint">Plusieurs publications peuvent être à la une en même temps. L’épinglage expire automatiquement après 15 jours.</span>
 				</span>
 			</label>
 		</div>
