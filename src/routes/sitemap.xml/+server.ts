@@ -23,6 +23,7 @@ const PAGES_FIXES = [
 	'/bibliotheque',
 	'/boite-a-outils',
 	'/jeux',
+	'/medias',
 	'/le-groupe',
 	'/nous-rejoindre',
 	...OUTILS.map(urlOutil),

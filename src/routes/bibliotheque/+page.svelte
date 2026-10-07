@@ -150,9 +150,9 @@
 	</p>
 {/if}
 
-<!-- Les outils et les jeux ont chacun leur page : ils sont appelés à se
+<!-- Les outils, les jeux et les médias ont chacun leur page : ils sont appelés à se
      multiplier, et faire tourner un simulateur n'est pas la même chose que
-     consulter un lien. Ces deux cartes sont leur porte d'entrée, en bas parce
+     consulter un lien. Ces trois cartes sont leur porte d'entrée, en bas parce
      qu'on y arrive après avoir parcouru les ressources - d'où la pagination
      courte au-dessus, qui les garde à portée de vue.
 
@@ -162,7 +162,7 @@
 	<h2 id="ailleurs" class="text-xs font-bold tracking-[0.15em] text-ink-faint uppercase">
 		Aussi dans la bibliothèque
 	</h2>
-	<ul class="mt-4 grid gap-4 sm:grid-cols-2">
+	<ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<li class="carte relative transition hover:border-brand">
 			<h3 class="text-lg font-extrabold text-ink">
 				<a class="after:absolute after:inset-0" href="/boite-a-outils">Boîte à outils</a>
@@ -178,6 +178,14 @@
 			</h3>
 			<p class="mt-1 text-sm text-ink-soft">
 				Faits par des militants, sans publicité et sans traçage.
+			</p>
+		</li>
+		<li class="carte relative transition hover:border-brand">
+			<h3 class="text-lg font-extrabold text-ink">
+				<a class="after:absolute after:inset-0" href="/medias">Médias</a>
+			</h3>
+			<p class="mt-1 text-sm text-ink-soft">
+				Les médias indépendants que nous regardons et lisons nous-mêmes.
 			</p>
 		</li>
 	</ul>

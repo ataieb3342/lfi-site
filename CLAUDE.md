@@ -332,13 +332,13 @@ faire tourner un simulateur n'est pas la même chose que consulter un lien. Une
 version antérieure empilait les trois sur la même page, qui devenait
 interminable.
 
-Les deux pages voisines sont atteintes par **deux cartes côte à côte en bas de
-la bibliothèque**, sous « Aussi dans la bibliothèque ». En bas et non en tête :
+Les pages voisines - outils, jeux et médias recommandés (`/medias`) - sont
+atteintes par **trois cartes en bas de la bibliothèque**, sous « Aussi dans la bibliothèque ». En bas et non en tête :
 on y arrive après avoir parcouru les ressources. C'est pour cela que la
 pagination est courte - voir ci-dessous.
 
 **Les ressources sont paginées**, huit par page (`PAR_PAGE` dans
-`bibliotheque/+page.server.ts`). Le nombre est petit exprès : les deux cartes du
+`bibliotheque/+page.server.ts`). Le nombre est petit exprès : les cartes du
 bas doivent rester visibles sans dérouler la page entière. Le numéro de page est
 **borné aux pages qui existent**, pour que `?page=9` affiche la dernière plutôt
 qu'une liste vide accompagnée d'un « aucune ressource » qui serait faux.
@@ -608,6 +608,16 @@ Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
   en production, une heure de cache. Sans cela, le navigateur sert pendant une
   heure la version précédente d'un jeu qu'on vient de modifier, et on cherche
   longtemps une erreur qui n'existe plus.
+
+## Les médias recommandés
+
+`/medias` liste quelques médias que le groupe conseille, écrits en dur dans
+`src/lib/medias.ts` (nom, format « à regarder » ou « à lire », lien, une phrase
+qui dit pourquoi). Pas d'administration : la liste bouge rarement et la
+recommandation est un choix politique, qui passe par un commit relu. **Elle
+reste courte** - cinq médias, c'est un conseil ; vingt, c'est un annuaire.
+Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
+« Ressources ». Pas sur l'accueil (voir « L'accueil »).
 
 ## La boîte à outils
 

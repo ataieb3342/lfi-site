@@ -28,7 +28,8 @@
 			liens: [
 				{ href: '/bibliotheque', label: 'Bibliothèque' },
 				{ href: '/boite-a-outils', label: 'Boîte à outils' },
-				{ href: '/jeux', label: 'Jeux' }
+				{ href: '/jeux', label: 'Jeux' },
+				{ href: '/medias', label: 'Médias' }
 			]
 		}
 	];
@@ -227,6 +228,7 @@
 				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
 				<li><a class="hover:text-white hover:underline" href="/boite-a-outils">Boîte à outils</a></li>
 				<li><a class="hover:text-white hover:underline" href="/jeux">Jeux</a></li>
+				<li><a class="hover:text-white hover:underline" href="/medias">Médias</a></li>
 				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>
 				<li><a class="hover:text-white hover:underline" href="/mentions-legales">Mentions légales</a></li>
 				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>
