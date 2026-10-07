@@ -4,7 +4,7 @@
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { MEDIAS } from '$lib/medias';
+	import { FORMATS, MEDIAS } from '$lib/medias';
 	import { COULEUR_KIND, formatDate, formatDateCourte, formatHeure, libellePublication, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -81,28 +81,6 @@
 		</p>
 	{/if}
 </section>
-
-<!-- Les médias qu'on recommande, sous le fil : une seule ligne de pastilles et
-     non un bloc, pour ne pas repousser l'article à la une (voir « L'accueil »
-     dans CLAUDE.md). Sur téléphone, la ligne défile au doigt plutôt que de
-     passer sur trois lignes. La phrase de chaque média est sur `/medias`. -->
-<nav aria-labelledby="titre-medias" class="mt-5 flex items-center gap-3">
-	<h2 id="titre-medias" class="shrink-0 text-xs font-bold tracking-[0.14em] text-ink-faint uppercase">
-		<a class="hover:text-brand hover:underline" href="/medias">On recommande</a>
-	</h2>
-	<ul class="fil-jours flex min-w-0 gap-2 overflow-x-auto">
-		{#each MEDIAS as media (media.nom)}
-			<li class="shrink-0">
-				<a
-					class="block rounded-full border border-line-forte bg-carte px-3 py-1 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand"
-					href={media.lien}
-					target="_blank"
-					rel="noopener noreferrer">{media.nom}</a
-				>
-			</li>
-		{/each}
-	</ul>
-</nav>
 
 {#if data.aLaUne.length}
 	<section class="border-b border-line py-6">
@@ -216,6 +194,29 @@
 		{:else}
 			<p class="text-sm text-ink-soft">Aucune actualité pour le moment.</p>
 		{/if}
+
+		<!-- Les médias qu'on recommande, dans la colonne et sous les actus : sur
+		     ordinateur ils occupent le vide à droite des articles, sur téléphone
+		     la colonne passe sous les articles et ils suivent les actus. Pas en
+		     tête de page : l'accueil montre d'abord ce que fait le groupe, et un
+		     lien sortant dès l'arrivée fait partir le visiteur ailleurs. -->
+		<section class="mt-8" aria-labelledby="titre-medias">
+			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
+				<h2 id="titre-medias" class="text-xl font-extrabold text-ink">On recommande</h2>
+				<a class="text-sm font-semibold text-brand hover:underline" href="/medias">Tout voir</a>
+			</div>
+			<ul>
+				{#each MEDIAS as media (media.nom)}
+					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
+						<a class="group block" href={media.lien} target="_blank" rel="noopener noreferrer">
+							<span class="text-sm font-bold text-ink group-hover:text-brand group-hover:underline">{media.nom}</span>
+							<span class="text-xs text-ink-faint"> · {FORMATS.find((f) => f.id === media.format)?.titre}</span>
+							<span class="mt-0.5 block text-sm leading-snug text-ink-soft">{media.description}</span>
+						</a>
+					</li>
+				{/each}
+			</ul>
+		</section>
 	</aside>
 </div>
 
