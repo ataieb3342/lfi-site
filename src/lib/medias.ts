@@ -33,14 +33,6 @@ export const MEDIAS = [
 			'Un média indépendant financé par ses abonnés : enquêtes, débats et émissions d’actualité.'
 	},
 	{
-		nom: 'Histoires crépues',
-		logo: '/images/medias/histoires-crepues.png',
-		format: 'regarder',
-		lien: 'https://www.youtube.com/@HistoiresCrepues',
-		description:
-			'L’histoire coloniale de la France racontée simplement, pour comprendre ce qu’elle laisse dans le présent.'
-	},
-	{
 		nom: 'Praxis',
 		logo: '/images/medias/praxis.png',
 		format: 'regarder',
