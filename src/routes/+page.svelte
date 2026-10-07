@@ -4,6 +4,7 @@
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
+	import { MEDIAS } from '$lib/medias';
 	import { COULEUR_KIND, formatDate, formatDateCourte, formatHeure, libellePublication, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -80,6 +81,28 @@
 		</p>
 	{/if}
 </section>
+
+<!-- Les médias qu'on recommande, sous le fil : une seule ligne de pastilles et
+     non un bloc, pour ne pas repousser l'article à la une (voir « L'accueil »
+     dans CLAUDE.md). Sur téléphone, la ligne défile au doigt plutôt que de
+     passer sur trois lignes. La phrase de chaque média est sur `/medias`. -->
+<nav aria-labelledby="titre-medias" class="mt-5 flex items-center gap-3">
+	<h2 id="titre-medias" class="shrink-0 text-xs font-bold tracking-[0.14em] text-ink-faint uppercase">
+		<a class="hover:text-brand hover:underline" href="/medias">On recommande</a>
+	</h2>
+	<ul class="fil-jours flex min-w-0 gap-2 overflow-x-auto">
+		{#each MEDIAS as media (media.nom)}
+			<li class="shrink-0">
+				<a
+					class="block rounded-full border border-line-forte bg-carte px-3 py-1 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand"
+					href={media.lien}
+					target="_blank"
+					rel="noopener noreferrer">{media.nom}</a
+				>
+			</li>
+		{/each}
+	</ul>
+</nav>
 
 {#if data.aLaUne.length}
 	<section class="border-b border-line py-6">

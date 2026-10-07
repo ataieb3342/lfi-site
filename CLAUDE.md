@@ -410,6 +410,8 @@ La page tient maintenant en quatre blocs, de haut en bas :
    `agenda-*` de la page agenda). Sur téléphone, le fil défile au doigt
    (`scroll-snap`, aucun script) ; la fiche suivante qui dépasse à droite dit
    qu'on peut faire glisser. L'article à la une commence vers 340 pixels.
+   Juste dessous, hors de la surface, une ligne de pastilles « On
+   recommande » mène aux médias conseillés (voir « Les médias recommandés »).
 2. **Les publications à la une**, puis les articles récents. Toute publication
    publiée peut être épinglée depuis l'administration : article, actualité,
    retour d'action, événement, formation, apéro ou revue de presse. Plusieurs
@@ -617,7 +619,9 @@ qui dit pourquoi). Pas d'administration : la liste bouge rarement et la
 recommandation est un choix politique, qui passe par un commit relu. **Elle
 reste courte** - cinq médias, c'est un conseil ; vingt, c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
-« Ressources ». Pas sur l'accueil (voir « L'accueil »).
+« Ressources ». Sur l'accueil, une **seule ligne de pastilles** sous le fil
+« Les prochains jours » (défilante sur téléphone) : pas de cartes ni de
+descriptions, qui repousseraient l'article à la une.
 
 ## La boîte à outils
 

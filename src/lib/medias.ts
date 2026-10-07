@@ -27,15 +27,16 @@ export const MEDIAS = [
 	{
 		nom: 'Histoires crépues',
 		format: 'regarder',
-		lien: 'https://www.youtube.com/@histoirescrepues',
+		lien: 'https://www.youtube.com/@HistoiresCrepues',
 		description:
 			'L’histoire coloniale de la France racontée simplement, pour comprendre ce qu’elle laisse dans le présent.'
 	},
 	{
 		nom: 'Praxis',
 		format: 'regarder',
-		lien: 'https://www.youtube.com/@praxis',
-		description: 'Des vidéos d’analyse politique, pour passer des idées à l’action.'
+		lien: 'https://www.youtube.com/@PraxisOfficiel',
+		description:
+			'« Reprendre le pouvoir » : un média d’action citoyenne financé par ses abonnés, pour passer de l’indignation à l’action.'
 	},
 	{
 		nom: 'Mediapart',
