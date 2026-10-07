@@ -421,7 +421,7 @@ La page tient maintenant en quatre blocs, de haut en bas :
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
    Dessous, dans la même colonne, **« On recommande »** : les médias conseillés
-   avec leur phrase. Sur téléphone la colonne passe sous les articles, il suit
+   avec leur logo et leur phrase. Sur téléphone la colonne passe sous les articles, il suit
    donc les actus. Pas en tête de page : un lien sortant dès l'arrivée fait
    partir le visiteur avant qu'il ait vu ce que fait le groupe.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
@@ -623,6 +623,10 @@ reste courte** - cinq médias, c'est un conseil ; vingt, c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
 « Ressources ». Sur l'accueil, ils sont sous la colonne « Actualités » (voir
 « L'accueil »).
+
+Chaque média a son **logo**, copié dans `static/images/medias/` (PNG carré de
+160 pixels). Jamais chargé depuis le site du média : la CSP l'interdit, et ce
+serait annoncer chaque visiteur de l'accueil à YouTube ou à Mediapart.
 
 ## La boîte à outils
 

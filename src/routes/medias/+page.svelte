@@ -38,13 +38,16 @@
 		</h2>
 		<ul class="mt-5 grid gap-4 sm:grid-cols-2">
 			{#each format.medias as media (media.nom)}
-				<li class="carte relative transition hover:border-brand">
-					<h3 class="text-lg font-extrabold text-ink">
-						<a class="after:absolute after:inset-0" href={media.lien} target="_blank" rel="noopener noreferrer">
-							{media.nom}
-						</a>
-					</h3>
-					<p class="mt-1 text-sm text-ink-soft">{media.description}</p>
+				<li class="carte relative flex gap-4 transition hover:border-brand">
+					<img class="size-14 shrink-0 rounded-xl" src={media.logo} alt="" width="56" height="56" />
+					<div class="min-w-0">
+						<h3 class="text-lg font-extrabold text-ink">
+							<a class="after:absolute after:inset-0" href={media.lien} target="_blank" rel="noopener noreferrer">
+								{media.nom}
+							</a>
+						</h3>
+						<p class="mt-1 text-sm text-ink-soft">{media.description}</p>
+					</div>
 				</li>
 			{/each}
 		</ul>

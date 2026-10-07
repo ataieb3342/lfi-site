@@ -208,10 +208,14 @@
 			<ul>
 				{#each MEDIAS as media (media.nom)}
 					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
-						<a class="group block" href={media.lien} target="_blank" rel="noopener noreferrer">
-							<span class="text-sm font-bold text-ink group-hover:text-brand group-hover:underline">{media.nom}</span>
-							<span class="text-xs text-ink-faint"> · {FORMATS.find((f) => f.id === media.format)?.titre}</span>
-							<span class="mt-0.5 block text-sm leading-snug text-ink-soft">{media.description}</span>
+						<a class="group flex gap-3" href={media.lien} target="_blank" rel="noopener noreferrer">
+							<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
+							<img class="size-10 shrink-0 rounded-lg" src={media.logo} alt="" width="40" height="40" loading="lazy" />
+							<span class="min-w-0">
+								<span class="text-sm font-bold text-ink group-hover:text-brand group-hover:underline">{media.nom}</span>
+								<span class="text-xs text-ink-faint"> · {FORMATS.find((f) => f.id === media.format)?.titre}</span>
+								<span class="mt-0.5 block text-sm leading-snug text-ink-soft">{media.description}</span>
+							</span>
 						</a>
 					</li>
 				{/each}

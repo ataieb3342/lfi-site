@@ -8,6 +8,13 @@
  * Elle doit rester courte. Vingt médias, c'est un annuaire ; cinq, c'est un
  * conseil. Pour en ajouter un : une ligne ci-dessous, avec une phrase qui dit
  * pourquoi on le recommande, pas seulement ce qu'il est.
+ *
+ * Les logos sont dans `static/images/medias/`, en PNG carré de 160 pixels sur
+ * fond opaque. Ils sont servis par le site et non chargés depuis celui du
+ * média : la CSP l'interdit (`img-src 'self'`), et chaque affichage de
+ * l'accueil annoncerait sinon le visiteur à YouTube ou à Mediapart. Pour un
+ * nouveau média, prendre l'image de partage (`og:image`) ou l'icône de son
+ * site, et la réduire à cette taille.
  */
 export const FORMATS = [
 	{ id: 'regarder', titre: 'À regarder' },
@@ -19,6 +26,7 @@ type Format = (typeof FORMATS)[number]['id'];
 export const MEDIAS = [
 	{
 		nom: 'Blast',
+		logo: '/images/medias/blast.png',
 		format: 'regarder',
 		lien: 'https://www.blast-info.fr/',
 		description:
@@ -26,6 +34,7 @@ export const MEDIAS = [
 	},
 	{
 		nom: 'Histoires crépues',
+		logo: '/images/medias/histoires-crepues.png',
 		format: 'regarder',
 		lien: 'https://www.youtube.com/@HistoiresCrepues',
 		description:
@@ -33,6 +42,7 @@ export const MEDIAS = [
 	},
 	{
 		nom: 'Praxis',
+		logo: '/images/medias/praxis.png',
 		format: 'regarder',
 		lien: 'https://www.youtube.com/@PraxisOfficiel',
 		description:
@@ -40,6 +50,7 @@ export const MEDIAS = [
 	},
 	{
 		nom: 'Mediapart',
+		logo: '/images/medias/mediapart.png',
 		format: 'lire',
 		lien: 'https://www.mediapart.fr/',
 		description:
@@ -47,12 +58,19 @@ export const MEDIAS = [
 	},
 	{
 		nom: 'Le Monde diplomatique',
+		logo: '/images/medias/monde-diplomatique.png',
 		format: 'lire',
 		lien: 'https://www.monde-diplomatique.fr/',
 		description:
 			'Le mensuel des grandes analyses : géopolitique, économie et critique du néolibéralisme.'
 	}
-] as const satisfies readonly { nom: string; format: Format; lien: string; description: string }[];
+] as const satisfies readonly {
+	nom: string;
+	logo: string;
+	format: Format;
+	lien: string;
+	description: string;
+}[];
 
 /** Les formats qui ont au moins un média, chacun avec les siens. */
 export function mediasParFormat() {
