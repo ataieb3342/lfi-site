@@ -414,16 +414,24 @@ La page tient maintenant en quatre blocs, de haut en bas :
    publiée peut être épinglée depuis l'administration : article, actualité,
    retour d'action, événement, formation, apéro ou revue de presse. Plusieurs
    fiches peuvent être épinglées en même temps ; elles forment alors une grille
-   et ne sont pas répétées dans les listes situées juste en dessous. Un
+   et ne sont pas répétées dans les listes situées juste en dessous.
+   La première est en grand (image à gauche, texte à droite), les suivantes en
+   cartes compactes deux par ligne, avec une vignette. Avec de grandes images
+   partout, une fiche sans image posée à côté d'une fiche illustrée était
+   étirée et restait vide. La grande fiche ne prend toute la largeur que si le
+   reste est pair, sinon la dernière resterait seule sur sa ligne. Un
    épinglage expire quinze jours après son activation (`pinned_at`) ; si rien
    n'est encore épinglé, la section disparaît et les articles restent dans leur
    liste normale.
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
-   Dessous, dans la même colonne, **« On recommande »** : les médias conseillés
-   avec leur logo et leur phrase. Sur téléphone la colonne passe sous les articles, il suit
-   donc les actus. Pas en tête de page : un lien sortant dès l'arrivée fait
-   partir le visiteur avant qu'il ait vu ce que fait le groupe.
+   Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les
+   médias conseillés en cartes, avec leur logo et leur phrase (deux par ligne
+   sur ordinateur). Ils ont d'abord été dans la colonne des actus, mais les
+   fiches épinglées étant retirées des « Articles récents », la colonne de
+   gauche était plus courte et laissait un trou. Pas en tête de page : un lien
+   sortant dès l'arrivée fait partir le visiteur avant qu'il ait vu ce que fait
+   le groupe.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
    arrive.
@@ -621,8 +629,8 @@ qui dit pourquoi). Pas d'administration : la liste bouge rarement et la
 recommandation est un choix politique, qui passe par un commit relu. **Elle
 reste courte** - cinq médias, c'est un conseil ; vingt, c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
-« Ressources ». Sur l'accueil, ils sont sous la colonne « Actualités » (voir
-« L'accueil »).
+« Ressources ». Sur l'accueil, ils sont sous les articles et les actualités
+(voir « L'accueil »).
 
 Chaque média a son **logo**, copié dans `static/images/medias/` (PNG carré de
 160 pixels). Jamais chargé depuis le site du média : la CSP l'interdit, et ce

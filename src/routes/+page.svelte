@@ -85,13 +85,24 @@
 {#if data.aLaUne.length}
 	<section class="border-b border-line py-6">
 		<h2 class="mb-4 text-xs font-bold tracking-[0.14em] text-brand uppercase">À la une</h2>
-		<div class="grid gap-5 {data.aLaUne.length > 1 ? 'md:grid-cols-2' : ''}">
-			{#each data.aLaUne as publication (publication.id)}
+		<!-- La première fiche en grand ; les suivantes en cartes compactes, deux
+		     par ligne, avec une petite vignette. Avec de grandes images partout,
+		     une fiche sans image posée à côté d'une fiche illustrée était étirée
+		     à sa hauteur et restait vide, et une fiche seule sur la dernière
+		     ligne laissait un trou à côté. La grande fiche prend toute la
+		     largeur quand le reste est pair, sinon elle se range comme les autres
+		     pour que la grille tombe juste. -->
+		<div class="grid gap-4 md:grid-cols-2">
+			{#each data.aLaUne as publication, i (publication.id)}
+				{@const large = i === 0 && (data.aLaUne.length === 1 || data.aLaUne.length % 2 === 1)}
+				{@const illustree = large && publication.cover}
 				<a
 					href={lienPublication(publication.kind, publication.slug)}
-					class="group min-w-0 overflow-hidden rounded-xl border border-line bg-carte transition hover:-translate-y-0.5 hover:border-brand"
+					class="group flex min-w-0 overflow-hidden rounded-xl border border-line bg-carte transition hover:-translate-y-0.5 hover:border-brand {large
+						? 'flex-col md:col-span-2' + (illustree ? ' md:grid md:grid-cols-2' : '')
+						: 'gap-4 p-4'}"
 				>
-					{#if publication.cover}
+					{#if illustree && publication.cover}
 						<div class="grid aspect-video w-full min-w-0 place-items-center overflow-hidden bg-surface-alt">
 							<img
 								src={publication.cover.url}
@@ -100,25 +111,37 @@
 							/>
 						</div>
 					{/if}
-					<div class="p-4 sm:p-5">
+					<div class="min-w-0 flex-1 {large ? 'p-4 sm:p-6 md:self-center' : ''}">
 						<p class="text-xs font-bold tracking-wide uppercase {COULEUR_KIND[publication.kind]}">
 							{libellePublication(publication.kind, publication.eventCategory)}
 							{#if publication.eventAt}
 								<span class="text-ink-faint"> · {formatDateCourte(publication.eventAt)}</span>
 							{/if}
 						</p>
-						<h3 class="titre-affiche mt-2 text-2xl text-ink group-hover:text-brand sm:text-3xl">
+						<h3
+							class="titre-affiche mt-2 text-ink group-hover:text-brand {large
+								? 'text-2xl sm:text-3xl'
+								: 'line-clamp-3 text-xl'}"
+						>
 							{publication.title}
 						</h3>
 						{#if publication.summary}
-							<p class="mt-3 line-clamp-3 text-ink-soft">{publication.summary}</p>
+							<p class="mt-2 text-ink-soft {large ? 'line-clamp-3' : 'line-clamp-2 text-sm'}">{publication.summary}</p>
 						{/if}
 						{#if !publication.eventAt}
-							<p class="mt-3 text-xs text-ink-faint">
+							<p class="mt-2 text-xs text-ink-faint">
 								{formatDate(publication.publishedAt)}{publication.authorName ? ` · ${publication.authorName}` : ''}
 							</p>
 						{/if}
 					</div>
+					{#if !large && publication.cover}
+						<!-- `alt` vide : la vignette illustre le titre qui la précède. -->
+						<img
+							src={publication.cover.url}
+							alt=""
+							class="size-24 shrink-0 self-start rounded-lg bg-surface-alt object-cover sm:size-28"
+						/>
+					{/if}
 				</a>
 			{/each}
 		</div>
@@ -194,34 +217,35 @@
 		{:else}
 			<p class="text-sm text-ink-soft">Aucune actualité pour le moment.</p>
 		{/if}
-
-		<!-- Les médias qu'on recommande, dans la colonne et sous les actus : sur
-		     ordinateur ils occupent le vide à droite des articles, sur téléphone
-		     la colonne passe sous les articles et ils suivent les actus. Pas en
-		     tête de page : l'accueil montre d'abord ce que fait le groupe, et un
-		     lien sortant dès l'arrivée fait partir le visiteur ailleurs. -->
-		<section class="mt-8" aria-labelledby="titre-medias">
-			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-				<h2 id="titre-medias" class="text-xl font-extrabold text-ink">On recommande</h2>
-				<a class="text-sm font-semibold text-brand hover:underline" href="/medias">Tout voir</a>
-			</div>
-			<ul>
-				{#each MEDIAS as media (media.nom)}
-					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
-						<a class="group flex gap-3" href={media.lien} target="_blank" rel="noopener noreferrer">
-							<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
-							<img class="size-10 shrink-0 rounded-lg" src={media.logo} alt="" width="40" height="40" loading="lazy" />
-							<span class="min-w-0">
-								<span class="text-sm font-bold text-ink group-hover:text-brand group-hover:underline">{media.nom}</span>
-								<span class="text-xs text-ink-faint"> · {FORMATS.find((f) => f.id === media.format)?.titre}</span>
-								<span class="mt-0.5 block text-sm leading-snug text-ink-soft">{media.description}</span>
-							</span>
-						</a>
-					</li>
-				{/each}
-			</ul>
-		</section>
 	</aside>
 </div>
+
+<!-- Les médias qu'on recommande, sous les deux colonnes et sur toute la
+     largeur. Ils étaient dans la colonne des actus : comme les fiches
+     épinglées sont retirées des « Articles récents », la colonne de gauche
+     était souvent bien plus courte et laissait un grand trou sur ordinateur.
+     Sur téléphone, l'ordre ne change pas : ils suivent les actus. Pas en tête
+     de page : l'accueil montre d'abord ce que fait le groupe. -->
+<section class="mt-8" aria-labelledby="titre-medias">
+	<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
+		<h2 id="titre-medias" class="text-xl font-extrabold text-ink">On recommande</h2>
+		<a class="text-sm font-semibold text-brand hover:underline" href="/medias">Tout voir</a>
+	</div>
+	<ul class="grid gap-4 sm:grid-cols-2">
+		{#each MEDIAS as media (media.nom)}
+			<li class="carte relative flex gap-3 transition hover:border-brand">
+				<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
+				<img class="size-10 shrink-0 rounded-lg" src={media.logo} alt="" width="40" height="40" loading="lazy" />
+				<div class="min-w-0">
+					<h3 class="text-sm font-bold text-ink">
+						<a class="after:absolute after:inset-0" href={media.lien} target="_blank" rel="noopener noreferrer">{media.nom}</a>
+					</h3>
+					<p class="text-xs text-ink-faint">{FORMATS.find((f) => f.id === media.format)?.titre}</p>
+					<p class="mt-1 text-sm leading-snug text-ink-soft">{media.description}</p>
+				</div>
+			</li>
+		{/each}
+	</ul>
+</section>
 
 <BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />
