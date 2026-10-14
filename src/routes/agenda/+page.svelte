@@ -101,7 +101,14 @@
 <section class="mt-8" aria-labelledby="mois-courant">
 	<div class="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
 		<a class="bouton-secondaire" href="?mois={data.moisPrecedent}" aria-label="Mois précédent">← Précédent</a>
-		<h2 id="mois-courant" class="text-center text-2xl font-extrabold text-ink capitalize">{calendrier.titre}</h2>
+		<!-- Sur téléphone, le mois passe au-dessus et les deux boutons dessous : sinon
+		     « Suivant » tombait seul sur une seconde ligne. -->
+		<h2
+			id="mois-courant"
+			class="order-first basis-full text-center text-2xl font-extrabold text-ink capitalize sm:order-none sm:basis-auto"
+		>
+			{calendrier.titre}
+		</h2>
 		<a class="bouton-secondaire" href="?mois={data.moisSuivant}" aria-label="Mois suivant">Suivant →</a>
 	</div>
 

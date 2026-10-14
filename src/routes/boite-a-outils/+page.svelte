@@ -69,9 +69,11 @@
 		</h2>
 		<p class="mt-1 max-w-2xl text-sm text-ink-soft">{rubrique.description}</p>
 
+		<!-- Un nombre impair d'outils laissait le dernier seul sur sa ligne, avec
+		     un trou à côté : il prend alors toute la largeur. -->
 		<ul class="mt-4 grid gap-4 sm:grid-cols-2">
 			{#each modules as outil (outil.dossier)}
-				<li class="carte relative transition hover:border-brand">
+				<li class="carte relative transition hover:border-brand sm:odd:last:col-span-2">
 					<h3 class="text-lg font-extrabold text-ink">
 						<a class="after:absolute after:inset-0" href={urlOutil(outil)} data-sveltekit-reload>
 							{outil.titre}
