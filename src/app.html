@@ -3,7 +3,11 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- Google n'affiche pas l'icône SVG seule dans ses résultats : il lui faut un .ico ou un PNG. -->
+		<link rel="icon" href="/favicon.ico" sizes="48x48" />
+		<link rel="icon" href="/icone-192.png" type="image/png" sizes="192x192" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss.xml" />
 		%sveltekit.head%
 	</head>

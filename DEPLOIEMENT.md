@@ -47,8 +47,10 @@ second terminal avant de fermer le premier.**
 
 ## 2. Faire pointer le nom de domaine
 
-Chez votre registrar, créez un enregistrement `A` (et `AAAA` si vous avez une
-IPv6) vers l'adresse du serveur. Attendez que `dig +short votre-domaine.fr`
+Chez votre registrar, créez un enregistrement `A` vers l'adresse IPv4 du
+serveur, pour le domaine et pour `www`. **Pas d'enregistrement `AAAA`** : le
+site ne se sert qu'en IPv4, sans quoi il ne distingue plus ses visiteurs IPv6
+(voir « Les vagues de requêtes » dans CLAUDE.md). Attendez que `dig +short votre-domaine.fr`
 renvoie la bonne adresse avant de continuer : Caddy a besoin que le domaine
 résolve pour obtenir le certificat HTTPS.
 

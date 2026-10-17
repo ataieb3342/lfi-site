@@ -889,16 +889,16 @@ bar pendant un apéro, une salle de réunion, ou les abonnés d'un opérateur mo
 qui partage ses adresses. Avant de les resserrer, se demander qui serait
 bloqué.
 
-**Les visiteurs IPv6 ne sont pas limités, et c'est un défaut connu.** Le site a
-une adresse IPv6, mais le réseau Docker n'en a pas : `docker-proxy` relaie ces
-visiteurs, qui arrivent tous au site sous l'adresse de la passerelle Docker
-(172.18.0.1). Limiter cette adresse bloquerait tous les visiteurs IPv6 d'un
-coup ; `limiteur.ts` laisse donc passer les adresses privées. La même confusion
-touche, depuis toujours, l'empreinte d'IP des commentaires : tous les
-commentateurs IPv6 partagent la même, et « Bloquer cette origine » sur l'un
-d'eux les bloque tous. La vraie correction est de faire voir à Caddy les
-vraies adresses IPv6 (IPv6 sur le réseau Docker, ou Caddy sur le réseau de
-l'hôte), ou de retirer l'enregistrement DNS AAAA. Le limiteur garde ses compteurs en mémoire, et non en base comme
+**Le site ne se sert qu'en IPv4, exprès.** Le réseau Docker n'a pas d'IPv6 :
+un visiteur IPv6 passait par `docker-proxy` et arrivait au site sous l'adresse
+de la passerelle Docker (172.18.0.1). Tous les visiteurs IPv6 avaient alors la
+même adresse, donc la même réserve dans le limiteur et la même empreinte pour
+les commentaires : « Bloquer cette origine » sur l'un les bloquait tous. Depuis
+le 17 octobre 2026, le domaine n'a plus d'enregistrement AAAA, et
+`docker/compose.yml` ne publie les ports que sur `0.0.0.0`. **Ne pas remettre
+d'enregistrement AAAA** sans avoir d'abord donné l'IPv6 au réseau Docker.
+
+Le limiteur garde ses compteurs en mémoire, et non en base comme
 `ratelimit.ts` (commentaires, connexion) : écrire chaque requête dans SQLite
 ferait exactement le travail que l'attaquant cherche à imposer.
 

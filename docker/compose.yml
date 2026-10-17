@@ -48,9 +48,13 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - '80:80'
-      - '443:443'
-      - '443:443/udp'
+      # IPv4 seulement. En IPv6, Docker relaie les visiteurs par docker-proxy,
+      # qui remplace leur adresse par la sienne (172.18.0.1) : le site ne
+      # pourrait plus les distinguer, ni pour la limite par adresse, ni pour
+      # bloquer un spammeur. Le domaine n'a donc pas d'enregistrement AAAA.
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+      - '0.0.0.0:443:443/udp'
     # Caddy lit SITE_DOMAIN et ADMIN_EMAIL depuis le même .env que le site.
     env_file:
       - ../.env
