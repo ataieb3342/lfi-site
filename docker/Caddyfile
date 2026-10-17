@@ -35,6 +35,10 @@ www.{$SITE_DOMAIN} {
 	@statiques path /_app/immutable/*
 	header @statiques Cache-Control "public, max-age=31536000, immutable"
 
+	# Le site sert favicon.ico sans type de fichier : Google pourrait l'ignorer.
+	@icone path /favicon.ico
+	header @icone >Content-Type "image/x-icon"
+
 	reverse_proxy site:3000 {
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
