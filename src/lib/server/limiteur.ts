@@ -82,11 +82,24 @@ export function cleAdresse(adresse: string): string {
 }
 
 /**
+ * Les visiteurs qui arrivent en IPv6 passent par un relais de Docker
+ * (docker-proxy) et apparaissent tous sous l'adresse privée de sa passerelle,
+ * du type 172.18.0.1. Limiter cette adresse reviendrait à bloquer d'un coup
+ * tous les visiteurs IPv6, qui sont nombreux sur mobile. Une adresse privée ne
+ * désigne donc personne en particulier : elle n'est pas limitée, et c'est le
+ * plafond de Caddy qui protège le site de ce côté-là.
+ */
+function adresseIndistincte(adresse: string): boolean {
+	return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(adresse);
+}
+
+/**
  * Faut-il servir cette requête ? Ne consomme de jetons que si la réponse est
  * oui : une adresse qui insiste pendant qu'elle est bloquée ne fait que
  * attendre que sa réserve se remplisse.
  */
 export function autoriser(adresse: string, chemin: string): boolean {
+	if (adresseIndistincte(adresse)) return true;
 	if (parPage.size > ENTREES_MAX || generales.size > ENTREES_MAX) {
 		console.warn('[limiteur] trop d’adresses suivies à la fois : compteurs remis à zéro');
 		parPage.clear();
