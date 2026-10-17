@@ -1,6 +1,18 @@
 {
 	email {$ADMIN_EMAIL}
 	# Caddy obtient et renouvelle le certificat HTTPS automatiquement.
+
+	servers {
+		timeouts {
+			# Un navigateur envoie l'en-tête de sa requête en une fraction de
+			# seconde. Un robot qui met plus de dix secondes le fait exprès,
+			# pour occuper le serveur à attendre.
+			read_header 10s
+			# Une connexion inactive est fermée au bout de deux minutes (cinq
+			# par défaut) : autant de mémoire rendue plus tôt.
+			idle 2m
+		}
+	}
 }
 
 # Le site ne se sert qu'à une seule adresse : « www » y renvoie, pour que le
@@ -26,6 +38,24 @@ www.{$SITE_DOMAIN} {
 	reverse_proxy site:3000 {
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
+
+		# Au plus cent requêtes en cours de traitement par le site. Au-delà,
+		# Caddy répond tout de suite que le site est surchargé, au lieu de
+		# faire patienter. Pendant l'attaque du 16 octobre 2026, ce sont ces
+		# requêtes en attente, par dizaines de milliers, qui ont rempli la
+		# mémoire du serveur. Le site lui-même écarte les adresses trop
+		# insistantes (src/lib/server/limiteur.ts) : ce plafond est le
+		# dernier filet, quand la vague vient de trop d'adresses à la fois.
+		unhealthy_request_count 100
+	}
+
+	# Quand le site ne peut pas répondre (surcharge, ou redémarrage pendant une
+	# mise à jour), un message plutôt qu'une page blanche.
+	handle_errors 502 503 504 {
+		header -Server
+		header Content-Type "text/plain; charset=utf-8"
+		header Retry-After 60
+		respond "Le site est momentanément surchargé ou en cours de redémarrage. Réessayez dans une minute." 503
 	}
 
 	log {

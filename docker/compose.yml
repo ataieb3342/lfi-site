@@ -5,6 +5,13 @@
 #                 Caddy peut l'atteindre.
 #   - « caddy » : le serveur en façade. Il obtient et renouvelle tout seul le
 #                 certificat HTTPS auprès de Let's Encrypt.
+#
+# Chaque conteneur a un plafond de mémoire et des journaux bornés. Le 16 octobre
+# 2026, une vague de requêtes a fait monter Caddy à 3 Go : le serveur entier a
+# manqué de mémoire, Docker lui-même s'est enrayé, et le site est resté figé
+# trois heures et demie alors que l'attaque avait cessé au bout de dix minutes.
+# Avec ces plafonds, un conteneur qui s'emballe est arrêté et relancé en
+# quelques secondes, sans entraîner le reste du serveur dans sa chute.
 
 services:
   site:
@@ -24,6 +31,18 @@ services:
       - interne
     security_opt:
       - no-new-privileges:true
+    # Le site occupe d'habitude 150 Mo ; la marge couvre l'envoi d'un PDF de 50 Mo.
+    mem_limit: 1g
+    # Trois fichiers de 10 Mo au plus. « non-blocking » : si Docker ne lit pas
+    # les journaux assez vite, les lignes en trop sont perdues plutôt que de
+    # faire attendre le programme qui les écrit (voir le conteneur caddy).
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+        mode: non-blocking
+        max-buffer-size: 4m
 
   caddy:
     image: caddy:2-alpine
@@ -45,6 +64,27 @@ services:
       - interne
     security_opt:
       - no-new-privileges:true
+    # Caddy occupe d'habitude 30 Mo. GOMEMLIMIT demande au ramasse-miettes de
+    # Go de libérer la mémoire plus activement à l'approche du plafond, pour ne
+    # l'atteindre qu'en dernier recours.
+    mem_limit: 512m
+    environment:
+      GOMEMLIMIT: 400MiB
+    # Pendant l'attaque du 16 octobre, Caddy écrivait une ligne d'erreur par
+    # requête refusée, et Docker, à court de mémoire, ne les lisait plus. Dans
+    # le mode par défaut (« blocking »), un programme qui écrit dans un journal
+    # plein s'arrête et attend : des lignes écrites à 21 h 29 n'ont été reçues
+    # par Docker qu'entre 1 h 01 et 1 h 06, au moment précis où le site est
+    # revenu.
+    # « non-blocking » sacrifie les lignes en trop pour que Caddy continue de
+    # répondre.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+        mode: non-blocking
+        max-buffer-size: 4m
 
 networks:
   interne:

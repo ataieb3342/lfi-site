@@ -39,12 +39,15 @@ native.
 | `src/lib/server/present.ts` | **Seul** point de passage base → navigateur |
 | `src/lib/server/media.ts` | Envoi et diffusion des images |
 | `src/lib/server/captcha.ts` | Anti-spam par preuve de travail |
+| `src/lib/server/limiteur.ts` | Écarte les adresses qui envoient trop de requêtes (voir « Les vagues de requêtes ») |
+| `src/lib/server/frequentation.ts` | Compte les visites et le trafic, sans cookie ni adresse IP (voir « La fréquentation ») |
 | `src/lib/components/Logo.svelte` | Le phi officiel, en dégradé ou en monochrome |
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
 | `src/lib/components/Encart.svelte` | Le gabarit unique des encarts d'appel |
 | `src/lib/components/Metadonnees.svelte` | Titre, description, adresse canonique et aperçus - sur **toutes** les pages publiques |
+| `src/lib/components/Histogramme.svelte` | Le graphique en colonnes de l'administration |
 | `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
-| `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin` |
+| `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin`, limite par adresse, comptage des visites |
 | `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites`, `/revue-de-presse` et la fiche d'un apéro |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
@@ -87,7 +90,9 @@ faille connue.
    injecter de script dans les pages.
 2. **La CSP de `vite.config.ts` reste en `default-src 'none'`.** Ne jamais
 	 ajouter `'unsafe-inline'` à `script-src`. Pas de polices Google, pas de CDN,
-	 pas d'outil de mesure d'audience ni d’iframe externe.
+	 pas d'outil de mesure d'audience extérieur ni d’iframe externe. Le site
+	 compte lui-même ses visites, côté serveur et sans script (voir « La
+	 fréquentation »).
 3. **Aucune adresse IP en clair en base.** On stocke `hmac('ip', adresse)`.
    Cela suffit pour limiter le spam et bloquer quelqu'un, sans conserver de
    donnée personnelle exploitable en cas de fuite.
@@ -772,9 +777,10 @@ Deux sujets demandent une vigilance particulière :
 
 ## Le référencement
 
-Le site n'a aucun outil de mesure d'audience et n'en aura pas (règle n° 2 des
-règles de sécurité). Tout ce qui suit se joue donc dans le HTML, sans script et
-sans service tiers.
+Le site n'a aucun outil de mesure d'audience extérieur et n'en aura pas (règle
+n° 2 des règles de sécurité) : il compte seulement ses visites lui-même, côté
+serveur (voir « La fréquentation »). Tout ce qui suit se joue donc dans le HTML,
+sans script et sans service tiers.
 
 **Toute page publique passe par `Metadonnees.svelte`.** Une page qui écrit son
 propre `<svelte:head>` perd l'adresse canonique et les aperçus, et personne ne
@@ -839,11 +845,124 @@ une fois :
 4. **Publier régulièrement.** Un site qui ne bouge pas est recrawlé de moins en
    moins souvent.
 
+## Les vagues de requêtes
+
+Le 16 octobre 2026 vers 21 h 27, environ 80 adresses ont envoyé 75 000 requêtes
+en dix minutes, presque toutes sur la page d'accueil, puis 26 000 autres vers
+1 h. Le site est resté figé de 21 h 27 à 1 h 07 : trois heures et demie, alors
+que la première vague s'était éteinte au bout de dix minutes. La chaîne, telle
+que les journaux la montrent :
+
+1. Le site fabrique une page en quelques dizaines de millisecondes. Face à plus
+   de 500 requêtes par seconde, il a pris du retard, et Caddy a accumulé les
+   requêtes en attente.
+2. Caddy est monté à 3 Go de mémoire sur les 4 du serveur ; le système l'a tué
+   deux fois.
+3. Le serveur entier, à court de mémoire, s'est enrayé. Docker ne lisait plus
+   les journaux, et Caddy, qui écrit une ligne d'erreur par requête perdue,
+   s'est arrêté net en attendant de pouvoir écrire. Des lignes écrites à 21 h 29
+   n'ont été reçues qu'entre 1 h 01 et 1 h 06, au moment précis où le site est
+   revenu.
+
+Quatre protections répondent chacune à un maillon, de l'extérieur vers
+l'intérieur :
+
+- **Des plafonds de mémoire** (`docker/compose.yml`) : 512 Mo pour Caddy, 1 Go
+  pour le site. Un conteneur qui s'emballe est arrêté et relancé en quelques
+  secondes, sans entraîner le reste du serveur.
+- **Des journaux bornés et non bloquants** (`docker/compose.yml`) : trois
+  fichiers de 10 Mo, en mode `non-blocking`. Mieux vaut perdre des lignes que
+  figer le programme qui les écrit.
+- **Caddy ne fait plus attendre** (`docker/Caddyfile`) : au-delà de cent
+  requêtes en cours de traitement par le site (`unhealthy_request_count`), il
+  répond tout de suite que le site est surchargé, avec un message lisible
+  (`handle_errors`). Il ferme aussi les connexions trop lentes ou inactives.
+- **Le site écarte les adresses insistantes** (`src/lib/server/limiteur.ts`),
+  avant toute lecture de la base : refuser coûte un dixième de milliseconde,
+  fabriquer la page cent fois plus. Chaque adresse a deux réserves : une
+  générale (300 requêtes d'affilée, puis 5 par seconde) et une par page (60 fois
+  la même page, puis 10 par minute). Les adresses IPv6 sont regroupées par bloc
+  de 64 bits, sans quoi un attaquant en changerait à chaque requête.
+
+Les seuils sont larges exprès : une même adresse peut cacher tout le Wi-Fi d'un
+bar pendant un apéro, une salle de réunion, ou les abonnés d'un opérateur mobile
+qui partage ses adresses. Avant de les resserrer, se demander qui serait
+bloqué. Le limiteur garde ses compteurs en mémoire, et non en base comme
+`ratelimit.ts` (commentaires, connexion) : écrire chaque requête dans SQLite
+ferait exactement le travail que l'attaquant cherche à imposer.
+
+**Ce que ces protections ne font pas** : arrêter une vague venue de milliers
+d'adresses qui demandent chacune peu de pages. Le plafond de Caddy garde alors
+le serveur debout, mais les visiteurs lisent « surchargé » le temps de la
+vague. Au-delà, il faudrait un service de filtrage placé devant le site
+(Cloudflare ou équivalent), qui verrait passer chaque visiteur : c'est
+contraire à ce que promet le site, et cette décision n'a pas été prise.
+
+Les réglages de `compose.yml` ne s'appliquent qu'à la recréation des
+conteneurs. `scripts/deployer.sh` s'en charge quand le fichier change.
+
+## La fréquentation
+
+Administration → Fréquentation montre les visites des trente derniers jours,
+les pages les plus lues, les sites d'où viennent les visiteurs, et le trafic
+avec les pics détectés. Le tableau de bord signale un pic des dernières
+48 heures.
+
+Le site compte lui-même, dans `src/lib/server/frequentation.ts` appelé par
+`hooks.server.ts`. **Aucun script, aucun cookie, aucun service extérieur** :
+tout vient de ce que chaque requête apporte de toute façon. **Aucune adresse IP
+ni aucun identifiant de visiteur n'est conservé** (règle n° 3) :
+
+- pour compter les visiteurs distincts d'une journée, on calcule une empreinte
+  de l'adresse et du navigateur avec un sel tiré au hasard chaque jour et gardé
+  **en mémoire seulement**. À minuit, il est oublié sans avoir été écrit nulle
+  part : plus personne ne peut relier deux visites. Seul le total part en base ;
+- les compteurs sont versés en base une fois par minute, en une transaction, et
+  à l'arrêt du conteneur (`sveltekit:shutdown`) ;
+- la table des minutes est purgée au bout de 90 jours (`nettoyer()` dans
+  `db.ts`) ; les totaux par jour sont gardés. La page Confidentialité le dit :
+  la tenir à jour si cela change.
+
+Compte comme page vue une requête GET réussie qui renvoie du HTML, ou les
+données d'une page quand le visiteur navigue sans recharger (SvelteKit ne
+redemande alors que ses données). Les images, les flux, l'administration, les
+administrateurs connectés et la vérification de santé de Docker ne comptent
+pas ; les robots qui s'annoncent sont comptés à part.
+
+C'est pour cela que `app.html` précharge **les données d'une page au clic**
+(`data-sveltekit-preload-data="tap"`), et son code seulement au survol.
+Précharger les données au survol comptait comme lue chaque page effleurée par
+la souris, et faisait calculer au serveur des pages que personne n'ouvrait. Sur
+téléphone, rien ne change : le préchargement y part au toucher dans les deux
+cas.
+
+Les chiffres sont des **ordres de grandeur**. Un redémarrage du site (chaque
+mise à jour) oublie le sel du jour : quelqu'un qui revient le même jour compte
+alors deux fois. Les « visites » sur sept ou trente jours additionnent les
+visiteurs de chaque jour : quelqu'un qui revient trois jours compte trois fois.
+
+Un **pic** est une minute de plus de 600 requêtes (`SEUIL_PIC`) ; le site en
+reçoit d'habitude quelques dizaines. Il est lu comme une « attaque probable »
+quand au moins un cinquième des requêtes ont été bloquées, ou quand chaque
+adresse en envoie en moyenne plus de soixante par minute ; sinon comme une
+« forte affluence », un article qui circule. Les requêtes que Caddy refuse
+lui-même n'atteignent pas le site et n'apparaissent donc pas.
+
+Les graphiques (`Histogramme.svelte`) sont faits de boîtes HTML et non d'un
+dessin SVG, pour que le texte ne rapetisse pas sur téléphone. Leurs deux
+couleurs (`--color-graphe` et `--color-graphe-alerte` dans `app.css`) sont
+dérivées du violet et du rouge du logo, et ont été vérifiées pour rester
+distinctes aux yeux des daltoniens, dans les deux thèmes : les changer demande
+de refaire cette vérification. Chaque graphique se parcourt au clavier et a son
+tableau de chiffres dépliable.
+
 ## Ajouter une page fixe
 
 Créer `src/routes/mon-adresse/+page.svelte`, puis ajouter le lien dans la
 navigation de `src/routes/+layout.svelte` et dans `PAGES_FIXES` de
-`src/routes/sitemap.xml/+server.ts`.
+`src/routes/sitemap.xml/+server.ts`. Ajouter aussi son titre dans `PAGES_FIXES`
+de `src/routes/admin/(interne)/frequentation/+page.server.ts`, pour que la page
+Fréquentation l'affiche par son nom plutôt que par son adresse.
 
 ## Le mode démonstration
 

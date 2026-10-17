@@ -390,6 +390,42 @@ const MIGRATIONS: string[] = [
 	 set pinned_at = coalesce(published_at, updated_at)
 	 where pinned = 1;
 	create index publications_pinned on publications(status, pinned, pinned_at desc);
+	`,
+	// 018 - la fréquentation, comptée par le site lui-même
+	//
+	// Uniquement des totaux : aucune adresse IP, aucun identifiant de visiteur,
+	// rien qui permette de suivre quelqu'un d'une page à l'autre (voir
+	// frequentation.ts). Les tables par jour sont gardées, celle des minutes
+	// est purgée au bout de 90 jours.
+	`
+	create table frequentation_jours (
+		jour text primary key,               -- AAAA-MM-JJ, heure de Paris
+		pages_vues integer not null default 0,
+		visiteurs integer not null default 0,
+		robots integer not null default 0    -- moteurs de recherche, aperçus de liens…
+	) without rowid;
+
+	create table frequentation_pages (
+		jour text not null,
+		chemin text not null,                -- /articles/mon-article, sans les paramètres
+		vues integer not null default 0,
+		primary key (jour, chemin)
+	) without rowid;
+
+	create table frequentation_provenances (
+		jour text not null,
+		provenance text not null,            -- nom du site d'où l'on arrive, ou '' pour un accès direct
+		arrivees integer not null default 0,
+		primary key (jour, provenance)
+	) without rowid;
+
+	create table trafic_minutes (
+		minute text primary key,             -- AAAA-MM-JJTHH:MM, en UTC
+		requetes integer not null default 0,
+		bloquees integer not null default 0, -- refusées par le limiteur (429)
+		erreurs integer not null default 0,  -- réponses 5xx
+		adresses integer not null default 0  -- adresses différentes dans la minute
+	) without rowid;
 	`
 ];
 
@@ -464,6 +500,9 @@ export function nettoyer() {
 	base.prepare('delete from sessions where expires_at < ?').run(now());
 	base.prepare('delete from rate_limits where created_at < ?').run(maintenantMs - 24 * 3600_000);
 	base.prepare('delete from used_challenges where expires_at < ?').run(maintenantMs);
+	base.prepare('delete from trafic_minutes where minute < ?').run(
+		new Date(maintenantMs - 90 * 24 * 3600_000).toISOString().slice(0, 16)
+	);
 }
 
 let minuterie: ReturnType<typeof setInterval> | null = null;

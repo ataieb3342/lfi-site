@@ -3,6 +3,7 @@ import { db } from '$lib/server/db';
 import { listForAdmin } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
 import { recentAudit } from '$lib/server/auth';
+import { picRecent, resumeFrequentation } from '$lib/server/frequentation';
 
 export const load: PageServerLoad = async () => {
 	const compte = (sql: string) => (db().prepare(sql).get() as { n: number }).n;
@@ -17,6 +18,8 @@ export const load: PageServerLoad = async () => {
 			commentaires: compte("select count(*) as n from comments where status = 'approved'")
 		},
 		recentes: listForAdmin().slice(0, 6).map(presentPublication),
-		journal: recentAudit(8)
+		journal: recentAudit(8),
+		frequentation: resumeFrequentation(),
+		picRecent: picRecent()
 	};
 };

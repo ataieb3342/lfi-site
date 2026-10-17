@@ -11,6 +11,7 @@
 		{ href: '/admin/commentaires', label: 'Commentaires', badge: data.commentairesEnAttente },
 		{ href: '/admin/sources', label: 'Sources des apéros', badge: data.sourcesEnAttente },
 		{ href: '/admin/medias', label: 'Images' },
+		{ href: '/admin/frequentation', label: 'Fréquentation' },
 		...(data.adminCourant.role === 'owner' ? [{ href: '/admin/comptes', label: 'Comptes' }] : []),
 		{ href: '/admin/reglages', label: 'Réglages' },
 		{ href: '/admin/mon-compte', label: 'Mon compte' }

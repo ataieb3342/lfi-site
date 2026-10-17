@@ -101,6 +101,14 @@
 	   texte doit passer au sombre pour rester lisible. */
 	--color-sur-brand: #ffffff;
 
+	/* Les barres des graphiques de l'administration (Fréquentation). Le violet
+	   de la marque est trop sombre pour une barre et le rouge trop pâle en
+	   thème sombre : ces deux teintes en sont dérivées, et la paire a été
+	   vérifiée pour rester distincte aux yeux des daltoniens, dans les deux
+	   thèmes. Le rouge marque les requêtes bloquées. */
+	--color-graphe: #7445a8;
+	--color-graphe-alerte: #b8334a;
+
 	--font-sans:
 		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 	--font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
@@ -161,6 +169,8 @@
 		--color-line: #2f2740;
 		--color-line-forte: #6d6280;
 		--color-sur-brand: #1a0f2e;
+		--color-graphe: #9b7bd8;
+		--color-graphe-alerte: #e0566b;
 	}
 }
 :root[data-theme='sombre'] {
@@ -185,6 +195,8 @@
 	--color-line: #2f2740;
 	--color-line-forte: #6d6280;
 	--color-sur-brand: #1a0f2e;
+	--color-graphe: #9b7bd8;
+	--color-graphe-alerte: #e0566b;
 }
 
 html {

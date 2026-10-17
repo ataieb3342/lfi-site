@@ -5,6 +5,8 @@ import { SESSION_COOKIE, resolveSession } from '$lib/server/auth';
 import { hmac } from '$lib/server/crypto';
 import { annoncerInstallationSiNecessaire } from '$lib/server/installation';
 import { modeDemo, preparerDemoSiNecessaire } from '$lib/server/demo';
+import { compterReponse, compterRequete } from '$lib/server/frequentation';
+import { autoriser, reponseTropDeRequetes } from '$lib/server/limiteur';
 import { THEME_COOKIE, lireTheme } from '$lib/server/theme';
 
 /** Chemins de l'administration accessibles sans être connecté. */
@@ -23,8 +25,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 	try {
 		clientAddress = event.getClientAddress();
 	} catch {
-		// Certains contextes (prérendu) n'ont pas d'adresse : on continue.
+		// Certains contextes (prérendu, vérification de santé de Docker) n'ont
+		// pas d'adresse : on continue.
 	}
+
+	// Une adresse trop insistante est écartée ici, avant toute lecture de la
+	// base : refuser coûte cent fois moins cher que fabriquer la page.
+	const autorisee = clientAddress === 'inconnue' || autoriser(clientAddress, event.url.pathname);
+	compterRequete(clientAddress, !autorisee);
+	if (!autorisee) return reponseTropDeRequetes();
+
 	event.locals.ipHash = hmac('ip', clientAddress);
 	event.locals.admin = resolveSession(event.cookies.get(SESSION_COOKIE));
 
@@ -45,6 +55,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%sveltekit.theme%', event.locals.theme)
 	});
+
+	// Des totaux en mémoire, versés en base une fois par minute : ni cookie,
+	// ni adresse IP conservée (voir src/lib/server/frequentation.ts).
+	compterReponse(event, response, clientAddress);
 
 	// En-têtes de sécurité. La CSP elle-même est configurée dans vite.config.ts.
 	response.headers.set('X-Content-Type-Options', 'nosniff');

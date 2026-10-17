@@ -42,6 +42,14 @@ export function formatRelative(iso: string | null | undefined): string {
 	return formatDate(iso);
 }
 
+/**
+ * « 1 requête », « 0 requête », « 1 234 requêtes ». En français, zéro et un
+ * prennent le singulier. Le pluriel par défaut ajoute un « s ».
+ */
+export function compte(nombre: number, singulier: string, pluriel = `${singulier}s`): string {
+	return `${nombre.toLocaleString('fr-FR')} ${nombre > 1 ? pluriel : singulier}`;
+}
+
 /** Taille lisible d'un document : « 820 Ko » ou « 45,2 Mo ». */
 export function formatTailleFichier(octets: number): string {
 	if (octets < 1024 * 1024) return `${Math.max(1, Math.round(octets / 1024))} Ko`;

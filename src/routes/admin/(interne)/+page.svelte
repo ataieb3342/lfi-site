@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatRelative, lienPublication } from '$lib/format';
+	import { compte, formatRelative, lienPublication } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -38,6 +38,17 @@
 	</a>
 {/if}
 
+{#if data.picRecent}
+	<a
+		href="/admin/frequentation"
+		class="mt-3 block hover:underline {data.picRecent.attaque ? 'alerte' : 'alerte alerte-succes'}"
+	>
+		{data.picRecent.attaque ? 'Attaque probable' : 'Forte affluence'}
+		{formatRelative(`${data.picRecent.debut}Z`)} : {compte(data.picRecent.requetes, 'requête')}, dont
+		{compte(data.picRecent.bloquees, 'bloquée')}. Voir la fréquentation.
+	</a>
+{/if}
+
 <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
 	{#each chiffres as chiffre (chiffre.label)}
 		<div class="carte">
@@ -46,6 +57,18 @@
 		</div>
 	{/each}
 </div>
+
+<a href="/admin/frequentation" class="carte mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 hover:border-brand">
+	<span>
+		<strong class="text-2xl font-extrabold text-ink">{data.frequentation.aujourdhui.toLocaleString('fr-FR')}</strong>
+		<span class="text-xs text-ink-faint">{data.frequentation.aujourdhui > 1 ? 'visiteurs' : 'visiteur'} aujourd’hui</span>
+	</span>
+	<span>
+		<strong class="text-2xl font-extrabold text-ink">{data.frequentation.semaine.toLocaleString('fr-FR')}</strong>
+		<span class="text-xs text-ink-faint">{data.frequentation.semaine > 1 ? 'visites' : 'visite'} sur 7 jours</span>
+	</span>
+	<span class="ml-auto text-sm font-semibold text-brand">Fréquentation et surveillance →</span>
+</a>
 
 <section class="mt-10">
 	<div class="mb-3 flex items-baseline justify-between">

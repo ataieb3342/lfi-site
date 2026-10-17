@@ -167,11 +167,25 @@ spam de commentaires (preuve de travail, quotas, pré-modération), lecture de
 fichiers arbitraires (les images sont servies depuis la base), fuite de données
 personnelles (aucune IP en clair, secrets 2FA chiffrés).
 
+**Protégé en partie : les vagues de requêtes.** Le 16 octobre 2026, une vague
+venue de 80 adresses a figé le site trois heures et demie. Depuis, le site
+refuse les adresses trop insistantes, Caddy répond « surchargé » au lieu de
+faire attendre, et chaque conteneur a un plafond de mémoire et des journaux
+bornés : une vague de cette taille est absorbée, et si elle dépasse, le site
+revient seul en quelques secondes après. Le détail est dans CLAUDE.md
+(« Les vagues de requêtes »), et Administration → Fréquentation montre ce qui
+arrive au site, minute par minute. Pour voir la mémoire de chaque conteneur :
+
+```bash
+ssh lfi 'docker stats --no-stream'
+```
+
 **Non protégé par le code :**
 
-- **La saturation réseau.** C'est l'anti-DDoS de l'hébergeur qui joue ce rôle.
-  En cas d'attaque sérieuse, mettre le site derrière un service de filtrage est
-  la seule réponse efficace.
+- **La saturation réseau, ou une vague venue de milliers d'adresses.** C'est
+  l'anti-DDoS de l'hébergeur qui joue ce rôle pour le réseau. En cas d'attaque
+  sérieuse et durable, mettre le site derrière un service de filtrage est la
+  seule réponse efficace — au prix d'un tiers qui voit passer chaque visiteur.
 - **Un ordinateur d'administrateur compromis.** Aucune protection côté serveur
   ne survit à un poste infecté.
 - **L'hameçonnage.** La double authentification par code élève beaucoup la

@@ -175,6 +175,14 @@ export function getPublishedBySlug(slug: string): PublicationListItem | undefine
 		| undefined;
 }
 
+/** Le titre des publications dont l'adresse se termine par l'un de ces slugs (page Fréquentation). */
+export function titresParSlug(slugs: string[]): { kind: Kind; slug: string; title: string }[] {
+	if (slugs.length === 0) return [];
+	return db()
+		.prepare(`select kind, slug, title from publications where slug in (${slugs.map(() => '?').join(', ')})`)
+		.all(...slugs) as { kind: Kind; slug: string; title: string }[];
+}
+
 export function getById(id: number): Publication | undefined {
 	return db().prepare('select * from publications where id = ?').get(id) as Publication | undefined;
 }
