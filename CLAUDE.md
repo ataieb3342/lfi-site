@@ -45,6 +45,7 @@ native.
 | `src/lib/components/BandeauApplication.svelte` | Invitation à installer Action populaire |
 | `src/lib/components/Encart.svelte` | Le gabarit unique des encarts d'appel |
 | `src/lib/components/Metadonnees.svelte` | Titre, description, adresse canonique et aperçus - sur **toutes** les pages publiques |
+| `src/lib/components/Partage.svelte` | Les boutons de partage en bas de chaque publication (voir « Le partage ») |
 | `src/lib/components/Histogramme.svelte` | Le graphique en colonnes de l'administration |
 | `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin`, limite par adresse, comptage des visites |
@@ -572,6 +573,32 @@ Pour ajouter une plateforme (PeerTube, Vimeo), étendre `VIDEO` et la
 construction de l'URL dans le moteur de rendu. `linkify` doit d'abord avoir
 reconnu l'adresse comme un lien, sans quoi la règle ne voit rien.
 
+## Le partage
+
+Chaque publication (article, actualité, apéro, revue de presse) se termine par
+une rangée de boutons : WhatsApp, Facebook, Telegram, Bluesky, X, e-mail
+(`Partage.svelte`, liste `reseaux`). Pas sur l'aperçu d'un brouillon.
+
+- **Ce sont de simples liens** vers la page de partage de chaque réseau. Les
+  boutons « officiels » des réseaux sont des scripts et des iframes qui leur
+  signalent chaque lecteur, qu'il partage ou non : la CSP les refuse (règle
+  n° 2), et le pied de page promet qu'aucun service tiers n'est utilisé. Rien
+  ne part vers un réseau avant le clic.
+- Deux boutons n'apparaissent qu'avec le script : « Copier le lien » (avec une
+  méthode de secours pour les navigateurs intégrés à Facebook ou Instagram, qui
+  refusent l'accès au presse-papiers) et « Autres applications », le menu de
+  partage du téléphone.
+- Les icônes sont les logos de Simple Icons (domaine public), recopiés dans le
+  composant : des SVG du projet, pas des fichiers venus de l'extérieur.
+
+**L'image d'aperçu.** Un lien partagé affiche l'image de couverture de la
+publication. Sans couverture, `Metadonnees.svelte` annonce
+`static/apercu-partage.jpg` : le phi blanc sur le fond de `.fond-degrade`, en
+1200 × 630, le format des grandes cartes de partage. Avant, une page sans
+couverture n'avait aucune image, et son lien passait inaperçu dans un fil.
+Les réseaux gardent l'aperçu d'une adresse en mémoire un certain temps : une
+page déjà partagée avant ce changement ne le montre pas tout de suite.
+
 ## Le formulaire de publication
 
 `src/lib/components/FormulairePublication.svelte` offre une barre d'outils
@@ -958,6 +985,12 @@ quand au moins un cinquième des requêtes ont été bloquées, ou quand chaque
 adresse en envoie en moyenne plus de soixante par minute ; sinon comme une
 « forte affluence », un article qui circule. Les requêtes que Caddy refuse
 lui-même n'atteignent pas le site et n'apparaissent donc pas.
+
+Les listes (pages lues, provenances) tiennent chacune sur une ligne, avec une
+barre proportionnelle derrière le chiffre, et n'en montrent que huit : le reste
+est replié sous « Voir les suivantes », comme les pics au-delà des trois plus
+récents. Avec le titre puis l'adresse de chaque page sur deux lignes, la liste
+faisait défiler un écran entier ; l'adresse est passée dans l'infobulle.
 
 Les graphiques (`Histogramme.svelte`) sont faits de boîtes HTML et non d'un
 dessin SVG, pour que le texte ne rapetisse pas sur téléphone. Leurs deux

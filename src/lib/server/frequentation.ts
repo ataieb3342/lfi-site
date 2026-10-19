@@ -405,7 +405,7 @@ export function lireFrequentation() {
 
 	const pages = base
 		.prepare(
-			'select chemin, sum(vues) as vues from frequentation_pages where jour >= ? group by chemin order by vues desc limit 15'
+			'select chemin, sum(vues) as vues from frequentation_pages where jour >= ? group by chemin order by vues desc limit 20'
 		)
 		.all(jours[0]) as { chemin: string; vues: number }[];
 

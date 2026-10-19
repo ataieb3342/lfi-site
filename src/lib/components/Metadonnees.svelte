@@ -26,7 +26,7 @@
 		/** Le titre complet de l'onglet, tel qu'il apparaîtra dans Google. */
 		titre: string;
 		description: string;
-		/** Chemin d'une image de couverture (« /media/… »), rendue absolue ici. */
+		/** Chemin d'une image de couverture (« /media/… »), rendue absolue ici. À défaut, l'image d'aperçu du site. */
 		image?: string | null;
 		type?: 'website' | 'article';
 		/** Faux pour une page qui ne doit pas entrer dans l'index (résultats de recherche, brouillon). */
@@ -37,9 +37,15 @@
 		donnees?: unknown;
 	} = $props();
 
+	// Sans image de couverture, l'aperçu d'un lien partagé montre le phi sur le
+	// violet du site (le fond de `.fond-degrade`). Sans aucune image, le lien
+	// passait inaperçu dans un fil WhatsApp ou Facebook. 1200 × 630 : le format
+	// des grandes cartes de partage, sur tous les réseaux.
+	const IMAGE_PAR_DEFAUT = { chemin: '/apercu-partage.jpg', largeur: 1200, hauteur: 630 };
+
 	const origine = $derived(page.url.origin);
 	const adresse = $derived(origine + (canonique ?? page.url.pathname));
-	const imageAbsolue = $derived(image ? origine + image : null);
+	const imageAbsolue = $derived(origine + (image ?? IMAGE_PAR_DEFAUT.chemin));
 	const nomDuSite = $derived(page.data.settings?.siteName ?? '');
 
 	// Les « < » du JSON sont échappés avant d'être écrits dans la page : un
@@ -72,9 +78,15 @@
 	<meta property="og:url" content={adresse} />
 	<meta property="og:locale" content="fr_FR" />
 	{#if nomDuSite}<meta property="og:site_name" content={nomDuSite} />{/if}
-	{#if imageAbsolue}<meta property="og:image" content={imageAbsolue} />{/if}
+	<meta property="og:image" content={imageAbsolue} />
+	{#if !image}
+		<!-- Les dimensions permettent à Facebook d'afficher l'image dès le premier
+		     partage, sans attendre de l'avoir téléchargée. -->
+		<meta property="og:image:width" content={String(IMAGE_PAR_DEFAUT.largeur)} />
+		<meta property="og:image:height" content={String(IMAGE_PAR_DEFAUT.hauteur)} />
+	{/if}
 
-	<meta name="twitter:card" content={imageAbsolue ? 'summary_large_image' : 'summary'} />
+	<meta name="twitter:card" content="summary_large_image" />
 
 	<!--
 		Les données structurées sont un bloc de données, pas un script : le

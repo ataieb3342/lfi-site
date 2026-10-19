@@ -47,7 +47,9 @@ export function organisation(origine: string, identite: Identite, cadre: CadreAp
 		alternateName: identite.tagline,
 		description: identite.description,
 		url: `${origine}/`,
-		logo: `${origine}/favicon.svg`,
+		// Une image PNG plutôt que le SVG du favicon : le format que tous les
+		// moteurs lisent, et assez grande (192 pixels, Google en demande 112).
+		logo: `${origine}/icone-192.png`,
 		areaServed: { '@type': 'City', name: 'Dijon' },
 		address: { '@type': 'PostalAddress', addressLocality: 'Dijon', postalCode: '21000', addressCountry: 'FR' },
 		parentOrganization: {
@@ -87,7 +89,7 @@ export function editeur(origine: string, identite: Identite) {
 		'@id': `${origine}/#organisation`,
 		name: identite.siteName,
 		url: `${origine}/`,
-		logo: { '@type': 'ImageObject', url: `${origine}/favicon.svg` }
+		logo: { '@type': 'ImageObject', url: `${origine}/icone-192.png` }
 	};
 }
 

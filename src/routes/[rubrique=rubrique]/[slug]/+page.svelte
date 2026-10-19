@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
+	import Partage from '$lib/components/Partage.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
 	import { articleStructure, editeur, evenementAction, evenementApero, filAriane } from '$lib/donnees-structurees';
 	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, LIBELLE_ACTION, libellePublication } from '$lib/format';
@@ -196,6 +197,11 @@
 			Vous voulez être avec nous la prochaine fois ?
 			<a class="font-bold text-brand underline" href="https://actionpopulaire.fr" target="_blank" rel="noreferrer">Rejoignez-nous sur Action populaire</a>.
 		</p>
+	{/if}
+
+	<!-- Un brouillon n'est pas public : rien à partager. -->
+	{#if !data.apercu}
+		<Partage titre={p.title} {adresse} />
 	{/if}
 </article>
 
