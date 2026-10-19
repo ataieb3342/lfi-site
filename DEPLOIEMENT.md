@@ -148,11 +148,21 @@ ssh lfi '/srv/lfi-site/scripts/deployer.sh'
 ssh lfi 'tail -30 /var/log/deploiement-site.log'
 ```
 
-Trois choses que le script gère et qu'on oublie en le faisant à la main : la
+Quatre choses que le script gère et qu'on oublie en le faisant à la main : la
 **sauvegarde préalable** (une migration ne se rejoue pas à l'envers), le
 **verrou** (une compilation dure plus de cinq minutes, cron relancerait par
-dessus), et la **recréation du conteneur Caddy** quand `docker/Caddyfile` a
-changé - le fichier est monté dans le conteneur, qui garde l'ancien sinon.
+dessus), la **recréation du conteneur Caddy** quand `docker/Caddyfile` a
+changé - le fichier est monté dans le conteneur, qui garde l'ancien sinon -,
+et le **ménage** des anciennes images et du cache de compilation, qui sinon
+s'accumulent jusqu'à remplir le disque.
+
+**Tout dossier ajouté dans `/srv/lfi-site` sur le serveur doit figurer dans
+`.dockerignore`.** Ce dossier est ce que Docker reçoit pour compiler. Le
+19 octobre 2026, le disque de 40 Go était plein : les sauvegardes et les
+preuves de l'attaque, qui n'y figuraient pas, étaient recopiées dans la
+compilation à chaque mise à jour, et Docker gardait chaque copie en cache. Le
+site a cessé de se mettre à jour et de se sauvegarder sans que rien ne le
+signale. Pour vérifier la place libre : `ssh lfi 'df -h /'`.
 
 Si la compilation échoue, les conteneurs en place continuent de servir la
 version précédente : un commit cassé ne coupe pas le site, il empêche

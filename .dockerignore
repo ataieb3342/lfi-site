@@ -2,6 +2,12 @@ node_modules
 .svelte-kit
 build
 data
+# Les sauvegardes et les preuves de l'attaque du 16 octobre vivent dans le
+# dossier du site, sur le serveur. Sans ces deux lignes, chaque mise à jour les
+# recopiait toutes dans la compilation, et Docker gardait la copie en cache :
+# le 19 octobre 2026, le disque de 40 Go était plein.
+sauvegardes
+incidents
 .git
 .env
 .env.*

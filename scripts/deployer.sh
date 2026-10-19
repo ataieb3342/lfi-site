@@ -57,4 +57,13 @@ if [ "$CADDY_A_RECREER" = 1 ]; then
 	$COMPOSE up -d --force-recreate caddy
 fi
 
-echo "✓ en ligne : $(git log --oneline -1)"
+# Chaque compilation laisse derrière elle l'image précédente et un cache. Sans
+# ce ménage, ils s'accumulent jusqu'à remplir le disque : le 19 octobre 2026,
+# le site a cessé de se mettre à jour et de se sauvegarder, sans que rien ne le
+# signale. Seul ce qui ne sert plus est supprimé : les conteneurs en marche
+# gardent leur image, et les données du site ne sont pas dans Docker. Un échec
+# ici n'annule pas la mise à jour, qui est déjà en ligne.
+docker image prune -f > /dev/null || true
+docker builder prune -af > /dev/null || true
+
+echo "✓ en ligne : $(git log --oneline -1) - $(df -h "$RACINE" | awk 'NR==2 {print $4}') libres sur le disque"

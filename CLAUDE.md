@@ -1051,3 +1051,11 @@ les cinq minutes**, sans relecture : `npm run check` avant de pousser n'est pas
 une politesse. Et si la compilation échoue, les conteneurs en place continuent
 de servir la version précédente - le site ne tombe pas, il cesse simplement de
 se mettre à jour, ce que seul `/var/log/deploiement-site.log` dira.
+
+**Tout dossier ajouté dans `/srv/lfi-site` sur le serveur doit figurer dans
+`.dockerignore`** : c'est ce que Docker reçoit pour compiler. Le 19 octobre
+2026, les sauvegardes et les preuves de l'attaque, absentes de ce fichier,
+étaient recopiées à chaque mise à jour et gardées dans le cache de Docker,
+jusqu'à remplir le disque de 40 Go. Le site a cessé de se mettre à jour et de
+se sauvegarder sans rien signaler. `deployer.sh` fait depuis le ménage des
+images et du cache après chaque mise à jour, et le journal note la place libre.
