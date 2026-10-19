@@ -8,6 +8,7 @@
 	import { articleStructure, editeur, evenementAction, evenementApero, filAriane } from '$lib/donnees-structurees';
 	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, LIBELLE_ACTION, libellePublication } from '$lib/format';
 	import { RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
+	import { lienGoogleAgenda, rendezVous } from '$lib/agenda';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -36,6 +37,11 @@
 	const rubrique = $derived(RUBRIQUE_PAR_KIND[p.kind]);
 	const adresse = $derived(`${page.url.origin}/${rubrique}/${p.slug}`);
 	const estRetourAction = $derived(p.kind === 'actu' && p.eventCategory === 'action');
+	// Ajouter à son agenda n'a de sens que pour un rendez-vous public à venir.
+	const rdv = $derived(
+		p.aVenir && !estRetourAction && !data.apercu ? rendezVous(p, cadre, data.resume, adresse) : null
+	);
+	const agenda = $derived(rdv ? lienGoogleAgenda(rdv) : null);
 	const fiche = $derived(
 		p.kind === 'apero'
 			? evenementApero(page.url.origin, adresse, p, data.resume, cadre, data.settings)
@@ -149,10 +155,28 @@
 		{#if p.eventAt && !estRetourAction && p.eventMeetingPoint}
 			<p class="mt-2 text-sm text-ink-soft"><strong>Point de rendez-vous :</strong> {p.eventMeetingPoint}</p>
 		{/if}
-		{#if p.eventAt && !estRetourAction && p.eventSignupUrl}
-			<p class="mt-4">
-				<a class="bouton" href={p.eventSignupUrl} target="_blank" rel="noopener noreferrer">S’inscrire</a>
-			</p>
+		{#if p.eventAt && !estRetourAction && (p.eventSignupUrl || agenda)}
+			<div class="mt-4 flex flex-wrap items-center gap-2">
+				{#if p.eventSignupUrl}
+					<a class="bouton" href={p.eventSignupUrl} target="_blank" rel="noopener noreferrer">S’inscrire</a>
+				{/if}
+				{#if agenda}
+					<!-- Voir src/lib/agenda.ts : le fichier pour l'iPhone, le Mac et
+					     Outlook, le lien pour Google (et donc Android). -->
+					<a class="bouton-secondaire" href="{adresse}/agenda.ics" data-sveltekit-reload>
+						<svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4" />
+						</svg>
+						<span><span class="sr-only">Ajouter à l’agenda</span> Apple, Outlook</span>
+					</a>
+					<a class="bouton-secondaire" href={agenda} target="_blank" rel="noopener noreferrer">
+						<svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4" />
+						</svg>
+						<span><span class="sr-only">Ajouter à</span> Google Agenda</span>
+					</a>
+				{/if}
+			</div>
 		{/if}
 	</header>
 

@@ -591,6 +591,15 @@ une rangée de boutons : WhatsApp, Facebook, Telegram, Bluesky, X, e-mail
 - Les icônes sont les logos de Simple Icons (domaine public), recopiés dans le
   composant : des SVG du projet, pas des fichiers venus de l'extérieur.
 
+**L'ajout à l'agenda.** Un rendez-vous à venir (actualité datée, formation,
+apéro - pas un retour d'action ni un brouillon) porte deux boutons sous sa
+date (`src/lib/agenda.ts`) : « Apple, Outlook » sert un fichier `.ics`
+(`/<rubrique>/<slug>/agenda.ics`), que l'iPhone et le Mac proposent d'ajouter
+dès qu'on l'ouvre ; « Google Agenda » est un simple lien prérempli, plus sûr
+sur Android où un `.ics` finit souvent dans les téléchargements. Les heures
+restent en heure de Paris ; sans heure de fin, le rendez-vous est inscrit pour
+deux heures, sans heure du tout, pour la journée.
+
 **L'image d'aperçu.** Un lien partagé affiche l'image de couverture de la
 publication. Sans couverture, `Metadonnees.svelte` annonce
 `static/apercu-partage.jpg` : le phi blanc sur le fond de `.fond-degrade`, en
