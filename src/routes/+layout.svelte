@@ -66,6 +66,39 @@
 		});
 	}
 
+	// Le pied de page reprend les familles de l'en-tête, une colonne chacune.
+	// C'est aussi là que vont les pages absentes de l'en-tête de bureau.
+	const groupesPied = [
+		{
+			titre: 'Le groupe',
+			liens: [
+				{ href: '/le-groupe', label: 'Qui sommes-nous ?' },
+				{ href: '/nous-rejoindre', label: 'Nous rejoindre' },
+				{ href: '/agenda', label: 'Agenda' },
+				{ href: '/aperos', label: 'Apéros' }
+			]
+		},
+		{
+			titre: 'Ressources',
+			liens: [
+				{ href: '/revue-de-presse', label: 'Revue de presse' },
+				{ href: '/bibliotheque', label: 'Bibliothèque' },
+				{ href: '/boite-a-outils', label: 'Boîte à outils' },
+				{ href: '/jeux', label: 'Jeux' },
+				{ href: '/medias', label: 'Médias' }
+			]
+		},
+		{
+			titre: 'Le site',
+			liens: [
+				{ href: '/rss.xml', label: 'Flux RSS' },
+				{ href: '/mentions-legales', label: 'Mentions légales' },
+				{ href: '/confidentialite', label: 'Confidentialité' },
+				{ href: '/admin', label: 'Administration' }
+			]
+		}
+	];
+
 	const affichages = [
 		{ valeur: 'auto', label: 'Automatique' },
 		{ valeur: 'clair', label: 'Clair' },
@@ -202,13 +235,16 @@
 <!-- Pas de marge haute : le rembourrage bas de `<main>` fait déjà l'écart, et
      le passage à une surface sombre marque la rupture à lui seul. -->
 <footer class="fond-degrade-sombre">
-	<div class="mx-auto grid max-w-5xl gap-8 px-4 py-8 sm:grid-cols-3">
-		<div class="sm:col-span-2">
+	<!-- Sur grand écran, la présentation à gauche et les liens en trois colonnes.
+	     En une seule liste de onze liens, la colonne de droite faisait plus de
+	     400 pixels de haut, et la moitié gauche restait vide sous la présentation. -->
+	<div class="mx-auto grid max-w-5xl gap-8 px-4 py-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+		<div>
 			<div class="flex items-center gap-3">
 				<Logo variante="mono" class="h-10 w-auto shrink-0 text-white" />
 				<p class="text-lg font-extrabold tracking-tight text-white">{data.settings.siteName}</p>
 			</div>
-			<p class="mt-4 max-w-md text-sm text-white/75">
+			<p class="mt-4 max-w-md text-sm text-pretty text-white/75">
 				Site d'un groupe d'action local de La France insoumise. Les contenus publiés ici
 				n'engagent que ce groupe et ne constituent pas une communication officielle du mouvement.
 			</p>
@@ -220,26 +256,28 @@
 				</p>
 			{/if}
 		</div>
-		<nav aria-label="Pied de page">
-			<ul class="space-y-2 text-sm text-white/80">
-				<li><a class="hover:text-white hover:underline" href="/le-groupe">Qui sommes-nous ?</a></li>
-				<li><a class="hover:text-white hover:underline" href="/nous-rejoindre">Nous rejoindre</a></li>
-				<li><a class="hover:text-white hover:underline" href="/revue-de-presse">Revue de presse</a></li>
-				<li><a class="hover:text-white hover:underline" href="/bibliotheque">Bibliothèque</a></li>
-				<li><a class="hover:text-white hover:underline" href="/boite-a-outils">Boîte à outils</a></li>
-				<li><a class="hover:text-white hover:underline" href="/jeux">Jeux</a></li>
-				<li><a class="hover:text-white hover:underline" href="/medias">Médias</a></li>
-				<li><a class="hover:text-white hover:underline" href="/rss.xml">Flux RSS</a></li>
-				<li><a class="hover:text-white hover:underline" href="/mentions-legales">Mentions légales</a></li>
-				<li><a class="hover:text-white hover:underline" href="/confidentialite">Confidentialité</a></li>
-				<li><a class="hover:text-white hover:underline" href="/admin">Administration</a></li>
-			</ul>
+		<nav aria-label="Pied de page" class="grid grid-cols-2 gap-8 sm:grid-cols-3">
+			{#each groupesPied as groupe (groupe.titre)}
+				<div>
+					<h2 class="text-xs font-bold tracking-[0.2em] text-white/60 uppercase">{groupe.titre}</h2>
+					<ul class="mt-3 space-y-2 text-sm text-white/80">
+						{#each groupe.liens as lien (lien.href)}
+							<li><a class="hover:text-white hover:underline" href={lien.href}>{lien.label}</a></li>
+						{/each}
+					</ul>
+				</div>
+			{/each}
+		</nav>
+	</div>
+	<div class="border-t border-white/15">
+		<div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4">
+			<p class="text-xs text-white/60">© {annee} - Ce site ne dépose aucun cookie de mesure d'audience.</p>
 
 			<!-- Choix d'affichage. Un formulaire ordinaire : le serveur pose un
 			     cookie et renvoie sur la même page, sans JavaScript. -->
-			<form method="POST" action="/theme" class="mt-6">
-				<p id="affichage-titre" class="text-sm font-semibold text-white/80">Affichage</p>
-				<div class="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="affichage-titre">
+			<form method="POST" action="/theme" class="flex flex-wrap items-center gap-x-3 gap-y-2">
+				<p id="affichage-titre" class="text-xs font-semibold text-white/70">Affichage</p>
+				<div class="flex flex-wrap gap-2" role="group" aria-labelledby="affichage-titre">
 					{#each affichages as a (a.valeur)}
 						<button
 							type="submit"
@@ -254,11 +292,6 @@
 					{/each}
 				</div>
 			</form>
-		</nav>
-	</div>
-	<div class="border-t border-white/15">
-		<p class="mx-auto max-w-5xl px-4 py-4 text-xs text-white/60">
-			© {annee} - Ce site ne dépose aucun cookie de mesure d'audience.
-		</p>
+		</div>
 	</div>
 </footer>

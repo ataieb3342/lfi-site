@@ -3,7 +3,6 @@ import { confirmTotp, countAdmins, createAdmin, storeTotpSecret } from './auth.t
 import { createComment, createPublication, createSource } from './content.ts';
 import { decryptAtRest, hmac } from './crypto.ts';
 import { supprimerJetonInstallation } from './installation.ts';
-import { setSetting } from './settings.ts';
 import { currentTotp, generateTotpSecret } from './totp.ts';
 
 /**
@@ -713,6 +712,4 @@ function remplirContenus(adminId: number, imageId: number | null) {
 				.run(ilYaNJours(Math.max(0, publieIlYa - 1), 10 + i), src.statut === 'approved' ? now() : null, idSource);
 		}
 	}
-
-	setSetting('contact_email', 'contact@exemple.fr');
 }

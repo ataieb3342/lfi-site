@@ -621,6 +621,12 @@ liste tout (`liensMobile` dans `src/routes/+layout.svelte`). Ajouter un lien
 dans l'en-tête de bureau le fait déborder sur les écrans moyens : préférer le
 pied de page ou le menu mobile.
 
+Le pied de page range ses liens en trois colonnes titrées - Le groupe,
+Ressources, Le site (`groupesPied`) - à droite de la présentation du groupe sur
+grand écran, en dessous ailleurs. Le choix d'affichage est dans la barre du
+bas, avec le copyright. En une seule liste de onze liens, la colonne faisait
+plus de 400 pixels de haut et laissait la moitié gauche vide.
+
 ## Les jeux
 
 `/jeux` montre quelques jeux faits maison. Chaque jeu est un dossier de
