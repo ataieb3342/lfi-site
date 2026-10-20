@@ -4,7 +4,7 @@
 	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { FORMATS, MEDIAS } from '$lib/medias';
+	import { titreFormat } from '$lib/medias';
 	import { COULEUR_KIND, formatDate, formatDateCourte, formatHeure, libellePublication, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -226,26 +226,28 @@
      était souvent bien plus courte et laissait un grand trou sur ordinateur.
      Sur téléphone, l'ordre ne change pas : ils suivent les actus. Pas en tête
      de page : l'accueil montre d'abord ce que fait le groupe. -->
+{#if data.medias.length}
 <section class="mt-8" aria-labelledby="titre-medias">
 	<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
 		<h2 id="titre-medias" class="text-xl font-extrabold text-ink">On recommande</h2>
 		<a class="text-sm font-semibold text-brand hover:underline" href="/medias">Tout voir</a>
 	</div>
 	<ul class="grid gap-4 sm:grid-cols-2">
-		{#each MEDIAS as media (media.nom)}
+		{#each data.medias as media (media.id)}
 			<li class="carte relative flex gap-3 transition hover:border-brand">
 				<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
-				<img class="size-10 shrink-0 rounded-lg" src={media.logo} alt="" width="40" height="40" loading="lazy" />
+				<img class="size-10 shrink-0 rounded-lg object-cover" src={media.logo} alt="" width="40" height="40" loading="lazy" />
 				<div class="min-w-0">
 					<h3 class="text-sm font-bold text-ink">
 						<a class="after:absolute after:inset-0" href={media.lien} target="_blank" rel="noopener noreferrer">{media.nom}</a>
 					</h3>
-					<p class="text-xs text-ink-faint">{FORMATS.find((f) => f.id === media.format)?.titre}</p>
+					<p class="text-xs text-ink-faint">{titreFormat(media.format)}</p>
 					<p class="mt-1 text-sm leading-snug text-ink-soft">{media.description}</p>
 				</div>
 			</li>
 		{/each}
 	</ul>
 </section>
+{/if}
 
 <BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />

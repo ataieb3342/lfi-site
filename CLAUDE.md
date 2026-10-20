@@ -432,7 +432,7 @@ La page tient maintenant en quatre blocs, de haut en bas :
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
    Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les
-   médias conseillés en cartes, avec leur logo et leur phrase (deux par ligne
+   médias cochés « Sur l'accueil » dans l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
    sur ordinateur). Ils ont d'abord été dans la colonne des actus, mais les
    fiches épinglées étant retirées des « Articles récents », la colonne de
    gauche était plus courte et laissait un trou. Pas en tête de page : un lien
@@ -670,18 +670,32 @@ Ici, la page d'un jeu porte sa propre CSP, aussi fermée que celle du site.
 
 ## Les médias recommandés
 
-`/medias` liste quelques médias que le groupe conseille, écrits en dur dans
-`src/lib/medias.ts` (nom, format « à regarder » ou « à lire », lien, une phrase
-qui dit pourquoi). Pas d'administration : la liste bouge rarement et la
-recommandation est un choix politique, qui passe par un commit relu. **Elle
-reste courte** - cinq médias, c'est un conseil ; vingt, c'est un annuaire.
+`/medias` liste quelques médias que le groupe conseille (nom, format « à
+regarder » ou « à lire », lien, une phrase qui dit pourquoi). Ils sont en base
+(table `medias_recommandes`, migration 019, qui a repris les quatre premiers)
+et se gèrent dans Administration → Médias recommandés
+(`admin/(interne)/medias-recommandes`, logique dans
+`src/lib/server/medias-recommandes.ts`) : ajout, modification, ordre
+(flèches), suppression, et la case **« Sur l'accueil »** qui choisit ceux que
+reprend la section « On recommande ». Tous sont sur `/medias` ; sans aucun
+média coché, la section de l'accueil disparaît. Chaque action passe par
+`audit()` : la recommandation est un choix politique, on doit savoir qui l'a
+faite. **La liste reste courte** - cinq médias, c'est un conseil ; vingt,
+c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
 « Ressources ». Sur l'accueil, ils sont sous les articles et les actualités
 (voir « L'accueil »).
 
-Chaque média a son **logo**, copié dans `static/images/medias/` (PNG carré de
-160 pixels). Jamais chargé depuis le site du média : la CSP l'interdit, et ce
-serait annoncer chaque visiteur de l'accueil à YouTube ou à Mediapart.
+Le lien n'accepte que `https://` (il finit dans un `href` public). L'adresse
+`/admin/medias` est déjà prise par les images : d'où `medias-recommandes`.
+
+Chaque média a son **logo**, servi par le site : les quatre premiers sont dans
+`static/images/medias/`, les suivants sont envoyés depuis le formulaire et
+passent par `storeUpload` comme toute image (type lu dans les octets, SVG
+refusé). Le logo envoyé est relié à l'image par `logo_media_id`, ce qui
+l'empêche d'être supprimé depuis Administration → Images tant qu'il sert.
+Jamais chargé depuis le site du média : la CSP l'interdit, et ce serait
+annoncer chaque visiteur de l'accueil à YouTube ou à Mediapart.
 
 ## La boîte à outils
 

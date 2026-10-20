@@ -1,7 +1,9 @@
 import { listPublicationManagerProfiles, type Comment, type PublicationListItem, type Publication, type Source } from './content.ts';
 import { getMedia } from './media.ts';
+import type { MediaRecommande } from './medias-recommandes.ts';
 import { getAdmin, publicProfileAnchor } from './auth.ts';
 import type { PublicationVue, CommentaireVue, SourceVue } from '$lib/types';
+import type { MediaRecommandeVue } from '$lib/medias';
 
 /**
  * Conversion des lignes SQL en objets destinés au navigateur.
@@ -109,3 +111,15 @@ function nomDuSite(url: string): string {
 }
 
 export type { PublicationVue, CommentaireVue, SourceVue };
+
+export function presentMediaRecommande(row: MediaRecommande): MediaRecommandeVue {
+	return {
+		id: row.id,
+		nom: row.nom,
+		format: row.format,
+		lien: row.lien,
+		description: row.description,
+		logo: row.logo,
+		accueil: !!row.accueil
+	};
+}

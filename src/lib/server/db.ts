@@ -426,6 +426,40 @@ const MIGRATIONS: string[] = [
 		erreurs integer not null default 0,  -- réponses 5xx
 		adresses integer not null default 0  -- adresses différentes dans la minute
 	) without rowid;
+	`,
+	// 019 - les médias recommandés passent du code à l'administration
+	//
+	// `logo` est l'adresse affichée : un fichier de `static/images/medias/`
+	// pour les quatre premiers, `/media/…` pour un logo envoyé depuis
+	// l'administration - `logo_media_id` le relie alors à l'image, pour
+	// qu'elle ne soit pas supprimée tant qu'elle sert.
+	`
+	create table medias_recommandes (
+		id integer primary key,
+		nom text not null,
+		format text not null check (format in ('regarder', 'lire')),
+		lien text not null,
+		description text not null default '',
+		logo text not null default '',
+		logo_media_id integer references media(id) on delete set null,
+		accueil integer not null default 0,  -- 1 : affiché sur l'accueil
+		position integer not null default 0, -- ordre d'affichage, croissant
+		created_at text not null
+	);
+
+	insert into medias_recommandes (nom, format, lien, description, logo, accueil, position, created_at) values
+		('Blast', 'regarder', 'https://www.blast-info.fr/',
+		 'Un média indépendant financé par ses abonnés : enquêtes, débats et émissions d’actualité.',
+		 '/images/medias/blast.png', 1, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+		('Praxis', 'regarder', 'https://www.youtube.com/@PraxisOfficiel',
+		 '« Reprendre le pouvoir » : un média d’action citoyenne financé par ses abonnés, pour passer de l’indignation à l’action.',
+		 '/images/medias/praxis.png', 1, 2, strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+		('Mediapart', 'lire', 'https://www.mediapart.fr/',
+		 'Le journal d’enquête sans publicité, à l’origine de plusieurs grandes affaires politico-financières.',
+		 '/images/medias/mediapart.png', 1, 3, strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+		('Le Monde diplomatique', 'lire', 'https://www.monde-diplomatique.fr/',
+		 'Le mensuel des grandes analyses : géopolitique, économie et critique du néolibéralisme.',
+		 '/images/medias/monde-diplomatique.png', 1, 4, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'));
 	`
 ];
 

@@ -51,6 +51,7 @@ scripts/           sauvegarde et restauration
 | Consulter les ressources validées | Bibliothèque |
 | Ajouter un jeu | Déposer son dossier dans `src/lib/jeux/` et l'ajouter à `src/lib/jeux.ts` |
 | Ajouter une image | Administration → Images |
+| Ajouter un média recommandé, choisir ceux de l'accueil | Administration → Médias recommandés |
 | Changer le nom du site, l'adresse de contact | Administration → Réglages |
 | Ouvrir ou fermer les commentaires du site | Administration → Réglages |
 | Mettre les liens de l'application Action populaire | Administration → Réglages |

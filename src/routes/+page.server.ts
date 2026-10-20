@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
 import type { PublicationVue } from '$lib/types';
 import { listAgenda, listPinnedPublished, listPublished } from '$lib/server/content';
-import { presentPublication } from '$lib/server/present';
+import { presentMediaRecommande, presentPublication } from '$lib/server/present';
+import { listMediasRecommandes } from '$lib/server/medias-recommandes';
 
 /** Nombre de jours couverts par le fil « Les prochains jours ». */
 const HORIZON = 15;
@@ -89,6 +90,8 @@ export const load: PageServerLoad = async () => {
 		aLaUne,
 		articles: articles.filter((article) => !idsALaUne.has(article.id)).slice(0, 5),
 		prochainsJours,
-		actus: actus.slice(0, 5)
+		actus: actus.slice(0, 5),
+		// Les médias cochés « Sur l'accueil » dans l'administration.
+		medias: listMediasRecommandes({ accueil: true }).map(presentMediaRecommande)
 	};
 };
