@@ -9,5 +9,5 @@ export const trailingSlash = 'always';
 
 const DOSSIERS = JEUX.map((jeu) => jeu.dossier);
 
-export const GET: RequestHandler = ({ params }) =>
-	servirFichierEmbarque('jeux', DOSSIERS, params.jeu, 'index.html');
+export const GET: RequestHandler = ({ params, url }) =>
+	servirFichierEmbarque('jeux', DOSSIERS, params.jeu, 'index.html', url.origin);

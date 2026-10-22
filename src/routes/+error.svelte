@@ -2,7 +2,9 @@
 	import { page } from '$app/state';
 </script>
 
-<svelte:head><title>{page.status} - Page introuvable</title></svelte:head>
+<!-- « Page introuvable » seulement pour une 404 : une panne du serveur n'est pas
+     une page absente, et le titre est ce que montre l'onglet. -->
+<svelte:head><title>{page.status} - {page.status === 404 ? 'Page introuvable' : 'Erreur'}</title></svelte:head>
 
 <div class="py-20 text-center">
 	<p class="text-6xl font-extrabold text-brand">{page.status}</p>

@@ -9,5 +9,5 @@ export const trailingSlash = 'always';
 
 const DOSSIERS = OUTILS.map((outil) => outil.dossier);
 
-export const GET: RequestHandler = ({ params }) =>
-	servirFichierEmbarque('boite-a-outils', DOSSIERS, params.outil, 'index.html');
+export const GET: RequestHandler = ({ params, url }) =>
+	servirFichierEmbarque('boite-a-outils', DOSSIERS, params.outil, 'index.html', url.origin);

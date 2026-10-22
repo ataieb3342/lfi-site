@@ -68,6 +68,31 @@ const CSP = [
 ].join('; ');
 
 /**
+ * Les balises de référencement qui demandent l'adresse absolue du site,
+ * glissées à la fin du `<head>` de la page au moment de la servir.
+ *
+ * `npm run outils:pages` écrit le titre et la description, mais un fichier
+ * statique ne connaît pas son domaine (`ORIGIN`, différent sur le site de
+ * démonstration) : sans cet ajout, les outils - les pages que quelqu'un qui ne
+ * connaît pas le groupe a le plus de chances de trouver - n'avaient ni adresse
+ * canonique, ni image d'aperçu. Un lien partagé s'affichait nu, et
+ * `/boite-a-outils/budget/index.html` comptait comme une seconde page.
+ */
+function balisesAbsolues(html: string, origine: string, racine: string, dossier: string): string {
+	const adresse = `${origine}/${racine}/${dossier}/`;
+	const balises = [
+		`<link rel="canonical" href="${adresse}">`,
+		`<meta property="og:url" content="${adresse}">`,
+		// La même image que les pages du site sans couverture (`Metadonnees.svelte`).
+		`<meta property="og:image" content="${origine}/apercu-partage.jpg">`,
+		'<meta property="og:image:width" content="1200">',
+		'<meta property="og:image:height" content="630">',
+		'<meta name="twitter:card" content="summary_large_image">'
+	].join('\n\t');
+	return html.replace('</head>', `\t${balises}\n</head>`);
+}
+
+/**
  * Renvoie un fichier d'un jeu ou d'un outil, ou 404 si le dossier demandé
  * n'est pas dans la liste (`src/lib/jeux.ts`, `src/lib/boite-a-outils.ts`) ou si le
  * fichier n'existe pas. Un dossier présent sur le disque mais absent de la
@@ -77,7 +102,9 @@ export function servirFichierEmbarque(
 	racine: 'jeux' | 'boite-a-outils',
 	dossiersAutorises: readonly string[],
 	dossier: string,
-	fichier: string
+	fichier: string,
+	/** L'origine du site (`url.origin`), pour les adresses absolues des pages. */
+	origine: string
 ): Response {
 	if (!dossiersAutorises.includes(dossier)) error(404, 'Page introuvable');
 
@@ -99,6 +126,10 @@ export function servirFichierEmbarque(
 	if (extension === 'html') headers['Content-Security-Policy'] = CSP;
 
 	// `contenu` est ici une adresse « data: » ; on ne renvoie que les octets.
-	const corps = image ? Buffer.from(contenu.split(',')[1] ?? '', 'base64') : contenu;
+	const corps = image
+		? Buffer.from(contenu.split(',')[1] ?? '', 'base64')
+		: extension === 'html'
+			? balisesAbsolues(contenu, origine, racine, dossier)
+			: contenu;
 	return new Response(corps, { headers });
 }

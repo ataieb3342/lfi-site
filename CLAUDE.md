@@ -772,6 +772,11 @@ trouver - on ne cherche pas « LFI Dijon », on cherche « combien d'impôts je
 paie ». Le nom du site y est écrit en dur, repris de `DEFAULTS` : le renommer
 dans l'administration demande de relancer le script.
 
+L'adresse canonique, `og:url` et l'image d'aperçu, elles, ne sont **pas**
+écrites par le script : elles demandent le domaine du site, qu'un fichier
+statique ignore. `fichiers-embarques.ts` les ajoute à la fin du `<head>` au
+moment de servir la page, pour les outils comme pour les jeux.
+
 Quatre règles, dont la première n'est pas négociable :
 
 1. **Chaque chiffre porte sa source et son année**, visibles en bas de la page,

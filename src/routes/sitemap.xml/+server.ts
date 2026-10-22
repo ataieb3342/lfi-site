@@ -40,7 +40,10 @@ const LISTES: Record<string, Kind> = {
 
 export const GET: RequestHandler = async ({ url }) => {
 	const base = url.origin;
-	const publications = listPublished({ limit: 500 });
+	// Toutes les publications : au-delà d'une limite, les plus anciennes
+	// sortaient du plan du site sans que personne s'en aperçoive. Le format
+	// en accepte 50 000 par fichier, le site n'en approchera pas.
+	const publications = listPublished({ limit: 50_000 });
 
 	// Dernière modification par type, pour dater les pages de liste : un plan du
 	// site qui dit « rien n'a bougé » évite au moteur de recharger pour rien, et

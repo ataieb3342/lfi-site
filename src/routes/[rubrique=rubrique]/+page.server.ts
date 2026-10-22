@@ -8,7 +8,6 @@ const PAR_PAGE = 15;
 export const load: PageServerLoad = async ({ params, url }) => {
 	const rubrique = params.rubrique as Rubrique;
 	const kind = KIND_PAR_RUBRIQUE[rubrique];
-	const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
 	const categorieDemandee = url.searchParams.get('categorie');
 	const categorie =
 		kind === 'actu' && ['action', 'reunion', 'formation'].includes(categorieDemandee ?? '')
@@ -16,6 +15,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			: undefined;
 
 	const total = countPublished(kind, categorie);
+	const pages = Math.max(1, Math.ceil(total / PAR_PAGE));
+	// Le numéro de page est borné aux pages qui existent, comme dans la
+	// bibliothèque. Sans cela, `?page=99` renvoyait une liste vide, indexable,
+	// qui se désignait elle-même comme canonique : une page vide de plus aux
+	// yeux du moteur, et autant qu'on peut taper de numéros.
+	const page = Math.min(Math.max(1, Number(url.searchParams.get('page')) || 1), pages);
 	const publications = listPublished({
 		kind,
 		eventCategory: categorie,
@@ -29,7 +34,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	return {
 		rubrique,
 		page,
-		pages: Math.max(1, Math.ceil(total / PAR_PAGE)),
+		pages,
 		total,
 		publications: publications.map(presentPublication),
 		categorie: categorie ?? null
