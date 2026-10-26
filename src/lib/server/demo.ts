@@ -159,19 +159,17 @@ function ilYaNJours(n: number, heure = 18): string {
 }
 
 type Fiche = {
-	kind: 'article' | 'actu' | 'apero' | 'revue';
+	kind: 'article' | 'actu' | 'apero';
 	title: string;
 	summary: string;
 	body: string;
 	auteur?: string;
 	/** Nombre de jours écoulés depuis la publication, ou une fonction qui le calcule. */
 	publieIlYa: number | (() => number);
-	/** Décalage en jours de la date de l'action (actualités et apéros), ou une fonction qui le calcule. */
+	/** Décalage en jours de la date du rendez-vous (événements et apéros), ou une fonction qui le calcule. */
 	actionDans?: number | (() => number);
 	/** Pastille affichée dans l'agenda et sur les rendez-vous. */
-	categorieEvenement?: 'action' | 'reunion' | 'formation';
-	/** Nature d’un retour d’action. */
-	categorieAction?: 'porte-a-porte' | 'tractage' | 'collage';
+	categorieEvenement?: 'reunion' | 'formation';
 	/** Vrai pour la fiche qui reçoit l'image de couverture de la démonstration. */
 	illustree?: true;
 	/** Mise en page éditoriale facultative. */
@@ -248,13 +246,10 @@ Et ce n’était que le premier jour…
 - [Temps de transport et vitesse - Forum Vies Mobiles](https://forumviesmobiles.org/regards-croises/464/temps-de-transport-et-vitesse)`
 	},
 	{
-		kind: 'actu',
+		kind: 'article',
 		title: 'Retour sur notre tractage',
 		summary:
 			'Retour sur notre tractage et les échanges avec les passantes et les passants.',
-		actionDans: -3,
-		categorieEvenement: 'action',
-		categorieAction: 'tractage',
 		publieIlYa: 1,
 		body: `Nous avons distribué notre tract sur la gratuité des transports pour les moins de 26 ans et échangé avec de nombreuses personnes.
 
@@ -316,7 +311,7 @@ La réunion se termine au plus tard à 21 h. Un pot est prévu ensuite pour cont
 **Places limitées à douze personnes** pour que chacun puisse s’exercer. Inscription par courriel.`
 	},
 	{
-		kind: 'actu',
+		kind: 'article',
 		title: 'Nouvelle permanence chaque mercredi soir',
 		summary: 'À partir de ce mois-ci, le groupe tient une permanence hebdomadaire ouverte à toutes et tous.',
 		publieIlYa: 12,
@@ -482,7 +477,7 @@ Une participante a proposé de dresser la liste des campagnes de boycott en cour
 		]
 	},
 	{
-		kind: 'revue',
+		kind: 'article',
 		title: 'Revue de presse : logement, budget municipal et ligne ferroviaire',
 		summary:
 			'Trois lectures de la semaine, avec ce que nous en retenons pour Dijon. Les liens renvoient vers les articles d’origine.',
@@ -613,7 +608,7 @@ Une trentaine de personnes, dont huit qui venaient pour la première fois. Bienv
 
 ## Calendrier
 
-Les actions terminées peuvent faire l’objet d’un retour dans la rubrique Actualités, sans information opérationnelle sur les prochaines actions.
+Les actions terminées font l’objet d’un compte rendu dans « À lire », sans information opérationnelle sur les prochaines actions.
 
 ## Finances
 
@@ -666,8 +661,7 @@ function remplirContenus(adminId: number, imageId: number | null) {
 						? null
 						: dansNJours(typeof fiche.actionDans === 'function' ? fiche.actionDans() : fiche.actionDans),
 				eventCategory:
-					fiche.kind === 'apero' ? 'apero' : (fiche.categorieEvenement ?? 'autre'),
-				actionCategory: fiche.categorieAction
+					fiche.kind === 'apero' ? 'apero' : (fiche.categorieEvenement ?? 'autre')
 			},
 			adminId
 		);

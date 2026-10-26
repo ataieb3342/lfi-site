@@ -7,9 +7,7 @@
 	const chiffres: { label: string; valeur: number; href?: string }[] = $derived([
 		{ label: 'À la une', valeur: data.stats.aLaUne, href: '/admin/a-la-une' },
 		{ label: 'Articles publiés', valeur: data.stats.articles },
-		{ label: 'Actualités publiées', valeur: data.stats.actus },
-		{ label: 'Apéros', valeur: data.stats.aperos },
-		{ label: 'Revues de presse', valeur: data.stats.revues },
+		{ label: 'Rendez-vous à venir', valeur: data.stats.rendezVous },
 		{ label: 'Brouillons', valeur: data.stats.brouillons },
 		{ label: 'Commentaires en ligne', valeur: data.stats.commentaires }
 	]);

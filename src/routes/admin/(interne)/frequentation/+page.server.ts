@@ -8,11 +8,9 @@ import { JEUX, urlJeu } from '$lib/jeux';
 /** Pour afficher un titre plutôt qu'une adresse dans la liste des pages lues. */
 const PAGES_FIXES: Record<string, string> = {
 	'/': 'Accueil',
-	'/articles': 'Articles',
-	'/actualites': 'Actualités',
+	'/articles': 'À lire',
 	'/agenda': 'Agenda',
 	'/aperos': 'Apéros',
-	'/revue-de-presse': 'Revue de presse',
 	'/bibliotheque': 'Bibliothèque',
 	'/boite-a-outils': 'Boîte à outils',
 	'/jeux': 'Jeux',

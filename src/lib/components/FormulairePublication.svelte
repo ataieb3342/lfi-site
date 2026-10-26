@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PublicationVue } from '$lib/types';
-	import { formatDateLongue, formatPlageHoraire } from '$lib/format';
 
 	type Champs = {
 		kind?: string;
@@ -13,7 +12,6 @@
 		status?: string;
 		eventAt?: string;
 		eventCategory?: string;
-		actionCategory?: string;
 		eventStartTime?: string;
 		eventEndTime?: string;
 		eventLocation?: string;
@@ -111,42 +109,14 @@
 	function typeDepuisPublication() {
 		return (
 			valeurs.kind ??
-			(publication?.kind === 'actu' && ['action', 'reunion', 'formation'].includes(publication.eventCategory)
-				? publication.eventCategory === 'action' ? 'retour-action' : publication.eventCategory
+			(publication?.kind === 'actu'
+				? publication.eventCategory === 'formation' ? 'formation' : 'reunion'
 				: publication?.kind) ??
 			'article'
 		);
 	}
 	let typeSelectionne = $state(typeDepuisPublication());
 
-	const modelesAction = {
-		'porte-a-porte': {
-			nom: 'Porte-à-porte',
-			accroche:
-				'Retour sur notre porte-à-porte et les échanges avec les habitantes et habitants.',
-			texte:
-				'Nous sommes allés à la rencontre des habitantes et habitants.\n\n## Ce que nous retenons\n\nPrésentez ici les échanges, les sujets qui sont revenus et les suites envisagées.'
-		},
-		tractage: {
-			nom: 'Tractage',
-			accroche:
-				'Retour sur notre tractage et les échanges avec les passantes et les passants.',
-			texte:
-				'Nous avons distribué nos tracts et échangé avec les passantes et les passants.\n\n## Ce que nous retenons\n\nPrésentez ici l’accueil reçu, les discussions et les suites envisagées.'
-		},
-		collage: {
-			nom: 'Collage d’affiches',
-			accroche: 'Retour sur notre collage d’affiches.',
-			texte:
-				'Nous avons mené une opération de collage d’affiches.\n\n## Ce que nous retenons\n\nPrésentez ici le déroulement général et le bilan de l’action, sans publier d’informations opérationnelles.'
-		},
-	} as const;
-
-	type CategorieAction = keyof typeof modelesAction;
-	function categorieActionInitiale(): CategorieAction {
-		const categorie = valeurs.actionCategory ?? publication?.actionCategory ?? 'porte-a-porte';
-		return categorie in modelesAction ? (categorie as CategorieAction) : 'porte-a-porte';
-	}
 	function resumeInitial() {
 		return valeurs.summary ?? publication?.summary ?? '';
 	}
@@ -180,7 +150,6 @@
 			(publication?.authorAdminId ? String(publication.authorAdminId) : publication?.authorName ? 'other' : '')
 		);
 	}
-	let categorieActionSelectionnee = $state<CategorieAction>(categorieActionInitiale());
 	let titre = $state(titreInitial());
 	let resume = $state(resumeInitial());
 	let corps = $state(corpsInitial());
@@ -191,46 +160,14 @@
 	let lieu = $state(lieuInitial());
 	let pointRendezVous = $state(pointRendezVousInitial());
 	let auteurChoisi = $state(auteurInitial());
-	let dernierModele = $state<CategorieAction | null>(null);
-	let dernierTitreAutomatique = $state('');
-	let dernierChapoAutomatique = $state('');
 
-	function textesAutomatiques(categorie = categorieActionSelectionnee) {
-		const modele = modelesAction[categorie];
-		const nouveauTitre = `Retour sur notre ${modele.nom.toLocaleLowerCase('fr')}`;
-		const date = dateRendezVous ? `Action menée le ${formatDateLongue(dateRendezVous)}.` : '';
-		const nouveauChapo = [date, modele.accroche].filter(Boolean).join('\n');
-		return { titre: nouveauTitre, chapo: nouveauChapo };
-	}
-
-	function actualiserTitreEtChapo(categorie = categorieActionSelectionnee) {
-		// Ces modèles ne concernent que les comptes rendus d'action. Les champs
-		// pratiques des autres rendez-vous réutilisent cette fonction.
-		if (typeSelectionne !== 'retour-action') return;
-		const automatique = textesAutomatiques(categorie);
-		if (!titre.trim() || titre === dernierTitreAutomatique) titre = automatique.titre;
-		if (!resume.trim() || resume === dernierChapoAutomatique) resume = automatique.chapo;
-		dernierTitreAutomatique = automatique.titre;
-		dernierChapoAutomatique = automatique.chapo;
-	}
-
-	function choisirCategorieAction(categorie: CategorieAction) {
-		const precedent = dernierModele ? modelesAction[dernierModele] : null;
-		const suivant = modelesAction[categorie];
-		if (!corps.trim() || corps === precedent?.texte) corps = suivant.texte;
-		categorieActionSelectionnee = categorie;
-		dernierModele = categorie;
-		actualiserTitreEtChapo(categorie);
-	}
-
-	function choisirType(type: string) {
-		if (typeSelectionne === 'retour-action' && type !== 'retour-action') {
-			if (titre === dernierTitreAutomatique) titre = '';
-			if (resume === dernierChapoAutomatique) resume = '';
-		}
-		typeSelectionne = type;
-		if (type === 'retour-action') choisirCategorieAction(categorieActionSelectionnee);
-	}
+	/** Ce que chaque type veut dire, affiché sous le menu pour éviter les erreurs de case. */
+	const aideType: Record<string, string> = {
+		article: 'Un texte à lire : analyse, compte rendu, prise de position, guide, annonce courte. Rangé dans « À lire ».',
+		reunion: 'Un rendez-vous où l’on peut venir : réunion publique, mobilisation, projection… Rangé dans l’agenda.',
+		formation: 'Un atelier pour apprendre ou se former. Rangé dans l’agenda.',
+		apero: 'La soirée thématique du lundi au bar. Après la soirée, rouvrez la fiche pour écrire le résumé.'
+	};
 
 	const v = $derived({
 		kind: typeSelectionne,
@@ -243,7 +180,6 @@
 		commentsOpen: valeurs.commentsOpen ?? publication?.commentsOpen ?? true,
 		eventAt: dateRendezVous,
 		eventCategory: valeurs.eventCategory ?? publication?.eventCategory ?? 'autre',
-		actionCategory: categorieActionSelectionnee,
 		eventStartTime: heureDebut,
 		eventEndTime: heureFin,
 		eventLocation: lieu,
@@ -255,10 +191,7 @@
 		eventMapEmbed: ''
 	});
 
-	const estRetourAction = $derived(typeSelectionne === 'retour-action');
 	const estRendezVous = $derived(['reunion', 'formation', 'apero'].includes(typeSelectionne));
-	const maintenant = new Date();
-	const aujourdHui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
 </script>
 
 {#if erreur}
@@ -375,20 +308,20 @@
 					name="kind"
 					class="champ"
 					value={typeSelectionne}
-					onchange={(event) => choisirType(event.currentTarget.value)}
+					onchange={(event) => (typeSelectionne = event.currentTarget.value)}
 				>
-					<option value="article">Article</option>
-					<option value="actu">Actualité</option>
-					<option value="retour-action">Retour d’action</option>
-					<option value="reunion">Événement</option>
-					<option value="formation">Formation</option>
-					<option value="apero">Apéro thématique</option>
-					<option value="revue">Revue de presse</option>
+					<!-- Deux familles, comme sur le site : la question à se poser est
+					     « est-ce que les gens peuvent venir ? ». -->
+					<optgroup label="Un texte">
+						<option value="article">Article</option>
+					</optgroup>
+					<optgroup label="Un rendez-vous">
+						<option value="reunion">Événement</option>
+						<option value="formation">Formation</option>
+						<option value="apero">Apéro thématique</option>
+					</optgroup>
 				</select>
-				<p class="aide">
-					Un seul choix suffit. Les champs utiles apparaissent automatiquement pour un retour d’action,
-					un événement, une formation ou un apéro.
-				</p>
+				<p class="aide">{aideType[typeSelectionne] ?? ''}</p>
 			</div>
 
 			{#if typeSelectionne === 'article'}
@@ -432,52 +365,33 @@
 				</div>
 			{/if}
 
-			{#if estRetourAction}
-				<div class="rounded-lg border border-brand/25 bg-brand-soft/40 p-3 space-y-3">
-					<p class="text-sm font-bold text-brand">Retour sur une action terminée</p>
-					<div>
-						<label class="etiquette" for="actionCategory">Type d’action</label>
-						<select id="actionCategory" name="actionCategory" class="champ" value={categorieActionSelectionnee} onchange={(event) => choisirCategorieAction(event.currentTarget.value as CategorieAction)}>
-							<option value="collage">Collage d’affiches</option>
-							<option value="porte-a-porte">Porte-à-porte</option>
-							<option value="tractage">Tractage / distribution</option>
-						</select>
-					</div>
-					<div>
-						<label class="etiquette" for="eventAt">Date de l’action</label>
-						<input id="eventAt" name="eventAt" type="date" class="champ" required max={aujourdHui} value={dateRendezVous} onchange={(event) => { dateRendezVous = event.currentTarget.value; actualiserTitreEtChapo(); }} />
-					</div>
-					<p class="aide">Seules les actions déjà terminées peuvent être publiées. Aucun horaire, lieu, responsable, carte ou lien d’inscription n’est enregistré.</p>
-				</div>
-			{/if}
-
 			{#if estRendezVous}
 				<div class="rounded-lg border border-brand/25 bg-brand-soft/40 p-3 space-y-3">
 					<p class="text-sm font-bold text-brand">Informations pratiques</p>
 
 					<div>
 						<label class="etiquette" for="eventAt">Date</label>
-						<input id="eventAt" name="eventAt" type="date" class="champ" required value={dateRendezVous} onchange={(event) => { dateRendezVous = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+						<input id="eventAt" name="eventAt" type="date" class="champ" required bind:value={dateRendezVous} />
 					</div>
 
 					<div class="grid grid-cols-2 gap-2">
 						<div>
 							<label class="etiquette" for="eventStartTime">Début</label>
-							<input id="eventStartTime" name="eventStartTime" type="time" class="champ" value={heureDebut} onchange={(event) => { heureDebut = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+							<input id="eventStartTime" name="eventStartTime" type="time" class="champ" bind:value={heureDebut} />
 						</div>
 						<div>
 							<label class="etiquette" for="eventEndTime">Fin</label>
-							<input id="eventEndTime" name="eventEndTime" type="time" class="champ" value={heureFin} onchange={(event) => { heureFin = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+							<input id="eventEndTime" name="eventEndTime" type="time" class="champ" bind:value={heureFin} />
 						</div>
 					</div>
 
 					<div>
 						<label class="etiquette" for="eventLocation">Lieu</label>
-						<input id="eventLocation" name="eventLocation" class="champ" maxlength="200" value={lieu} placeholder="Place Charlie Chaplin" oninput={(event) => { lieu = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+						<input id="eventLocation" name="eventLocation" class="champ" maxlength="200" placeholder="Place Charlie Chaplin" bind:value={lieu} />
 					</div>
 					<div>
 						<label class="etiquette" for="eventMeetingPoint">Point de rendez-vous <span class="font-normal text-ink-faint">(facultatif)</span></label>
-						<input id="eventMeetingPoint" name="eventMeetingPoint" class="champ" maxlength="300" value={pointRendezVous} placeholder="Devant l’entrée principale" oninput={(event) => { pointRendezVous = event.currentTarget.value; actualiserTitreEtChapo(); }} />
+						<input id="eventMeetingPoint" name="eventMeetingPoint" class="champ" maxlength="300" placeholder="Devant l’entrée principale" bind:value={pointRendezVous} />
 					</div>
 					<div>
 						<label class="etiquette" for="eventAddress">Adresse</label>

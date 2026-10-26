@@ -8,7 +8,7 @@
 
 export type PublicationVue = {
 	id: number;
-	kind: 'article' | 'actu' | 'apero' | 'revue';
+	kind: 'article' | 'actu' | 'apero';
 	slug: string;
 	title: string;
 	summary: string;
@@ -22,11 +22,10 @@ export type PublicationVue = {
 	authorAdminId: number | null;
 	authorProfileUrl: string | null;
 	commentCount: number;
-	/** Date du rendez-vous ou de l’action racontée (AAAA-MM-JJ). */
+	/** Date du rendez-vous (AAAA-MM-JJ) ; null pour un article. */
 	eventAt: string | null;
 	/** Catégorie utilisée pour la couleur et le filtrage dans l'agenda. */
-	eventCategory: 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
-	actionCategory: 'porte-a-porte' | 'tractage' | 'collage' | 'mobilisation' | 'collecte' | 'autre';
+	eventCategory: 'reunion' | 'apero' | 'formation' | 'autre';
 	eventStartTime: string;
 	eventEndTime: string;
 	eventLocation: string;

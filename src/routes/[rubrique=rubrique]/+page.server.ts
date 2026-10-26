@@ -1,42 +1,33 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { countPublished, listPublished, type CategorieEvenement } from '$lib/server/content';
+import { countPublished, listPublished } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
-import { KIND_PAR_RUBRIQUE, type Rubrique } from '$lib/rubriques';
 
 const PAR_PAGE = 15;
 
+/**
+ * La seule liste servie ici est « À lire » (/articles) : les apéros ont leur
+ * page, et les événements sont dans l'agenda. Les anciennes listes redirigent,
+ * filtres compris : /actualites?categorie=… n'a plus d'équivalent exact, et
+ * l'agenda montre tous les rendez-vous avec leurs propres filtres.
+ */
 export const load: PageServerLoad = async ({ params, url }) => {
-	const rubrique = params.rubrique as Rubrique;
-	const kind = KIND_PAR_RUBRIQUE[rubrique];
-	const categorieDemandee = url.searchParams.get('categorie');
-	const categorie =
-		kind === 'actu' && ['action', 'reunion', 'formation'].includes(categorieDemandee ?? '')
-			? (categorieDemandee as CategorieEvenement)
-			: undefined;
+	if (params.rubrique === 'actualites') redirect(301, '/agenda');
+	if (params.rubrique === 'revue-de-presse') redirect(301, '/articles');
 
-	const total = countPublished(kind, categorie);
+	const total = countPublished('article');
 	const pages = Math.max(1, Math.ceil(total / PAR_PAGE));
 	// Le numéro de page est borné aux pages qui existent, comme dans la
 	// bibliothèque. Sans cela, `?page=99` renvoyait une liste vide, indexable,
 	// qui se désignait elle-même comme canonique : une page vide de plus aux
 	// yeux du moteur, et autant qu'on peut taper de numéros.
 	const page = Math.min(Math.max(1, Number(url.searchParams.get('page')) || 1), pages);
-	const publications = listPublished({
-		kind,
-		eventCategory: categorie,
-		limit: PAR_PAGE,
-		offset: (page - 1) * PAR_PAGE,
-		// Les actions à venir remontent en tête des actualités ; les articles
-		// restent classés du plus récent au plus ancien.
-		ordre: kind === 'actu' ? 'agenda' : 'chronologique'
-	});
+	const publications = listPublished({ kind: 'article', limit: PAR_PAGE, offset: (page - 1) * PAR_PAGE });
 
 	return {
-		rubrique,
 		page,
 		pages,
 		total,
-		publications: publications.map(presentPublication),
-		categorie: categorie ?? null
+		publications: publications.map(presentPublication)
 	};
 };

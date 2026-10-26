@@ -4,8 +4,15 @@ import { listAgenda, listPinnedPublished, listPublished } from '$lib/server/cont
 import { presentMediaRecommande, presentPublication } from '$lib/server/present';
 import { listMediasRecommandes } from '$lib/server/medias-recommandes';
 
-/** Nombre de jours couverts par le fil « Les prochains jours ». */
-const HORIZON = 15;
+/**
+ * Nombre de rendez-vous du fil « Les prochains rendez-vous ». Un nombre et non
+ * une durée : avec une fenêtre de quinze jours, le fil n'en montrait que deux
+ * quand le suivant tombait le seizième jour, et se vidait entre deux périodes
+ * chargées.
+ */
+const DANS_LE_FIL = 6;
+/** Rendez-vous suivants, listés dans la colonne « Plus tard dans l'agenda ». */
+const PLUS_TARD = 5;
 
 /** AAAA-MM-JJ à l'heure du serveur, comme la page /agenda. */
 function jourIso(date: Date): string {
@@ -61,36 +68,26 @@ export const load: PageServerLoad = async () => {
 	const aLaUne = listPinnedPublished().map(presentPublication);
 	const idsALaUne = new Set(aLaUne.map((publication) => publication.id));
 
-	// Le fil des prochains jours : événements, formations et apéros
-	// confondus, dans l'ordre du calendrier. Sa fenêtre est glissante : elle
-	// part d'aujourd'hui et ne dépend ni de la semaine civile ni du mois.
+	// Le fil des prochains rendez-vous : événements, formations et apéros
+	// confondus, dans l'ordre du calendrier, à partir d'aujourd'hui. Toutes
+	// les dates à venir sont lues : c'est ce qui permet de reconnaître un
+	// rendez-vous hebdomadaire.
 	const maintenant = new Date();
 	const aujourdhui = jourIso(maintenant);
 	const demain = jourIso(new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate() + 1));
-	const fin = jourIso(new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate() + HORIZON));
-	// Toutes les dates à venir sont lues, pas seulement celles du fil : c'est
-	// ce qui permet de reconnaître un rendez-vous hebdomadaire.
 	const aVenir = regrouperRepetitions(listAgenda(aujourdhui, '9999-12-31').map(presentPublication));
-	const prochainsJours = aVenir
-		.filter((rdv) => rdv.eventAt! < fin)
-		.slice(0, 8)
-		.map((rdv) => ({
-			...rdv,
-			jour: rdv.eventAt === aujourdhui ? 'Aujourd’hui' : rdv.eventAt === demain ? 'Demain' : null
-		}));
-
-	// La colonne « Actualités » ne répète pas ce que le fil montre déjà : elle
-	// garde les brèves, les comptes rendus et les rendez-vous plus lointains.
-	const dansLeFil = new Set(prochainsJours.map((rdv) => rdv.title));
-	const actus = regrouperRepetitions(
-		listPublished({ kind: 'actu', limit: 30, ordre: 'agenda' }).map(presentPublication)
-	).filter((actu) => !dansLeFil.has(actu.title) && !idsALaUne.has(actu.id));
+	const prochainsRendezVous = aVenir.slice(0, DANS_LE_FIL).map((rdv) => ({
+		...rdv,
+		jour: rdv.eventAt === aujourdhui ? 'Aujourd’hui' : rdv.eventAt === demain ? 'Demain' : null
+	}));
+	// La colonne de droite prend la suite du fil, sans le répéter.
+	const plusTard = aVenir.slice(DANS_LE_FIL, DANS_LE_FIL + PLUS_TARD).filter((rdv) => !idsALaUne.has(rdv.id));
 
 	return {
 		aLaUne,
 		articles: articles.filter((article) => !idsALaUne.has(article.id)).slice(0, 5),
-		prochainsJours,
-		actus: actus.slice(0, 5),
+		prochainsRendezVous,
+		plusTard,
 		// Les médias cochés « Sur l'accueil » dans l'administration.
 		medias: listMediasRecommandes({ accueil: true }).map(presentMediaRecommande)
 	};

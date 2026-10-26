@@ -1,11 +1,11 @@
 import { db, now } from './db.ts';
 import { supprimerPdf } from './bibliotheque.ts';
 
-export type Kind = 'article' | 'actu' | 'apero' | 'revue';
+export type Kind = 'article' | 'actu' | 'apero';
 export type Status = 'draft' | 'published';
 export type StyleMiseEnPage = 'standard' | 'carnet-aquarelle';
-export type CategorieEvenement = 'action' | 'reunion' | 'apero' | 'formation' | 'autre';
-export type CategorieAction = 'porte-a-porte' | 'tractage' | 'collage' | 'mobilisation' | 'collecte' | 'autre';
+/** Catégorie d'un rendez-vous dans l'agenda ; 'autre' pour un article. */
+export type CategorieEvenement = 'reunion' | 'apero' | 'formation' | 'autre';
 
 export type Publication = {
 	id: number;
@@ -23,7 +23,6 @@ export type Publication = {
 	pinned_order: number | null;
 	event_at: string | null;
 	event_category: CategorieEvenement;
-	action_category: CategorieAction;
 	event_start_time: string;
 	event_end_time: string;
 	event_location: string;
@@ -163,7 +162,6 @@ export function listAgenda(debut: string, fin: string) {
 			`${PUBLIC_SELECT}
 			 where p.status = 'published'
 			   and p.event_at is not null
-			   and p.event_category != 'action'
 			   and p.event_at >= ? and p.event_at < ?
 			 order by p.event_at asc, p.title collate nocase asc`
 		)
@@ -237,7 +235,6 @@ export type PublicationInput = {
 	/** Date de l'action annoncée (AAAA-MM-JJ), ou null. */
 	eventAt: string | null;
 	eventCategory: CategorieEvenement;
-	actionCategory?: CategorieAction;
 	eventStartTime?: string;
 	eventEndTime?: string;
 	eventLocation?: string;
@@ -258,11 +255,11 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 		.prepare(
 			`insert into publications
 			 (kind, slug, title, summary, body, cover_media_id, status, comments_open,
-			  event_at, event_category, action_category, event_start_time, event_end_time,
+			  event_at, event_category, event_start_time, event_end_time,
 			  event_location, event_address, event_location_url, event_managers, event_signup_url,
 			  event_meeting_point, event_map_media_id, event_map_embed_url, byline_admin_id,
 			  published_at, created_at, updated_at, author_id, author_name, layout_style)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -275,7 +272,6 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			input.commentsOpen ? 1 : 0,
 			input.eventAt,
 			input.eventCategory,
-			input.actionCategory ?? 'autre',
 			input.eventStartTime ?? '',
 			input.eventEndTime ?? '',
 			input.eventLocation ?? '',
@@ -315,7 +311,7 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		`update publications set
 		   kind = ?, slug = ?, title = ?, summary = ?, body = ?, cover_media_id = ?,
 		   status = ?, comments_open = ?, event_at = ?, event_category = ?,
-		   action_category = ?, event_start_time = ?, event_end_time = ?, event_location = ?,
+		   event_start_time = ?, event_end_time = ?, event_location = ?,
 		   event_address = ?, event_location_url = ?, event_managers = ?, event_signup_url = ?,
 		   event_meeting_point = ?, event_map_media_id = ?, event_map_embed_url = ?, byline_admin_id = ?, published_at = ?,
 		   updated_at = ?, author_name = ?, layout_style = ?
@@ -331,7 +327,6 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		input.commentsOpen ? 1 : 0,
 		input.eventAt,
 		input.eventCategory,
-		input.actionCategory ?? 'autre',
 		input.eventStartTime ?? '',
 		input.eventEndTime ?? '',
 		input.eventLocation ?? '',

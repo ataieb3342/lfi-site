@@ -12,9 +12,9 @@ export const load: PageServerLoad = async () => {
 		stats: {
 			aLaUne: compte("select count(*) as n from publications where pinned = 1 and status = 'published'"),
 			articles: compte("select count(*) as n from publications where kind = 'article' and status = 'published'"),
-			actus: compte("select count(*) as n from publications where kind = 'actu' and status = 'published'"),
-			aperos: compte("select count(*) as n from publications where kind = 'apero' and status = 'published'"),
-			revues: compte("select count(*) as n from publications where kind = 'revue' and status = 'published'"),
+			rendezVous: compte(
+				"select count(*) as n from publications where kind in ('actu', 'apero') and status = 'published' and event_at >= date('now', 'localtime')"
+			),
 			brouillons: compte("select count(*) as n from publications where status = 'draft'"),
 			commentaires: compte("select count(*) as n from comments where status = 'approved'")
 		},

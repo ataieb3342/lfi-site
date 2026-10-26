@@ -93,7 +93,7 @@ export function editeur(origine: string, identite: Identite) {
 	};
 }
 
-/** Une publication ordinaire : article, actualité, revue de presse. */
+/** Un article : tout ce qui n'est pas un rendez-vous. */
 export function articleStructure(
 	origine: string,
 	adresse: string,
@@ -102,7 +102,7 @@ export function articleStructure(
 	identite: Identite
 ) {
 	const fiche: Record<string, unknown> = {
-		'@type': p.kind === 'actu' ? 'NewsArticle' : 'Article',
+		'@type': 'Article',
 		headline: p.title,
 		description: resume,
 		inLanguage: 'fr-FR',

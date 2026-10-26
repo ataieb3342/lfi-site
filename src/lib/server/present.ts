@@ -46,7 +46,6 @@ export function presentPublication(row: PublicationListItem | Publication): Publ
 		commentCount: 'comment_count' in row ? Number(row.comment_count) : 0,
 		eventAt: row.event_at,
 		eventCategory: row.event_category,
-		actionCategory: row.action_category,
 		eventStartTime: row.event_start_time,
 		eventEndTime: row.event_end_time,
 		eventLocation: row.event_location,

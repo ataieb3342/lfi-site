@@ -16,10 +16,8 @@ import type { Kind } from '$lib/rubriques';
 const PAGES_FIXES = [
 	'/',
 	'/articles',
-	'/actualites',
 	'/agenda',
 	'/aperos',
-	'/revue-de-presse',
 	'/bibliotheque',
 	'/boite-a-outils',
 	'/jeux',
@@ -33,9 +31,8 @@ const PAGES_FIXES = [
 /** Les pages de liste, datées de leur publication la plus récente. */
 const LISTES: Record<string, Kind> = {
 	'/articles': 'article',
-	'/actualites': 'actu',
-	'/aperos': 'apero',
-	'/revue-de-presse': 'revue'
+	'/agenda': 'actu',
+	'/aperos': 'apero'
 };
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -47,7 +44,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	// Dernière modification par type, pour dater les pages de liste : un plan du
 	// site qui dit « rien n'a bougé » évite au moteur de recharger pour rien, et
-	// une date fraîche sur /actualites l'incite à revenir vite après une publication.
+	// une date fraîche sur /articles l'incite à revenir vite après une publication.
 	const dernierParKind = new Map<string, string>();
 	for (const p of publications) {
 		const jour = (p.updated_at ?? p.created_at).slice(0, 10);

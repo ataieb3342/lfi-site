@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
 	createComment,
@@ -13,7 +13,7 @@ import { renderMarkdown, toPlainText } from '$lib/server/markdown';
 import { createChallenge, verifySolution } from '$lib/server/captcha';
 import { rateLimit, rateLimitPeek } from '$lib/server/ratelimit';
 import { commentsGloballyOpen, preModerationEnabled } from '$lib/server/settings';
-import { KIND_PAR_RUBRIQUE, type Rubrique } from '$lib/rubriques';
+import { KIND_PAR_RUBRIQUE, RUBRIQUE_PAR_KIND, type Rubrique } from '$lib/rubriques';
 import { MAX_PDF_BYTES, stockerPdf, supprimerPdf } from '$lib/server/bibliotheque';
 
 const CORPS_MIN = 2;
@@ -38,11 +38,14 @@ const QUOTA_SANS_PREUVE = { limite: 1, fenetreMs: 15 * 60_000 };
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const publication = getBySlugAnyStatus(params.slug);
-	const kindAttendu = KIND_PAR_RUBRIQUE[params.rubrique as Rubrique];
+	if (!publication) error(404, 'Page introuvable');
 
-	if (!publication || publication.kind !== kindAttendu) {
-		error(404, 'Page introuvable');
-	}
+	// Une publication qui a changé de rubrique - une revue de presse ou une
+	// brève devenue article (migration 021) - garde son adresse d'origine en
+	// redirection : les liens déjà partagés continuent de mener à elle. Le slug
+	// est unique dans toute la table, il n'y a donc pas d'ambiguïté.
+	const rubrique = RUBRIQUE_PAR_KIND[publication.kind];
+	if (rubrique !== params.rubrique) redirect(301, `/${rubrique}/${publication.slug}`);
 	// Un brouillon n'est visible que par un administrateur connecté (aperçu).
 	if (publication.status !== 'published' && !locals.admin) {
 		error(404, 'Page introuvable');
