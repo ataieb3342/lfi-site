@@ -16,6 +16,9 @@ export const load: PageServerLoad = async ({ url }) => {
 					? (kindInterne as Kind)
 					: undefined,
 			status: status === 'draft' || status === 'published' ? (status as Status) : undefined,
+			// « À la une » est rangé avec les états dans le filtre : c'est là
+			// qu'on le cherche, à côté de « Publiés » et « Brouillons ».
+			pinned: status === 'une' ? true : undefined,
 			search: recherche
 		}).map(presentPublication).filter((publication) =>
 			categorie

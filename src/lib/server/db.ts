@@ -460,6 +460,28 @@ const MIGRATIONS: string[] = [
 		('Le Monde diplomatique', 'lire', 'https://www.monde-diplomatique.fr/',
 		 'Le mensuel des grandes analyses : géopolitique, économie et critique du néolibéralisme.',
 		 '/images/medias/monde-diplomatique.png', 1, 4, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'));
+	`,
+	// 020 - la une se gère à la main, dans un ordre choisi
+	//
+	// L'expiration après quinze jours est abandonnée : une fiche reste à la
+	// une jusqu'à ce qu'on l'en retire (Administration → À la une).
+	// `pinned_at` est gardé et dit seulement depuis quand. Les épinglages déjà
+	// expirés sont retirés, pour que rien ne réapparaisse sur l'accueil ; les
+	// autres sont rangés dans l'ordre qu'avait l'accueil, du plus récent au
+	// plus ancien.
+	`
+	update publications set pinned = 0, pinned_at = null
+	 where pinned = 1 and datetime(pinned_at) < datetime('now', '-15 days');
+	alter table publications add column pinned_order integer;
+	update publications set pinned_order = 1 + (
+		select count(*) from publications q
+		 where q.pinned = 1
+		   and (coalesce(q.published_at, q.updated_at) > coalesce(publications.published_at, publications.updated_at)
+		        or (coalesce(q.published_at, q.updated_at) = coalesce(publications.published_at, publications.updated_at)
+		            and q.id > publications.id))
+	) where pinned = 1;
+	drop index publications_pinned;
+	create index publications_pinned on publications(pinned, pinned_order);
 	`
 ];
 
@@ -528,9 +550,6 @@ export function nettoyer() {
 	const base = connexion;
 	if (!base) return;
 	const maintenantMs = Date.now();
-	base.prepare(
-		"update publications set pinned = 0, pinned_at = null where pinned = 1 and datetime(pinned_at) < datetime('now', '-15 days')"
-	).run();
 	base.prepare('delete from sessions where expires_at < ?').run(now());
 	base.prepare('delete from rate_limits where created_at < ?').run(maintenantMs - 24 * 3600_000);
 	base.prepare('delete from used_challenges where expires_at < ?').run(maintenantMs);

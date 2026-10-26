@@ -417,18 +417,29 @@ La page tient maintenant en quatre blocs, de haut en bas :
    (`scroll-snap`, aucun script) ; la fiche suivante qui dépasse à droite dit
    qu'on peut faire glisser. L'article à la une commence vers 340 pixels.
 2. **Les publications à la une**, puis les articles récents. Toute publication
-   publiée peut être épinglée depuis l'administration : article, actualité,
-   retour d'action, événement, formation, apéro ou revue de presse. Plusieurs
-   fiches peuvent être épinglées en même temps ; elles forment alors une grille
-   et ne sont pas répétées dans les listes situées juste en dessous.
+   en ligne peut y être mise : article, actualité, retour d'action, événement,
+   formation, apéro ou revue de presse. Cinq au plus (`MAX_A_LA_UNE` dans
+   `content.ts`) ; elles forment une grille et ne sont pas répétées dans les
+   listes situées juste en dessous.
    La première est en grand (image à gauche, texte à droite), les suivantes en
    cartes compactes deux par ligne, avec une vignette. Avec de grandes images
    partout, une fiche sans image posée à côté d'une fiche illustrée était
    étirée et restait vide. La grande fiche ne prend toute la largeur que si le
-   reste est pair, sinon la dernière resterait seule sur sa ligne. Un
-   épinglage expire quinze jours après son activation (`pinned_at`) ; si rien
-   n'est encore épinglé, la section disparaît et les articles restent dans leur
+   reste est pair, sinon la dernière resterait seule sur sa ligne. Si rien
+   n'est à la une, la section disparaît et les articles restent dans leur
    liste normale.
+
+   **La une se gère sur sa propre page**, Administration → À la une
+   (`admin/(interne)/a-la-une`) : ce qui y est, dans l'ordre de l'accueil
+   (`pinned_order`), avec des flèches pour ranger, « Retirer », et de quoi
+   ajouter une publication récente ou cherchée. Ce n'est plus une case du
+   formulaire de publication - le formulaire dit seulement si la fiche est à
+   la une et à quel rang : avec une case par fiche, il fallait rouvrir les
+   publications une à une pour savoir ce qui s'affichait, et l'ordre ne se
+   réglait pas. **Rien n'expire tout seul** : l'ancienne expiration après
+   quinze jours faisait disparaître des fiches sans prévenir (migration 020).
+   `pinned_at` ne dit plus que depuis quand. Chaque ajout, retrait et
+   déplacement passe par `audit()`.
 3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
    comptes rendus et rendez-vous plus lointains, cinq au plus.
    Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les

@@ -55,10 +55,10 @@ function joursEntre(avant: string, apres: string): number {
 
 export const load: PageServerLoad = async () => {
 	const articles = listPublished({ kind: 'article', limit: 12 }).map(presentPublication);
-	const epinglees = listPinnedPublished().map(presentPublication);
-	// La une est un choix éditorial temporaire. Sans épinglage actif, la section
-	// disparaît au lieu d'y maintenir indéfiniment le dernier article publié.
-	const aLaUne = epinglees;
+	// La une est choisie et rangée à la main (Administration → À la une). Si
+	// elle est vide, la section disparaît au lieu d'y maintenir le dernier
+	// article publié.
+	const aLaUne = listPinnedPublished().map(presentPublication);
 	const idsALaUne = new Set(aLaUne.map((publication) => publication.id));
 
 	// Le fil des prochains jours : événements, formations et apéros

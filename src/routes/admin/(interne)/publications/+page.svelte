@@ -36,6 +36,7 @@
 			<option value="">Tous</option>
 			<option value="published" selected={data.filtres.status === 'published'}>Publiés</option>
 			<option value="draft" selected={data.filtres.status === 'draft'}>Brouillons</option>
+			<option value="une" selected={data.filtres.status === 'une'}>À la une</option>
 		</select>
 	</div>
 	<button class="bouton-secondaire" type="submit">Filtrer</button>
@@ -55,7 +56,7 @@
 						{:else}
 							<span class="font-semibold text-brand">Brouillon</span>
 						{/if}
-						{#if p.pinned}<span>· Épinglé</span>{/if}
+						{#if p.pinned}<span>· À la une</span>{/if}
 						<span>· {p.commentCount} commentaire{p.commentCount > 1 ? 's' : ''}</span>
 					</p>
 				</div>

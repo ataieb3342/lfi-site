@@ -25,7 +25,6 @@
 		eventSignupUrl?: string;
 		eventMapEmbed?: string;
 		commentsOpen?: boolean;
-		pinned?: boolean;
 	};
 
 	let {
@@ -34,7 +33,8 @@
 		erreur = '',
 		libelleValider = 'Enregistrer',
 		apercu = '',
-		admins = []
+		admins = [],
+		positionUne = null
 	}: {
 		publication?: PublicationVue | null;
 		valeurs?: Champs;
@@ -43,6 +43,8 @@
 		/** Texte rendu en HTML par le serveur après un clic sur « Aperçu ». */
 		apercu?: string;
 		admins?: { id: number; name: string; profilePublic: boolean }[];
+		/** Rang de la publication à la une (1 pour la grande fiche), ou null. */
+		positionUne?: number | null;
 	} = $props();
 
 	/*
@@ -239,7 +241,6 @@
 		authorName: valeurs.authorName ?? publication?.authorName ?? '',
 		status: valeurs.status ?? publication?.status ?? 'draft',
 		commentsOpen: valeurs.commentsOpen ?? publication?.commentsOpen ?? true,
-		pinned: valeurs.pinned ?? publication?.pinned ?? false,
 		eventAt: dateRendezVous,
 		eventCategory: valeurs.eventCategory ?? publication?.eventCategory ?? 'autre',
 		actionCategory: categorieActionSelectionnee,
@@ -521,13 +522,16 @@
 				<span>Autoriser les commentaires</span>
 			</label>
 
-			<label class="flex items-start gap-2 text-sm text-ink">
-				<input type="checkbox" name="pinned" value="1" checked={v.pinned} class="mt-0.5" />
-				<span>
-					Épingler à la une
-					<span class="mt-0.5 block text-xs font-normal text-ink-faint">Plusieurs publications peuvent être à la une en même temps. L’épinglage expire automatiquement après 15 jours.</span>
-				</span>
-			</label>
+			<!-- La une ne se coche plus ici : elle se gère sur sa propre page, où
+			     l'on voit tout ce qui y est et dans quel ordre. -->
+			<p class="text-sm text-ink">
+				{#if positionUne}
+					<span class="font-semibold">À la une</span>, {positionUne === 1 ? 'en grande fiche' : `en ${positionUne}ᵉ position`}.
+				{:else}
+					Pas à la une.
+				{/if}
+				<a class="font-semibold text-brand hover:underline" href="/admin/a-la-une">Gérer la une →</a>
+			</p>
 		</div>
 
 		<div class="carte space-y-3">
