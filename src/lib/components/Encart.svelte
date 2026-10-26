@@ -3,8 +3,8 @@
 
 	/**
 	 * Encart d'appel : le gabarit unique des invitations posées en tête ou en bas
-	 * d'une page - la bibliothèque depuis les apéros, la revue de presse depuis
-	 * les articles, Action populaire depuis les actualités.
+	 * d'une page - la bibliothèque depuis « À lire », Action populaire depuis
+	 * l'agenda et le bas de l'accueil.
 	 *
 	 * Il annonce toujours une **autre** page. Un encart posé en tête d'une page
 	 * pour vanter une section de cette même page se lit comme une publicité, et

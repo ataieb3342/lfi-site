@@ -17,15 +17,24 @@ function decalerMois(mois: string, decalage: number): string {
 	return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
+/** Nombre de rendez-vous de la liste « À venir », au-dessus du calendrier. */
+const A_VENIR = 10;
+
 export const load: PageServerLoad = async ({ url }) => {
 	const mois = moisValide(url.searchParams.get('mois'));
 	const debut = `${mois}-01`;
 	const suivant = decalerMois(mois, 1);
+	const maintenant = new Date();
+	const aujourdhui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
 
 	return {
 		mois,
 		moisPrecedent: decalerMois(mois, -1),
 		moisSuivant: suivant,
-		evenements: listAgenda(debut, `${suivant}-01`).map(presentPublication)
+		evenements: listAgenda(debut, `${suivant}-01`).map(presentPublication),
+		// Le calendrier d'un mois se lit mal sur téléphone : la liste des
+		// prochains rendez-vous, elle, se lit partout. C'est elle qui a pris la
+		// place de l'ancienne page Actualités.
+		aVenir: listAgenda(aujourdhui, '9999-12-31').slice(0, A_VENIR).map(presentPublication)
 	};
 };

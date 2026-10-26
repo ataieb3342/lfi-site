@@ -49,7 +49,8 @@ native.
 | `src/lib/components/Histogramme.svelte` | Le graphique en colonnes de l'administration |
 | `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin`, limite par adresse, comptage des visites |
-| `src/routes/[rubrique=rubrique]/` | Pages publiques `/articles`, `/actualites`, `/revue-de-presse` et la fiche d'un apéro |
+| `src/routes/[rubrique=rubrique]/` | La liste « À lire » (`/articles`), les fiches de toutes les publications, et les redirections des anciennes adresses |
+| `src/routes/agenda/` | Page publique `/agenda` : les prochains rendez-vous puis le calendrier du mois |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
 | `src/lib/boite-a-outils/` + `src/routes/boite-a-outils/` | Page publique `/boite-a-outils` : les outils interactifs de vulgarisation (voir plus bas) |
@@ -131,7 +132,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   lueurs radiales, l'une rouge, l'autre violette - pas le dégradé diagonal du
   logo en aplat. Le dégradé pur ne sert qu'en filet fin (`.filet-degrade`).
 - **Chaque type de publication a sa couleur**, prise aux trois couleurs du
-  logo : violet pour les articles, rouge pour les actualités, pourpre pour les
+  logo : violet pour les articles, rouge pour les événements, pourpre pour les
   apéros (`COULEUR_KIND` et `FOND_KIND` dans `format.ts`). Elle sert aux
   étiquettes des listes et aux surfaces colorées : `.fond-degrade`,
   `.fond-actu`, `.fond-apero`, construites pareil (fond profond, deux lueurs).
@@ -171,10 +172,10 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 
   Deux pièges. Le filet va sur un **conteneur**, jamais sur la surface colorée
   elle-même : elle est arrondie, la bordure s'y dessinerait par-dessus au lieu
-  de faire un trait en dessous. Et sur les actualités, le bandeau Action
+  de faire un trait en dessous. Et sur l'agenda, le bandeau Action
   populaire disparaît quand l'application est désactivée dans les réglages - le
-  filet est donc conditionné par `aBandeau`, sans quoi la page afficherait un
-  trait tout seul. L'accueil, lui, n'a pas de filet : son bandeau ouvre la page
+  filet est donc conditionné par `data.app.actif`, sans quoi la page afficherait
+  un trait tout seul. L'accueil, lui, n'a pas de filet : son bandeau ouvre la page
   et le contenu qui suit a son propre en-tête.
 - **Le premier bloc d'une page n'ajoute pas sa marge haute** à celle de
   `<main>`. C'est une règle d'`app.css` (`main > :first-child`) et non quelque
@@ -221,49 +222,74 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
   mais la couleur principale des textes et liens est le violet, le rouge n'est
   qu'un accent.
 
-## Les quatre types de publication
+## Deux familles, quatre types de publication
+
+Le visiteur se pose deux questions, et le site range tout d'après elles :
+**« où est-ce que je peux venir ? »** (l'agenda) et **« qu'est-ce que vous
+faites, qu'est-ce que vous pensez ? »** (« À lire »). Celui qui publie se pose
+la même : « est-ce que les gens peuvent venir ? » - oui, c'est un rendez-vous ;
+non, c'est un article.
 
 Une seule table `publications`, distinguée par la colonne `kind` :
 
-- **`article`** - analyses, comptes rendus, prises de position. Classés du plus
-  récent au plus ancien.
-- **`actu`** - actualités : annonces de rendez-vous, mobilisations, réactions à
-  chaud. Elles ont une colonne `event_at` facultative (date de l'action, au
-  format `AAAA-MM-JJ`).
-- **`apero`** - apéros thématiques (voir plus bas). `event_at` y est
-  obligatoire : c'est la date de la soirée.
-- **`revue`** - revues de presse : ce qu'on a lu ailleurs, rassemblé et
-  commenté. C'est un article ordinaire du point de vue de la base ; seuls sa
-  rubrique (`/revue-de-presse`), son étiquette et l'encart qui y mène le
-  distinguent. Les liens vont dans le corps du texte, chacun avec sa source et
-  ce que le groupe en retient.
+| Famille | Type affiché | `kind` | `event_category` | Où il apparaît |
+| --- | --- | --- | --- | --- |
+| À lire | Article | `article` | `autre` | `/articles` (titre « À lire ») |
+| Agenda | Événement | `actu` | `reunion` | `/agenda`, fiche sous `/actualites/…` |
+| Agenda | Formation | `actu` | `formation` | `/agenda`, fiche sous `/actualites/…` |
+| Agenda | Apéro thématique | `apero` | `apero` | `/agenda` et `/aperos` |
+
+- Un **article** n'a pas de date de rendez-vous, qu'il fasse trois lignes ou
+  trois pages : analyse, compte rendu, prise de position, guide, annonce
+  courte. Le formulaire efface la date et les informations pratiques d'un
+  article.
+- Un **rendez-vous** a toujours une date (`event_at`, `AAAA-MM-JJ`). C'est elle
+  qui le place dans l'agenda, puis dans le passé.
+
+**Il y en a eu sept, et c'était trop** (octobre 2026). Actualité (brève),
+retour d'action et revue de presse existaient en plus : le menu « Actualités »
+mêlait sept entrées des deux familles, la page Actualités était en fait un
+second agenda rempli de « rendez-vous passés », et l'équipe elle-même se
+trompait de case (un apéro publié comme événement, des comptes rendus publiés
+comme articles, une revue de presse qui contenait des guides). La migration 021
+a tout rangé : revues, brèves et retours d'action sont devenus des articles,
+les rendez-vous sans catégorie des événements, et les apéros publiés comme
+événements des apéros. **Avant de rajouter un type, se demander s'il ne s'agit
+pas d'un article** : un type de plus, c'est une case de plus où se tromper.
+
+Les adresses partagées avant ce rangement continuent de fonctionner. Le slug
+étant unique dans toute la table, la fiche redirige vers sa rubrique actuelle
+(`/revue-de-presse/x` et `/actualites/x` vers `/articles/x` quand c'est devenu
+un article), et les anciennes listes redirigent (`/actualites` vers `/agenda`,
+`/revue-de-presse` vers `/articles`). C'est pour cela que le `match` de
+`src/params/rubrique.ts` accepte encore `revue-de-presse`. La contrainte
+`check` accepte encore `'revue'` : reconstruire la table pour l'en retirer ne
+rapportait rien.
+
+Les événements et formations gardent leurs fiches sous `/actualites/…`, même
+si le mot n'apparaît plus nulle part sur le site : des liens ont été partagés,
+et le visiteur ne lit pas l'adresse. `LISTE_RUBRIQUE` (`rubriques.ts`) dit
+quelle page liste chaque rubrique - l'agenda pour `actualites`.
 
 Ajouter un type demande de toucher, dans cet ordre : la contrainte `check` de
 `publications` (une migration qui reconstruit la table, voir la 007), `Kind`
-dans `rubriques.ts` et `content.ts`, les quatre tables de `rubriques.ts`, le
+dans `rubriques.ts` et `content.ts`, les tables de `rubriques.ts`, le
 `match` de `src/params/rubrique.ts`, `LIBELLE_KIND`, `COULEUR_KIND` et
 `FOND_KIND` de `format.ts`, la validation de `formulaires.ts`, le menu du
-formulaire de publication, le filtre de l'administration et `PAGES_FIXES` du
-plan du site. Le flux RSS et les cartes suivent tout seuls.
+formulaire de publication (et sa phrase d'aide), le filtre de
+l'administration et `PAGES_FIXES` du plan du site. Le flux RSS et les cartes
+suivent tout seuls.
 
-La revue de presse **n'est pas dans l'en-tête de bureau** : une cinquième
-rubrique le ferait déborder sur les écrans moyens. On y accède par le pied de
-page, par le menu mobile et par l'encart en tête de la liste des articles.
+## L'agenda
 
-Le tri des actualités passe par `listPublished({ ordre: 'agenda' })` : les
-rendez-vous dont la date n'est pas passée remontent en tête, de la plus proche à la
-plus lointaine, puis viennent les autres par date de publication. La comparaison
-se fait en SQL sur des chaînes `AAAA-MM-JJ` face à `date('now', 'localtime')`,
-afin que le classement reste cohérent avec la date affichée en France autour de
-minuit.
+`/agenda` est la porte des rendez-vous : l'en-tête, le bandeau Action
+populaire, la liste **« À venir »** (les dix prochains, tous types confondus),
+puis le calendrier du mois avec ses filtres par type. La liste n'est affichée
+que sur le mois courant : c'est elle qui se lit sur téléphone, où une grille
+de sept colonnes est illisible. Elle remplace l'ancienne page Actualités.
 
-Une actualité sans `event_at` se comporte comme une simple brève d'information.
-
-Une publication de catégorie `action` est uniquement un **retour d’action** :
-sa date doit être passée et elle ne contient ni horaire, ni lieu, ni carte, ni
-responsable, ni inscription. Elle reste dans les actualités et est exclue de
-l’agenda. La fiche se termine automatiquement par une invitation générale à
-rejoindre le groupe sur Action populaire, sans annoncer la prochaine action.
+Un lien sous le chapô mène à `/aperos` : les apéros n'ont plus d'entrée dans
+l'en-tête.
 
 ## Les apéros thématiques
 
@@ -292,7 +318,7 @@ l'avance, puis publie un résumé des échanges. Sur le site :
   horaires, lieu et adresse ; dès qu'un lieu ou une adresse spécifique est
   renseigné, le couple propre à la fiche remplace entièrement le couple
   habituel afin de ne jamais associer un nouveau lieu à l'ancienne adresse.
-- Le prochain apéro a sa fiche dans le fil « Les prochains jours » de
+- Le prochain apéro a sa fiche dans le fil « Les prochains rendez-vous » de
   l'accueil, comme les autres rendez-vous (voir « L'accueil »). Il est aussi
   dans le flux RSS et dans le plan du site. `BandeauApero.svelte` n'est plus
   utilisé sur l'accueil.
@@ -394,10 +420,8 @@ un écran entier de surface colorée avant le premier article. Il a été retir�
 `CarrouselAccueil.svelte` avec lui. La raison n'était pas seulement sa hauteur :
 six diapositives sur sept répétaient ce qui se trouvait déjà ailleurs sur la même
 page ou dans l'en-tête - l'identité du groupe est dans l'en-tête, le pied de page
-et « Le groupe » ; les rendez-vous publics sont dans la colonne « Actualités »
-de l'accueil, qui les remonte déjà en tête avec leur date en étiquette (tri
-`agenda`) ; les retours d’action restent chronologiques et la bibliothèque est
-dans l'en-tête.
+et « Le groupe » ; les rendez-vous publics sont dans le fil de l'accueil, et
+la bibliothèque est dans l'en-tête.
 
 Le carrousel avait été remplacé par un grand bandeau d'ouverture (devise,
 boutons, prochain rendez-vous), une rangée de trois cartes de navigation et le
@@ -408,17 +432,19 @@ La page tient maintenant en quatre blocs, de haut en bas :
 
 1. **L'ouverture**, sur la surface `.fond-degrade` - le seul pavé coloré de la
    page : une ligne d'identité, la devise en `h1`, puis le **fil « Les
-   prochains jours »**. Une fiche claire par rendez-vous des quinze prochains
-   jours (`HORIZON` dans `+page.server.ts`), événements, formations et apéros
-   confondus (`listAgenda`, qui écarte les retours d'action), huit au plus. Chaque fiche porte
+   prochains rendez-vous »** : les six prochains (`DANS_LE_FIL` dans
+   `+page.server.ts`), événements, formations et apéros confondus
+   (`listAgenda`). **Un nombre et non une durée** : le fil couvrait d'abord
+   quinze jours, et n'affichait que deux fiches quand le rendez-vous suivant
+   tombait le seizième jour. Chaque fiche porte
    « Aujourd'hui » ou « Demain » quand c'est le cas, l'heure, le titre, le
    type et le lieu, et un liseré dans la couleur de sa catégorie (les classes
    `agenda-*` de la page agenda). Sur téléphone, le fil défile au doigt
    (`scroll-snap`, aucun script) ; la fiche suivante qui dépasse à droite dit
    qu'on peut faire glisser. L'article à la une commence vers 340 pixels.
 2. **Les publications à la une**, puis les articles récents. Toute publication
-   en ligne peut y être mise : article, actualité, retour d'action, événement,
-   formation, apéro ou revue de presse. Cinq au plus (`MAX_A_LA_UNE` dans
+   en ligne peut y être mise : article, événement, formation ou apéro. Cinq
+   au plus (`MAX_A_LA_UNE` dans
    `content.ts`) ; elles forment une grille et ne sont pas répétées dans les
    listes situées juste en dessous.
    La première est en grand (image à gauche, texte à droite), les suivantes en
@@ -440,12 +466,14 @@ La page tient maintenant en quatre blocs, de haut en bas :
    quinze jours faisait disparaître des fiches sans prévenir (migration 020).
    `pinned_at` ne dit plus que depuis quand. Chaque ajout, retrait et
    déplacement passe par `audit()`.
-3. **La colonne « Actualités »**, qui **ne répète pas le fil** : brèves,
-   comptes rendus et rendez-vous plus lointains, cinq au plus.
+3. **« À lire »** à gauche (les articles récents), et à droite **« Plus tard
+   dans l'agenda »**, qui **prend la suite du fil sans le répéter** : les cinq
+   rendez-vous suivants (`PLUS_TARD`). Sans rendez-vous plus lointain, la
+   colonne disparaît et « À lire » prend toute la largeur.
    Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les
    médias cochés « Sur l'accueil » dans l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
-   sur ordinateur). Ils ont d'abord été dans la colonne des actus, mais les
-   fiches épinglées étant retirées des « Articles récents », la colonne de
+   sur ordinateur). Ils ont d'abord été dans la colonne de droite, mais les
+   fiches à la une étant retirées de « À lire », la colonne de
    gauche était plus courte et laissait un trou. Pas en tête de page : un lien
    sortant dès l'arrivée fait partir le visiteur avant qu'il ait vu ce que fait
    le groupe.
@@ -482,14 +510,13 @@ contenu et déborder sur mobile).
 
 ## Le bandeau Action populaire
 
-Affiché en tête de la liste des actualités, au bas de chaque actualité et au bas
+Affiché en tête de l'agenda, au bas de chaque événement et au bas
 de l'accueil - pas ailleurs : c'est là que le visiteur cherche les prochains
 rendez-vous, donc le moment où proposer l'application a du sens. Sur l'accueil il
 est **tout en bas**, jamais en tête. Pour l'étendre à tout le site, déplacer le
 composant dans `src/routes/+layout.svelte`, juste avant le `<footer>`.
 
-C'est un `Encart` ordinaire, au même gabarit que ceux des articles et de la revue
-de presse - mais il porte les couleurs de l'application
+C'est un `Encart` ordinaire, au même gabarit que celui de « À lire » - mais il porte les couleurs de l'application
 (jaune `#f0e80d`, bleu nuit `#0b0b33`) et non celles du site, écrites en dur
 plutôt que prises dans les jetons : elles ne doivent bouger ni avec le thème
 sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu - c'est ce qui
@@ -507,9 +534,8 @@ plutôt que d'afficher des boutons morts.
 ## Les encarts d'appel
 
 `src/lib/components/Encart.svelte` est le gabarit **unique** des invitations
-posées en tête d'une page : la bibliothèque depuis la revue de presse, la revue
-de presse depuis les articles, Action populaire depuis les actualités et le bas
-de l'accueil. Ils avaient chacun leur mise en page ; d'une page à l'autre, le
+posées en tête d'une page : la bibliothèque depuis « À lire », Action populaire
+depuis l'agenda et le bas de l'accueil. Ils avaient chacun leur mise en page ; d'une page à l'autre, le
 visiteur ne reconnaissait pas qu'il s'agissait de la même chose.
 
 **Un encart annonce toujours une autre page.** Posé en tête d'une page pour
@@ -586,7 +612,7 @@ reconnu l'adresse comme un lien, sans quoi la règle ne voit rien.
 
 ## Le partage
 
-Chaque publication (article, actualité, apéro, revue de presse) se termine par
+Chaque publication (article, événement, formation, apéro) se termine par
 une rangée de boutons : WhatsApp, Facebook, Telegram, Bluesky, X, e-mail
 (`Partage.svelte`, liste `reseaux`). Pas sur l'aperçu d'un brouillon.
 
@@ -602,8 +628,8 @@ une rangée de boutons : WhatsApp, Facebook, Telegram, Bluesky, X, e-mail
 - Les icônes sont les logos de Simple Icons (domaine public), recopiés dans le
   composant : des SVG du projet, pas des fichiers venus de l'extérieur.
 
-**L'ajout à l'agenda.** Un rendez-vous à venir (actualité datée, formation,
-apéro - pas un retour d'action ni un brouillon) porte deux boutons sous sa
+**L'ajout à l'agenda.** Un rendez-vous à venir (événement, formation,
+apéro - pas un brouillon) porte deux boutons sous sa
 date (`src/lib/agenda.ts`) : « Apple, Outlook » sert un fichier `.ics`
 (`/<rubrique>/<slug>/agenda.ics`), que l'iPhone et le Mac proposent d'ajouter
 dès qu'on l'ouvre ; « Google Agenda » est un simple lien prérempli, plus sûr
@@ -633,13 +659,17 @@ texte tapé restent en place.
 
 ## L'en-tête
 
-La navigation de bureau se limite à quatre rubriques de contenu (Actualités,
-Articles, Apéros, Bibliothèque - qui couvre les outils, les lectures et les
-jeux) et un bouton « Nous rejoindre ». Le logo ramène
-à l'accueil ; « Le groupe » est dans le pied de page. Le menu mobile, lui,
-liste tout (`liensMobile` dans `src/routes/+layout.svelte`). Ajouter un lien
+L'en-tête porte les deux portes du site, **Agenda** et **À lire**, en liens
+simples (`liensPrincipaux` dans `src/routes/+layout.svelte`), puis le menu
+**Ressources** (bibliothèque, outils, jeux, médias), « Qui sommes-nous ? » et le
+bouton « Nous rejoindre ». Le logo ramène à l'accueil. Le menu mobile reprend
+la même chose. « Agenda » s'allume aussi sur les fiches d'événements
+(`/actualites/…`) et sur les apéros (`sections`).
+
+Pas de menu déroulant pour les publications : l'ancien menu « Actualités »
+alignait sept entrées des deux familles, et on s'y perdait. Ajouter un lien
 dans l'en-tête de bureau le fait déborder sur les écrans moyens : préférer le
-pied de page ou le menu mobile.
+pied de page.
 
 Le pied de page range ses liens en trois colonnes titrées - Le groupe,
 Ressources, Le site (`groupesPied`) - à droite de la présentation du groupe sur
@@ -694,7 +724,7 @@ média coché, la section de l'accueil disparaît. Chaque action passe par
 faite. **La liste reste courte** - cinq médias, c'est un conseil ; vingt,
 c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
-« Ressources ». Sur l'accueil, ils sont sous les articles et les actualités
+« Ressources ». Sur l'accueil, ils sont sous « À lire » et l'agenda
 (voir « L'accueil »).
 
 Le lien n'accepte que `https://` (il finit dans un `href` public). L'adresse
@@ -1061,8 +1091,7 @@ de connexion affiche les identifiants et le code du moment. L'administration
 est donc ouverte à tout le monde : ce mode est réservé au site de test sur
 Render (`render.yaml`, `DEMO.md`) et ne doit jamais être activé en production.
 Les contenus fictifs sont dans le tableau `FICHES` de ce fichier ; les dates
-des rendez-vous sont relatives au jour du démarrage. Le retour d’action fictif
-porte toujours sur une date passée.
+des rendez-vous sont relatives au jour du démarrage.
 
 La fiche portant `illustree: true` reçoit une **image de couverture**, encodée
 en base64 dans `demo-image.ts`. Elle est dans le code et non dans

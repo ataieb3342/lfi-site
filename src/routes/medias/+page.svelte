@@ -58,7 +58,7 @@
 	<p class="text-sm text-ink-soft">
 		Les lectures et documents partagés autour de nos apéros sont dans la
 		<a class="font-semibold text-brand hover:underline" href="/bibliotheque">bibliothèque</a>, et
-		ce que nous avons retenu de l’actualité dans la
-		<a class="font-semibold text-brand hover:underline" href="/revue-de-presse">revue de presse</a>.
+		nos analyses et comptes rendus dans
+		<a class="font-semibold text-brand hover:underline" href="/articles">À lire</a>.
 	</p>
 </section>

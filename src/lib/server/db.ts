@@ -482,6 +482,37 @@ const MIGRATIONS: string[] = [
 	) where pinned = 1;
 	drop index publications_pinned;
 	create index publications_pinned on publications(pinned, pinned_order);
+	`,
+	// 021 - deux familles au lieu de sept types : l'agenda et « À lire »
+	//
+	// Un rendez-vous (événement, formation, apéro) a une date à venir ; tout le
+	// reste est un article. La revue de presse, la brève (actualité sans date)
+	// et le retour d'action disparaissent : ils deviennent des articles, à la
+	// même adresse sous /articles (l'ancienne redirige). La contrainte CHECK
+	// accepte encore 'revue' : la reconstruire pour l'en retirer ferait courir
+	// un risque à toute la table pour rien.
+	//
+	// Les rendez-vous sans catégorie deviennent des événements, et les apéros
+	// publiés par erreur comme événements (« Apéro thématique. » du 26 octobre
+	// 2026) deviennent des apéros, pour paraître sur /aperos.
+	`
+	update publications set kind = 'article' where kind = 'revue';
+
+	delete from publication_managers where publication_id in (
+		select id from publications
+		 where kind = 'actu' and (event_at is null or event_category = 'action')
+	);
+	update publications set
+	 kind = 'article', event_at = null, event_category = 'autre', action_category = 'autre',
+	 event_start_time = '', event_end_time = '', event_location = '', event_address = '',
+	 event_location_url = '', event_managers = '', event_signup_url = '',
+	 event_meeting_point = '', event_map_media_id = null, event_map_embed_url = ''
+	 where kind = 'actu' and (event_at is null or event_category = 'action');
+
+	update publications set kind = 'apero', event_category = 'apero'
+	 where kind = 'actu' and (event_category = 'apero' or lower(title) like 'apéro thématique%');
+	update publications set event_category = 'reunion'
+	 where kind = 'actu' and event_category = 'autre';
 	`
 ];
 

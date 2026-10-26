@@ -6,8 +6,8 @@
 	import Partage from '$lib/components/Partage.svelte';
 	import PreuveDeTravail from '$lib/components/PreuveDeTravail.svelte';
 	import { articleStructure, editeur, evenementAction, evenementApero, filAriane } from '$lib/donnees-structurees';
-	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, LIBELLE_ACTION, libellePublication } from '$lib/format';
-	import { RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
+	import { COULEUR_KIND, formatDate, formatDateLongue, formatDateTime, formatPlageHoraire, formatTailleFichier, libellePublication } from '$lib/format';
+	import { LISTE_RUBRIQUE, RUBRIQUE_PAR_KIND, TITRE_RUBRIQUE } from '$lib/rubriques';
 	import { lienGoogleAgenda, rendezVous } from '$lib/agenda';
 	import type { ActionData, PageData } from './$types';
 
@@ -36,16 +36,13 @@
 	// annoncé comme un événement, il peut apparaître comme tel dans Google.
 	const rubrique = $derived(RUBRIQUE_PAR_KIND[p.kind]);
 	const adresse = $derived(`${page.url.origin}/${rubrique}/${p.slug}`);
-	const estRetourAction = $derived(p.kind === 'actu' && p.eventCategory === 'action');
 	// Ajouter à son agenda n'a de sens que pour un rendez-vous public à venir.
-	const rdv = $derived(
-		p.aVenir && !estRetourAction && !data.apercu ? rendezVous(p, cadre, data.resume, adresse) : null
-	);
+	const rdv = $derived(p.aVenir && !data.apercu ? rendezVous(p, cadre, data.resume, adresse) : null);
 	const agenda = $derived(rdv ? lienGoogleAgenda(rdv) : null);
 	const fiche = $derived(
 		p.kind === 'apero'
 			? evenementApero(page.url.origin, adresse, p, data.resume, cadre, data.settings)
-			: p.eventAt && !estRetourAction
+			: p.eventAt
 				? evenementAction(page.url.origin, adresse, p, data.resume, data.settings)
 			: articleStructure(page.url.origin, adresse, p, data.resume, data.settings)
 	);
@@ -62,7 +59,7 @@
 		editeur(page.url.origin, data.settings),
 		filAriane(page.url.origin, [
 			{ nom: 'Accueil', chemin: '/' },
-			{ nom: TITRE_RUBRIQUE[rubrique], chemin: `/${rubrique}` },
+			{ nom: TITRE_RUBRIQUE[rubrique], chemin: LISTE_RUBRIQUE[rubrique] },
 			{ nom: p.title, chemin: `/${rubrique}/${p.slug}` }
 		])
 	]}
@@ -78,17 +75,15 @@
 	</p>
 {/if}
 
-<!-- Lien de retour pour les deux rubriques absentes de l'en-tête de bureau :
-     sans lui, on ne retrouve la liste que par le pied de page. -->
+<!-- Lien de retour vers la liste d'un rendez-vous : un apéro vers les apéros,
+     un événement ou une formation vers l'agenda. -->
 {#if p.kind === 'apero'}
 	<p class="mb-6 text-sm">
 		<a class="font-semibold text-brand hover:underline" href="/aperos">← Tous les apéros</a>
 	</p>
-{:else if p.kind === 'revue'}
+{:else if p.kind === 'actu'}
 	<p class="mb-6 text-sm">
-		<a class="font-semibold text-brand hover:underline" href="/revue-de-presse"
-			>← Toutes les revues de presse</a
-		>
+		<a class="font-semibold text-brand hover:underline" href="/agenda">← Tout l’agenda</a>
 	</p>
 {/if}
 
@@ -104,11 +99,6 @@
 				{#if p.publishedAt}<time datetime={p.publishedAt}>{formatDate(p.publishedAt)}</time>{/if}
 				{#if p.publishedAt && p.authorName} · {/if}
 				{#if p.authorName}{#if p.authorProfileUrl}<a class="hover:text-brand hover:underline" href={p.authorProfileUrl}>{p.authorName}</a>{:else}{p.authorName}{/if}{/if}
-			</p>
-		{/if}
-		{#if estRetourAction && p.authorName}
-			<p class="mt-3 text-sm text-ink-faint">
-				{#if p.authorProfileUrl}<a class="hover:text-brand hover:underline" href={p.authorProfileUrl}>{p.authorName}</a>{:else}{p.authorName}{/if}
 			</p>
 		{/if}
 		{#if p.summary}
@@ -131,10 +121,6 @@
 					{#if p.eventLocationUrl}<a class="font-semibold underline" href={p.eventLocationUrl} target="_blank" rel="noopener noreferrer">{lieuComplet}</a>{:else}<span class="font-semibold">{lieuComplet}</span>{/if}
 				{/if}
 			</p>
-		{:else if p.eventAt && estRetourAction}
-			<p class="mt-5 inline-flex items-center gap-2 rounded-lg bg-surface-alt px-4 py-2.5 text-sm font-bold text-ink-faint">
-				{LIBELLE_ACTION[p.actionCategory]} · action menée le <time datetime={p.eventAt}>{formatDate(p.eventAt)}</time>
-			</p>
 		{:else if p.eventAt}
 			<p
 				class="mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold
@@ -152,10 +138,10 @@
 				</p>
 			{/if}
 		{/if}
-		{#if p.eventAt && !estRetourAction && p.eventMeetingPoint}
+		{#if p.eventAt && p.eventMeetingPoint}
 			<p class="mt-2 text-sm text-ink-soft"><strong>Point de rendez-vous :</strong> {p.eventMeetingPoint}</p>
 		{/if}
-		{#if p.eventAt && !estRetourAction && (p.eventSignupUrl || agenda)}
+		{#if p.eventAt && (p.eventSignupUrl || agenda)}
 			<div class="mt-4 flex flex-wrap items-center gap-2">
 				{#if p.eventSignupUrl}
 					<a class="bouton" href={p.eventSignupUrl} target="_blank" rel="noopener noreferrer">S’inscrire</a>
@@ -202,7 +188,7 @@
 		/>
 	{/if}
 
-		{#if p.eventAt && !estRetourAction && p.eventManagerPeople.length}
+		{#if p.eventAt && p.eventManagerPeople.length}
 			<p class="mt-5 text-sm text-ink-soft">
 				<strong>Responsable{p.eventManagerPeople.length > 1 ? 's' : ''} :</strong>
 				{#each p.eventManagerPeople as personne, index (personne.name)}
@@ -216,12 +202,6 @@
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html data.corpsHtml}
 	</div>
-	{#if estRetourAction}
-		<p class="mt-6 rounded-lg bg-brand-soft px-4 py-3 text-sm text-ink">
-			Vous voulez être avec nous la prochaine fois ?
-			<a class="font-bold text-brand underline" href="https://actionpopulaire.fr" target="_blank" rel="noreferrer">Rejoignez-nous sur Action populaire</a>.
-		</p>
-	{/if}
 
 	<!-- Un brouillon n'est pas public : rien à partager. -->
 	{#if !data.apercu}

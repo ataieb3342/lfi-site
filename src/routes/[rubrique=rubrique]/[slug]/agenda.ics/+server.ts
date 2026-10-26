@@ -14,13 +14,8 @@ import { fichierIcs, rendezVous } from '$lib/agenda';
 export const GET: RequestHandler = async ({ params, url }) => {
 	const publication = getBySlugAnyStatus(params.slug);
 	const kindAttendu = KIND_PAR_RUBRIQUE[params.rubrique as Rubrique];
-	// Un brouillon n'est pas public, et un retour d'action n'est pas un rendez-vous.
-	if (
-		!publication ||
-		publication.kind !== kindAttendu ||
-		publication.status !== 'published' ||
-		publication.event_category === 'action'
-	) {
+	// Un brouillon n'est pas public, et un article n'est pas un rendez-vous.
+	if (!publication || publication.kind !== kindAttendu || publication.status !== 'published' || !publication.event_at) {
 		error(404, 'Page introuvable');
 	}
 

@@ -24,7 +24,8 @@
 
 <!--
 	L'accueil s'ouvre sur ce qui se passe, pas sur un slogan : un titre d'une
-	ligne, puis le fil des quinze prochains jours. Une fiche par rendez-vous,
+	ligne, puis le fil des prochains rendez-vous (un nombre fixe, pour qu'il
+	ne soit jamais presque vide). Une fiche par rendez-vous,
 	événements, formations et apéros confondus, dans la couleur de sa
 	catégorie (celle de l'agenda). Le fil défile au doigt sur téléphone
 	(`scroll-snap`, aucun script, aucun défilement automatique) et tient sur
@@ -45,13 +46,13 @@
 		Agir ici, discuter ensemble, changer les choses.
 	</h1>
 
-	{#if data.prochainsJours.length}
+	{#if data.prochainsRendezVous.length}
 		<div class="mt-5 flex items-baseline justify-between gap-4">
-			<h2 class="text-xs font-bold tracking-[0.14em] text-white/75 uppercase">Les prochains jours</h2>
+			<h2 class="text-xs font-bold tracking-[0.14em] text-white/75 uppercase">Les prochains rendez-vous</h2>
 			<a class="text-sm font-semibold text-white underline-offset-2 hover:underline" href="/agenda">Tout l’agenda →</a>
 		</div>
 		<ol class="fil-jours mt-2 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-			{#each data.prochainsJours as rdv (rdv.id)}
+			{#each data.prochainsRendezVous as rdv (rdv.id)}
 				{@const lieu = rdv.eventLocation || (rdv.kind === 'apero' ? data.apero.lieu : '')}
 				{@const heure = rdv.eventStartTime || (rdv.kind === 'apero' ? data.apero.heure : '')}
 				<li class="agenda-{rdv.eventCategory} w-60 shrink-0 snap-start">
@@ -77,7 +78,7 @@
 		</ol>
 	{:else}
 		<p class="mt-3 text-white/85">
-			Pas de rendez-vous annoncé dans les quinze prochains jours. <a class="font-semibold text-white underline" href="/agenda">Voir l’agenda</a>
+			Pas de rendez-vous annoncé pour le moment. <a class="font-semibold text-white underline" href="/agenda">Voir l’agenda</a>
 		</p>
 	{/if}
 </section>
@@ -150,13 +151,13 @@
 
 <!-- `pt-6` et non `py-6` : le bandeau qui suit apporte sa propre marge haute,
      les deux s'ajoutaient. -->
-<div class="grid gap-8 pt-6 lg:grid-cols-[1fr_20rem]">
+<div class="grid gap-8 pt-6 {data.plusTard.length ? 'lg:grid-cols-[1fr_20rem]' : ''}">
 	<!-- Masquée quand le seul article existant est déjà « à la une » :
 	     un titre de section suivi du vide fait plus négligé qu'utile. -->
 	{#if data.articles.length || !data.aLaUne.length}
 		<section>
 			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-				<h2 class="text-xl font-extrabold text-ink">Articles récents</h2>
+				<h2 class="text-xl font-extrabold text-ink">À lire</h2>
 				<a class="text-sm font-semibold text-brand hover:underline" href="/articles">Tout voir</a>
 			</div>
 
@@ -174,38 +175,29 @@
 		<div></div>
 	{/if}
 
-	<aside>
-		<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-			<h2 class="text-xl font-extrabold text-ink">Actualités</h2>
-			<a class="text-sm font-semibold text-brand hover:underline" href="/actualites">Tout voir</a>
-		</div>
-
-		{#if data.actus.length}
-			<!-- Une ligne par rendez-vous, la date en colonne à gauche : la liste
-			     se parcourt d'un coup d'œil, comme un agenda de poche. Le titre est
-			     coupé à deux lignes, la fiche complète est à un clic. -->
+	<!-- La suite du fil, sans le répéter : les rendez-vous qui viennent après
+	     les six du haut. Une ligne par rendez-vous, la date en colonne à
+	     gauche : la liste se parcourt d'un coup d'œil, comme un agenda de poche.
+	     Sans rendez-vous plus lointain, la colonne disparaît. -->
+	{#if data.plusTard.length}
+		<aside>
+			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
+				<h2 class="text-xl font-extrabold text-ink">Plus tard dans l’agenda</h2>
+			</div>
 			<ul>
-				{#each data.actus as actu (actu.id)}
+				{#each data.plusTard as rdv (rdv.id)}
 					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
-						<a href="/actualites/{actu.slug}" class="flex gap-3 hover:text-brand">
-							{#if actu.aVenir}
-								<!-- Rendez-vous à venir : la date de l'action prime sur celle de
-								     publication, c'est l'information utile au lecteur. -->
-								<span
-									class="w-24 shrink-0 self-start rounded whitespace-nowrap bg-accent-soft px-1.5 py-0.5 text-center text-xs font-bold text-accent-dark"
-								>
-									{formatDateCourte(actu.eventAt)}
-								</span>
-							{:else}
-								<span class="w-24 shrink-0 whitespace-nowrap pt-0.5 text-center text-xs text-ink-faint">
-									{formatDateCourte(actu.eventAt ?? actu.publishedAt?.slice(0, 10))}
-								</span>
-							{/if}
+						<a href={lienPublication(rdv.kind, rdv.slug)} class="flex gap-3 hover:text-brand">
+							<span
+								class="w-24 shrink-0 self-start rounded whitespace-nowrap bg-accent-soft px-1.5 py-0.5 text-center text-xs font-bold text-accent-dark"
+							>
+								{formatDateCourte(rdv.eventAt)}
+							</span>
 							<span class="min-w-0">
-								<span class="line-clamp-2 text-sm leading-snug font-semibold">{actu.title}</span>
-								{#if actu.autresDates}
+								<span class="line-clamp-2 text-sm leading-snug font-semibold">{rdv.title}</span>
+								{#if rdv.autresDates}
 									<span class="block text-xs text-ink-faint">
-										+ {actu.autresDates} autre{actu.autresDates > 1 ? 's' : ''} date{actu.autresDates > 1 ? 's' : ''}
+										+ {rdv.autresDates} autre{rdv.autresDates > 1 ? 's' : ''} date{rdv.autresDates > 1 ? 's' : ''}
 									</span>
 								{/if}
 							</span>
@@ -214,17 +206,15 @@
 				{/each}
 			</ul>
 			<a class="mt-3 inline-block text-sm font-semibold text-brand hover:underline" href="/agenda">Tout l’agenda</a>
-		{:else}
-			<p class="text-sm text-ink-soft">Aucune actualité pour le moment.</p>
-		{/if}
-	</aside>
+		</aside>
+	{/if}
 </div>
 
 <!-- Les médias qu'on recommande, sous les deux colonnes et sur toute la
-     largeur. Ils étaient dans la colonne des actus : comme les fiches
-     épinglées sont retirées des « Articles récents », la colonne de gauche
-     était souvent bien plus courte et laissait un grand trou sur ordinateur.
-     Sur téléphone, l'ordre ne change pas : ils suivent les actus. Pas en tête
+     largeur. Ils étaient dans la colonne de droite : comme les fiches à la
+     une sont retirées de « À lire », la colonne de gauche était souvent bien
+     plus courte et laissait un grand trou sur ordinateur. Sur téléphone,
+     l'ordre ne change pas : ils suivent l'agenda. Pas en tête
      de page : l'accueil montre d'abord ce que fait le groupe. -->
 {#if data.medias.length}
 <section class="mt-8" aria-labelledby="titre-medias">

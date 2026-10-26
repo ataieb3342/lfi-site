@@ -2,9 +2,12 @@
 	import { page } from '$app/state';
 	import type { PageData } from './$types';
 	import type { PublicationVue } from '$lib/types';
+	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
+	import CartePublication from '$lib/components/CartePublication.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { filAriane } from '$lib/donnees-structurees';
-	import { lienPublication } from '$lib/format';
+	import { COULEUR_KIND, lienPublication } from '$lib/format';
+	import { CHAPO_RUBRIQUE, SURLIGNE_RUBRIQUE, TITRE_RUBRIQUE } from '$lib/rubriques';
 
 	let { data }: { data: PageData } = $props();
 
@@ -12,8 +15,7 @@
 	const categories: { valeur: Categorie; libelle: string; classe: string }[] = [
 		{ valeur: 'reunion', libelle: 'Événements', classe: 'agenda-reunion' },
 		{ valeur: 'apero', libelle: 'Apéros', classe: 'agenda-apero' },
-		{ valeur: 'formation', libelle: 'Formations', classe: 'agenda-formation' },
-		{ valeur: 'autre', libelle: 'Autres', classe: 'agenda-autre' }
+		{ valeur: 'formation', libelle: 'Formations', classe: 'agenda-formation' }
 	];
 
 	let visibles = $state(new Set<Categorie>(categories.map((c) => c.valeur)));
@@ -73,7 +75,7 @@
 	// Le mois courant est l'agenda : c'est lui qui entre dans l'index, à
 	// l'adresse nue. Les autres mois portent `noindex, follow` - il y en a une
 	// infinité, le bouton « Suivant » menant toujours au suivant, et ils ne
-	// contiennent rien qui ne soit déjà listé dans /actualites et /aperos. Le
+	// contiennent rien qui ne soit déjà sur les fiches des rendez-vous. Le
 	// `follow` reste indispensable : sans lui, les rendez-vous eux-mêmes
 	// cesseraient d'être atteints depuis cette page.
 	const moisCourant = $derived(data.mois === aujourdHuiIso.slice(0, 7));
@@ -83,7 +85,7 @@
 
 <Metadonnees
 	titre="Agenda{suffixe} - {data.settings.siteName}"
-	description="Le calendrier des actions, événements, apéros et formations du groupe d'action."
+	description={CHAPO_RUBRIQUE.actualites}
 	canonique={chemin}
 	indexable={moisCourant}
 	donnees={filAriane(page.url.origin, [
@@ -92,11 +94,41 @@
 	])}
 />
 
-<header class="border-b border-line pb-4">
-	<p class="text-sm font-bold tracking-wide text-brand uppercase">Nos rendez-vous</p>
-	<h1 class="titre-affiche mt-2 text-4xl text-ink sm:text-5xl">Agenda</h1>
-	<p class="mt-4 max-w-2xl text-lg text-ink-soft">Consultez les rendez-vous du groupe, mois par mois.</p>
+<!-- Le filet passe sous le bandeau Action populaire quand il est affiché, et
+     sous l'en-tête sinon : jamais un trait au-dessus d'une surface colorée. -->
+<header class={data.app.actif ? '' : 'border-b border-line pb-4'}>
+	<p class="text-xs font-bold tracking-[0.2em] uppercase {COULEUR_KIND.actu}">{SURLIGNE_RUBRIQUE.actualites}</p>
+	<h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">{TITRE_RUBRIQUE.actualites}</h1>
+	<p class="mt-3 max-w-2xl text-lg text-ink-soft">{CHAPO_RUBRIQUE.actualites}</p>
+	<!-- Les apéros n'ont plus d'entrée dans l'en-tête : leur page (le prochain
+	     thème, l'archive des précédents) s'atteint d'ici et du pied de page. -->
+	<p class="mt-3 text-sm">
+		<a class="font-semibold text-pourpre hover:underline" href="/aperos">Les apéros thématiques, un lundi sur deux →</a>
+	</p>
 </header>
+
+{#if data.app.actif}
+	<!-- C'est ici que le visiteur cherche où venir : le bon moment pour lui
+	     proposer l'application qui le prévient des prochains rendez-vous. -->
+	<div class="border-b border-line pb-5">
+		<BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} compact />
+	</div>
+{/if}
+
+{#if moisCourant}
+	<section class="mt-8" aria-labelledby="titre-a-venir">
+		<h2 id="titre-a-venir" class="text-xl font-extrabold text-ink">À venir</h2>
+		{#if data.aVenir.length}
+			<div class="mt-5 space-y-5">
+				{#each data.aVenir as rdv (rdv.id)}
+					<CartePublication publication={rdv} />
+				{/each}
+			</div>
+		{:else}
+			<p class="mt-5 text-ink-soft">Aucun rendez-vous annoncé pour le moment.</p>
+		{/if}
+	</section>
+{/if}
 
 <section class="mt-8" aria-labelledby="mois-courant">
 	<div class="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">

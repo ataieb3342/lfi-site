@@ -16,8 +16,12 @@ export async function lirePublication(
 	couvertureActuelle: number | null,
 	carteActuelle: number | null = null
 ): Promise<PublicationInput> {
+	// Quatre types : un texte (article) ou un rendez-vous (événement, formation,
+	// apéro). Événements et formations partagent le `kind` 'actu' et se
+	// distinguent par leur catégorie d'agenda.
 	const typeAffiche = String(form.get('kind') ?? 'article');
-	const kind = ['retour-action', 'reunion', 'formation'].includes(typeAffiche) ? 'actu' : typeAffiche;
+	const kind = typeAffiche === 'reunion' || typeAffiche === 'formation' ? 'actu' : typeAffiche;
+	const estRendezVous = kind !== 'article';
 	const status = String(form.get('status') ?? 'draft');
 	const title = String(form.get('title') ?? '').trim();
 	const summary = String(form.get('summary') ?? '').trim();
@@ -31,34 +35,28 @@ export async function lirePublication(
 	const authorName = auteurAdmin
 		? auteurAdmin.profile_name || auteurAdmin.display_name
 		: String(form.get('authorName') ?? '').trim();
-	const eventAt = String(form.get('eventAt') ?? '').trim();
-	// Les types datés déterminent directement leur catégorie d'agenda. Un apéro
-	// reste toujours un apéro ; les publications ordinaires n'ont pas de catégorie.
-	const eventCategory =
-		typeAffiche === 'retour-action' || typeAffiche === 'reunion' || typeAffiche === 'formation'
-			? typeAffiche === 'retour-action' ? 'action' : typeAffiche
-			: kind === 'apero'
-				? 'apero'
-				: 'autre';
-	const actionCategory = String(form.get('actionCategory') ?? 'autre');
-	const estRetourAction = typeAffiche === 'retour-action';
-	const eventStartTime = estRetourAction ? '' : String(form.get('eventStartTime') ?? '').trim();
-	const eventEndTime = estRetourAction ? '' : String(form.get('eventEndTime') ?? '').trim();
-	const eventLocation = estRetourAction ? '' : String(form.get('eventLocation') ?? '').trim();
-	const eventAddress = estRetourAction ? '' : String(form.get('eventAddress') ?? '').trim();
-	const eventLocationUrl = estRetourAction ? '' : String(form.get('eventLocationUrl') ?? '').trim();
-	const eventManagers = estRetourAction ? '' : String(form.get('eventManagers') ?? '').trim();
-	const eventManagerAdminIds = estRetourAction
-		? []
-		: form
+	// Un article n'a ni date ni informations pratiques : ce qu'aurait laissé
+	// un changement de type en cours de saisie est ignoré.
+	const champ = (nom: string) => (estRendezVous ? String(form.get(nom) ?? '').trim() : '');
+	const eventAt = champ('eventAt');
+	const eventCategory = typeAffiche === 'reunion' || typeAffiche === 'formation' ? typeAffiche : kind === 'apero' ? 'apero' : 'autre';
+	const eventStartTime = champ('eventStartTime');
+	const eventEndTime = champ('eventEndTime');
+	const eventLocation = champ('eventLocation');
+	const eventAddress = champ('eventAddress');
+	const eventLocationUrl = champ('eventLocationUrl');
+	const eventManagers = champ('eventManagers');
+	const eventManagerAdminIds = estRendezVous
+		? form
 				.getAll('eventManagerAdminIds')
 				.map((valeur) => Number(valeur))
-				.filter((id) => Number.isInteger(id) && admins.some((admin) => admin.id === id));
-	const eventSignupUrl = estRetourAction ? '' : String(form.get('eventSignupUrl') ?? '').trim();
-	const eventMeetingPoint = estRetourAction ? '' : String(form.get('eventMeetingPoint') ?? '').trim();
+				.filter((id) => Number.isInteger(id) && admins.some((admin) => admin.id === id))
+		: [];
+	const eventSignupUrl = champ('eventSignupUrl');
+	const eventMeetingPoint = champ('eventMeetingPoint');
 	const eventMapEmbedUrl = '';
 
-	if (!['article', 'actu', 'retour-action', 'reunion', 'formation', 'apero', 'revue'].includes(typeAffiche)) {
+	if (!['article', 'reunion', 'formation', 'apero'].includes(typeAffiche)) {
 		throw new ErreurFormulaire('Type de publication inconnu.');
 	}
 
@@ -71,23 +69,12 @@ export async function lirePublication(
 	if (summary.length > 500) throw new ErreurFormulaire('Le chapô est trop long (500 caractères maximum).');
 	if (body.length > 200_000) throw new ErreurFormulaire('Le texte est trop long.');
 	if (eventAt && !/^\d{4}-\d{2}-\d{2}$/.test(eventAt)) {
-		throw new ErreurFormulaire("La date de l'action est invalide.");
+		throw new ErreurFormulaire('La date du rendez-vous est invalide.');
 	}
-	// Un apéro sans date n'a pas de sens : c'est elle qui le place dans la
-	// liste, avant ou après la soirée.
-	if (['retour-action', 'reunion', 'formation', 'apero'].includes(typeAffiche) && !eventAt) {
-		throw new ErreurFormulaire('Ce type de publication a toujours une date : renseignez la date du rendez-vous.');
-	}
-	if (!['action', 'reunion', 'apero', 'formation', 'autre'].includes(eventCategory)) {
-		throw new ErreurFormulaire("La catégorie de l'événement est invalide.");
-	}
-	if (typeAffiche === 'retour-action' && !['porte-a-porte', 'tractage', 'collage'].includes(actionCategory)) {
-		throw new ErreurFormulaire("La catégorie de l'action est invalide.");
-	}
-	const maintenant = new Date();
-	const aujourdHui = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
-	if (estRetourAction && eventAt > aujourdHui) {
-		throw new ErreurFormulaire("Un retour d’action ne peut être publié qu’après l’action.");
+	// Un rendez-vous sans date n'a pas de sens : c'est elle qui le place dans
+	// l'agenda, avant ou après la soirée.
+	if (estRendezVous && !eventAt) {
+		throw new ErreurFormulaire('Un rendez-vous a toujours une date : renseignez la date.');
 	}
 	if (eventStartTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(eventStartTime)) {
 		throw new ErreurFormulaire("L'heure de début est invalide.");
@@ -128,7 +115,7 @@ export async function lirePublication(
 	// L'interface n'ajoute plus de nouvelle image de carte, mais une ancienne
 	// fiche peut encore en posséder une. Une simple modification ne doit pas la
 	// supprimer silencieusement.
-	const eventMapMediaId = estRetourAction ? null : carteActuelle;
+	const eventMapMediaId = estRendezVous ? carteActuelle : null;
 
 	return {
 		kind: kind as Kind,
@@ -143,7 +130,6 @@ export async function lirePublication(
 		coverMediaId,
 		eventAt: eventAt || null,
 		eventCategory: eventCategory as PublicationInput['eventCategory'],
-		actionCategory: actionCategory as PublicationInput['actionCategory'],
 		eventStartTime,
 		eventEndTime,
 		eventLocation,
@@ -181,7 +167,6 @@ export function valeursSaisies(form: FormData) {
 		commentsOpen: form.get('commentsOpen') === '1',
 		eventAt: String(form.get('eventAt') ?? ''),
 		eventCategory: String(form.get('eventCategory') ?? 'autre'),
-		actionCategory: String(form.get('actionCategory') ?? 'autre'),
 		eventStartTime: String(form.get('eventStartTime') ?? ''),
 		eventEndTime: String(form.get('eventEndTime') ?? ''),
 		eventLocation: String(form.get('eventLocation') ?? ''),

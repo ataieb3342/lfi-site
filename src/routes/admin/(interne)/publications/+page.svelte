@@ -22,12 +22,10 @@
 		<select id="type" name="type" class="champ">
 			<option value="">Tous</option>
 			<option value="article" selected={data.filtres.kind === 'article'}>Articles</option>
-			<option value="actu" selected={data.filtres.kind === 'actu'}>Actualités</option>
-			<option value="action" selected={data.filtres.kind === 'action'}>Actions</option>
+			<option value="actu" selected={data.filtres.kind === 'actu'}>Tous les rendez-vous hors apéros</option>
 			<option value="reunion" selected={data.filtres.kind === 'reunion'}>Événements</option>
 			<option value="formation" selected={data.filtres.kind === 'formation'}>Formations</option>
 			<option value="apero" selected={data.filtres.kind === 'apero'}>Apéros</option>
-			<option value="revue" selected={data.filtres.kind === 'revue'}>Revues de presse</option>
 		</select>
 	</div>
 	<div>

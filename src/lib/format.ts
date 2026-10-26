@@ -58,27 +58,15 @@ export function formatTailleFichier(octets: number): string {
 
 export const LIBELLE_KIND: Record<string, string> = {
 	article: 'Article',
-	actu: 'Actualité',
-	apero: 'Apéro thématique',
-	revue: 'Revue de presse'
+	actu: 'Événement',
+	apero: 'Apéro thématique'
 };
 
 /** Libellé du type tel qu'il est choisi dans l'administration. */
 export function libellePublication(kind: string, eventCategory: string): string {
-	if (kind === 'actu' && eventCategory === 'action') return 'Retour d’action';
-	if (kind === 'actu' && eventCategory === 'reunion') return 'Événement';
 	if (kind === 'actu' && eventCategory === 'formation') return 'Formation';
 	return LIBELLE_KIND[kind] ?? 'Publication';
 }
-
-export const LIBELLE_ACTION: Record<string, string> = {
-	'porte-a-porte': 'Porte-à-porte',
-	tractage: 'Tractage / distribution',
-	collage: 'Collage d’affiches',
-	mobilisation: 'Mobilisation',
-	collecte: 'Collecte',
-	autre: 'Action'
-};
 
 /** « 18:00 » devient « 18 h », « 18:30 » devient « 18 h 30 ». */
 export function formatHeure(heure: string): string {
@@ -98,7 +86,6 @@ export function formatPlageHoraire(debut: string, fin: string): string {
 
 /** Libellé court de la pastille d'un rendez-vous. */
 export const LIBELLE_EVENEMENT: Record<string, string> = {
-	action: 'Retour d’action',
 	reunion: 'Événement',
 	apero: 'Apéro',
 	formation: 'Formation',
@@ -107,30 +94,25 @@ export const LIBELLE_EVENEMENT: Record<string, string> = {
 
 /**
  * Couleur de chaque type de publication, prise aux trois couleurs du logo :
- * violet pour les articles, rouge pour les actualités, pourpre pour les apéros.
- * Sert aux étiquettes des listes et aux surfaces du carrousel.
+ * violet pour les articles, rouge pour les événements, pourpre pour les apéros.
+ * Sert aux étiquettes des listes et aux surfaces colorées.
  */
 export const COULEUR_KIND: Record<string, string> = {
 	article: 'text-brand',
 	actu: 'text-accent',
-	apero: 'text-pourpre',
-	// La revue de presse est une lecture d'articles : elle reste dans le violet,
-	// en plus soutenu. Aucune quatrième couleur n'est inventée - la palette du
-	// logo n'en a que trois.
-	revue: 'text-brand-dark'
+	apero: 'text-pourpre'
 };
 
 /** Surface colorée de chaque type (voir app.css), pour les diapositives. */
 export const FOND_KIND: Record<string, string> = {
 	article: 'fond-degrade',
 	actu: 'fond-actu',
-	apero: 'fond-apero',
-	revue: 'fond-degrade'
+	apero: 'fond-apero'
 };
 
 /** Chemin public d'une publication. */
 export function lienPublication(kind: string, slug: string): string {
-	const rubrique = RUBRIQUE_PAR_KIND[kind as Kind] ?? 'actualites';
+	const rubrique = RUBRIQUE_PAR_KIND[kind as Kind] ?? 'articles';
 	return `/${rubrique}/${slug}`;
 }
 

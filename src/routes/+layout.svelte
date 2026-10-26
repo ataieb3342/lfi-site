@@ -8,20 +8,18 @@
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
+	// Les publications se rangent en deux portes, d'après la question que se
+	// pose le visiteur : « où est-ce que je peux venir ? » (l'agenda) et
+	// « qu'est-ce que vous faites et pensez ? » (À lire). Pas de menu déroulant
+	// pour elles : sept entrées mêlant les deux familles, on s'y perdait.
+	// `sections` liste les adresses où le lien s'allume : la fiche d'un
+	// événement est sous /actualites, celle d'un apéro sous /aperos.
+	const liensPrincipaux = [
+		{ href: '/agenda', label: 'Agenda', sections: ['/agenda', '/actualites', '/aperos'] },
+		{ href: '/articles', label: 'À lire', sections: ['/articles'] }
+	];
+
 	const groupesNavigation = [
-		{
-			href: '/actualites',
-			label: 'Actualités',
-			liens: [
-				{ href: '/agenda', label: 'Agenda' },
-				{ href: '/aperos', label: 'Apéros' },
-				{ href: '/actualites?categorie=action', label: 'Retours d’action' },
-				{ href: '/actualites?categorie=reunion', label: 'Événements' },
-				{ href: '/actualites?categorie=formation', label: 'Formations' },
-				{ href: '/articles', label: 'Articles' },
-				{ href: '/revue-de-presse', label: 'Revue de presse' }
-			]
-		},
 		{
 			href: '/bibliotheque',
 			label: 'Ressources',
@@ -36,6 +34,10 @@
 
 	function actif(href: string): boolean {
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
+	}
+
+	function sectionActive(sections: string[]): boolean {
+		return sections.some(actif);
 	}
 
 	const annee = new Date().getFullYear();
@@ -81,7 +83,7 @@
 		{
 			titre: 'Ressources',
 			liens: [
-				{ href: '/revue-de-presse', label: 'Revue de presse' },
+				{ href: '/articles', label: 'À lire' },
 				{ href: '/bibliotheque', label: 'Bibliothèque' },
 				{ href: '/boite-a-outils', label: 'Boîte à outils' },
 				{ href: '/jeux', label: 'Jeux' },
@@ -112,7 +114,7 @@
 	<!-- Site de démonstration : tout ce qui est publié ici est fictif. -->
 	<div class="bg-amber-300 text-sm text-amber-950">
 		<p class="mx-auto max-w-5xl px-4 py-2">
-			<strong>Site de démonstration.</strong> Les articles, actualités et commentaires sont fictifs.
+			<strong>Site de démonstration.</strong> Les articles, rendez-vous et commentaires sont fictifs.
 			L'espace d'administration est ouvert à l'essai :
 			<a class="font-semibold underline underline-offset-2" href="/admin">essayez-le</a>.
 		</p>
@@ -150,6 +152,17 @@
 		<!-- Navigation bureau -->
 		<nav class="ml-auto hidden md:block" aria-label="Navigation principale">
 			<ul class="flex items-center gap-1">
+				{#each liensPrincipaux as lien (lien.href)}
+					<li>
+						<a
+							href={lien.href}
+							aria-current={sectionActive(lien.sections) ? 'page' : undefined}
+							class="block rounded-full px-3 py-1.5 text-sm font-semibold transition-colors
+								{sectionActive(lien.sections) ? 'bg-brand-soft text-brand' : 'text-ink-soft hover:bg-surface-alt hover:text-ink'}"
+							>{lien.label}</a
+						>
+					</li>
+				{/each}
 				{#each groupesNavigation as groupe, index (groupe.href)}
 					<li>
 						<div class="flex items-center rounded-full {actif(groupe.href) ? 'bg-brand-soft text-brand' : ''}">
@@ -210,6 +223,9 @@
 				aria-label="Navigation principale"
 			>
 				<ul class="space-y-2">
+					{#each liensPrincipaux as lien (lien.href)}
+						<li><a class="block rounded px-3 py-2 font-bold text-ink" href={lien.href}>{lien.label}</a></li>
+					{/each}
 					{#each groupesNavigation as groupe (groupe.href)}
 						<li class="border-t border-line pt-2">
 							<a class="block rounded px-3 py-2 font-bold text-ink" href={groupe.href}>{groupe.label}</a>
