@@ -25,7 +25,7 @@
 				{libellePublication(publication.kind, publication.eventCategory)}
 			</span>
 			{#if publication.pinned}
-				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">Épinglé</span>
+				<span class="rounded bg-brand-soft px-1.5 py-0.5 font-semibold text-brand">À la une</span>
 			{/if}
 			{#if publication.eventAt && publication.aVenir}
 				<span class="rounded bg-accent-soft px-1.5 py-0.5 font-semibold text-accent-dark">

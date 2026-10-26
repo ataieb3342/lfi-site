@@ -54,6 +54,7 @@
 	<FormulairePublication
 		publication={data.publication}
 		admins={data.admins}
+		positionUne={data.positionUne}
 		{valeurs}
 		erreur={form?.erreur ?? ''}
 		apercu={form?.apercu ?? ''}

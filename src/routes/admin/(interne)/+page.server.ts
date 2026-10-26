@@ -10,6 +10,7 @@ export const load: PageServerLoad = async () => {
 
 	return {
 		stats: {
+			aLaUne: compte("select count(*) as n from publications where pinned = 1 and status = 'published'"),
 			articles: compte("select count(*) as n from publications where kind = 'article' and status = 'published'"),
 			actus: compte("select count(*) as n from publications where kind = 'actu' and status = 'published'"),
 			aperos: compte("select count(*) as n from publications where kind = 'apero' and status = 'published'"),

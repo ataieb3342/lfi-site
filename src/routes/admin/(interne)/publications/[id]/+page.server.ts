@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { deletePublication, getById, updatePublication } from '$lib/server/content';
+import { deletePublication, getById, positionALaUne, updatePublication } from '$lib/server/content';
 import { presentPublication } from '$lib/server/present';
 import { apercuPublication, ErreurFormulaire, lirePublication, valeursSaisies } from '$lib/server/formulaires';
 import { audit, listAdminChoices } from '$lib/server/auth';
@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			profilePublic: !!profile_public
 		})),
 		corps: publication.body,
+		positionUne: positionALaUne(publication.id),
 		enregistre: url.searchParams.has('enregistre')
 	};
 };

@@ -19,6 +19,8 @@ export type Publication = {
 	comments_open: number;
 	pinned: number;
 	pinned_at: string | null;
+	/** Rang à la une, à partir de 1 ; null hors de la une. */
+	pinned_order: number | null;
 	event_at: string | null;
 	event_category: CategorieEvenement;
 	action_category: CategorieAction;
@@ -95,15 +97,15 @@ const PUBLIC_SELECT = `
  */
 const ORDRE = {
 	chronologique: `order by
-		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		p.pinned desc,
 		p.published_at desc`,
 	agenda: `order by
-		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		p.pinned desc,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		p.published_at desc`,
 	archives: `order by
-		case when p.pinned = 1 and datetime(p.pinned_at) >= datetime('now', '-15 days') then 1 else 0 end desc,
+		p.pinned desc,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		coalesce(p.event_at, substr(p.published_at, 1, 10)) desc,
@@ -128,17 +130,16 @@ export function listPublished(
 }
 
 /**
- * Toutes les publications choisies pour l'accueil, quel que soit leur type.
- * Plusieurs fiches peuvent être épinglées en même temps : l'ordre suit leur
- * première date de publication, de la plus récente à la plus ancienne.
+ * Les publications à la une de l'accueil, dans l'ordre choisi dans
+ * Administration → À la une. Une fiche repassée en brouillon garde sa place
+ * mais n'est pas affichée.
  */
 export function listPinnedPublished() {
 	return db()
 		.prepare(
 			`${PUBLIC_SELECT}
 			 where p.status = 'published' and p.pinned = 1
-			   and datetime(p.pinned_at) >= datetime('now', '-15 days')
-			 order by p.published_at desc, p.id desc`
+			 order by p.pinned_order, p.id`
 		)
 		.all() as PublicationListItem[];
 }
@@ -192,25 +193,32 @@ export function getBySlugAnyStatus(slug: string): PublicationListItem | undefine
 }
 
 /** Liste pour l'administration : brouillons compris. */
-export function listForAdmin(opts: { kind?: Kind; status?: Status; search?: string } = {}) {
+export function listForAdmin(
+	opts: { kind?: Kind; status?: Status; search?: string; pinned?: boolean; limit?: number } = {}
+) {
 	const search = opts.search?.trim() ? `%${opts.search.trim()}%` : null;
+	const pinned = opts.pinned === undefined ? null : opts.pinned ? 1 : 0;
 	return db()
 		.prepare(
 			`${PUBLIC_SELECT}
 			 where (? is null or p.kind = ?)
 			   and (? is null or p.status = ?)
+			   and (? is null or p.pinned = ?)
 			   and (? is null or p.title like ? or p.body like ?)
 			 order by coalesce(p.published_at, p.updated_at) desc
-			 limit 200`
+			 limit ?`
 		)
 		.all(
 			opts.kind ?? null,
 			opts.kind ?? null,
 			opts.status ?? null,
 			opts.status ?? null,
+			pinned,
+			pinned,
 			search,
 			search,
-			search
+			search,
+			opts.limit ?? 200
 		) as PublicationListItem[];
 }
 
@@ -224,7 +232,6 @@ export type PublicationInput = {
 	layoutStyle?: StyleMiseEnPage;
 	status: Status;
 	commentsOpen: boolean;
-	pinned: boolean;
 	coverMediaId: number | null;
 	authorName: string;
 	/** Date de l'action annoncée (AAAA-MM-JJ), ou null. */
@@ -250,12 +257,12 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 	const result = db()
 		.prepare(
 			`insert into publications
-			 (kind, slug, title, summary, body, cover_media_id, status, comments_open, pinned,
+			 (kind, slug, title, summary, body, cover_media_id, status, comments_open,
 			  event_at, event_category, action_category, event_start_time, event_end_time,
 			  event_location, event_address, event_location_url, event_managers, event_signup_url,
 			  event_meeting_point, event_map_media_id, event_map_embed_url, byline_admin_id,
-			  published_at, created_at, updated_at, author_id, author_name, layout_style, pinned_at)
-			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			  published_at, created_at, updated_at, author_id, author_name, layout_style)
+			 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		)
 		.run(
 			input.kind,
@@ -266,7 +273,6 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			input.coverMediaId,
 			input.status,
 			input.commentsOpen ? 1 : 0,
-			input.pinned ? 1 : 0,
 			input.eventAt,
 			input.eventCategory,
 			input.actionCategory ?? 'autre',
@@ -286,8 +292,7 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 			timestamp,
 			authorId,
 			input.authorName,
-			input.layoutStyle ?? 'standard',
-			input.pinned ? timestamp : null
+			input.layoutStyle ?? 'standard'
 		);
 	const id = Number(result.lastInsertRowid);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
@@ -305,16 +310,15 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 	// La date de publication est figée à la première mise en ligne.
 	const publishedAt =
 		input.status === 'published' ? (existing.published_at ?? now()) : existing.published_at;
-	const pinnedAt = input.pinned ? (existing.pinned ? existing.pinned_at ?? now() : now()) : null;
 
 	db().prepare(
 		`update publications set
 		   kind = ?, slug = ?, title = ?, summary = ?, body = ?, cover_media_id = ?,
-		   status = ?, comments_open = ?, pinned = ?, event_at = ?, event_category = ?,
+		   status = ?, comments_open = ?, event_at = ?, event_category = ?,
 		   action_category = ?, event_start_time = ?, event_end_time = ?, event_location = ?,
 		   event_address = ?, event_location_url = ?, event_managers = ?, event_signup_url = ?,
 		   event_meeting_point = ?, event_map_media_id = ?, event_map_embed_url = ?, byline_admin_id = ?, published_at = ?,
-		   updated_at = ?, author_name = ?, layout_style = ?, pinned_at = ?
+		   updated_at = ?, author_name = ?, layout_style = ?
 		 where id = ?`
 	).run(
 		input.kind,
@@ -325,7 +329,6 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		input.coverMediaId,
 		input.status,
 		input.commentsOpen ? 1 : 0,
-		input.pinned ? 1 : 0,
 		input.eventAt,
 		input.eventCategory,
 		input.actionCategory ?? 'autre',
@@ -344,7 +347,6 @@ export function updatePublication(id: number, input: PublicationInput, opts: { r
 		now(),
 		input.authorName,
 		input.layoutStyle ?? 'standard',
-		pinnedAt,
 		id
 	);
 	replacePublicationManagers(id, input.eventManagerAdminIds ?? []);
@@ -385,6 +387,77 @@ export function deletePublication(id: number) {
 		.all(id) as { pdf_filename: string }[];
 	db().prepare('delete from publications where id = ?').run(id);
 	for (const pdf of pdfs) supprimerPdf(pdf.pdf_filename);
+}
+
+/* ------------------------------------------------------------------ la une */
+
+/**
+ * La une de l'accueil, gérée depuis Administration → À la une : on ajoute,
+ * on retire, on range à la main. Rien n'expire tout seul. La première fiche
+ * est affichée en grand, les suivantes en cartes.
+ */
+export const MAX_A_LA_UNE = 5;
+
+/** Toutes les fiches à la une, brouillons compris, dans l'ordre de l'accueil. */
+export function listALaUne() {
+	return db()
+		.prepare(`${PUBLIC_SELECT} where p.pinned = 1 order by p.pinned_order, p.id`)
+		.all() as PublicationListItem[];
+}
+
+/** Rang de la fiche à la une (1 pour la grande fiche), ou null. */
+export function positionALaUne(id: number): number | null {
+	const i = listALaUne().findIndex((p) => p.id === id);
+	return i < 0 ? null : i + 1;
+}
+
+export function mettreALaUne(id: number) {
+	const publication = getById(id);
+	if (!publication) throw new Error('Publication introuvable.');
+	if (publication.pinned) return;
+	if (publication.status !== 'published') {
+		throw new Error('Seule une publication en ligne peut être mise à la une.');
+	}
+	if (listALaUne().length >= MAX_A_LA_UNE) {
+		throw new Error(
+			`La une compte déjà ${MAX_A_LA_UNE} publications : retirez-en une avant d’en ajouter une autre.`
+		);
+	}
+	const { suivante } = db()
+		.prepare('select coalesce(max(pinned_order), 0) + 1 as suivante from publications where pinned = 1')
+		.get() as { suivante: number };
+	db()
+		.prepare('update publications set pinned = 1, pinned_at = ?, pinned_order = ? where id = ?')
+		.run(now(), suivante, id);
+}
+
+export function retirerDeLaUne(id: number) {
+	db().prepare('update publications set pinned = 0, pinned_at = null, pinned_order = null where id = ?').run(id);
+	renumeroterLaUne(listALaUne());
+}
+
+/** Échange la place d'une fiche avec sa voisine du dessus ou du dessous. */
+export function deplacerALaUne(id: number, sens: 'haut' | 'bas') {
+	const liste = listALaUne();
+	const i = liste.findIndex((p) => p.id === id);
+	const j = sens === 'haut' ? i - 1 : i + 1;
+	if (i < 0 || j < 0 || j >= liste.length) return;
+	[liste[i], liste[j]] = [liste[j], liste[i]];
+	renumeroterLaUne(liste);
+}
+
+// Les rangs sont renumérotés à chaque changement : sans cela, un trou laissé
+// par une fiche retirée ou supprimée fausserait le rang affiché.
+function renumeroterLaUne(liste: { id: number }[]) {
+	const maj = db().prepare('update publications set pinned_order = ? where id = ?');
+	db().exec('begin');
+	try {
+		liste.forEach((p, k) => maj.run(k + 1, p.id));
+		db().exec('commit');
+	} catch (err) {
+		db().exec('rollback');
+		throw err;
+	}
 }
 
 /* ----------------------------------------------------------- commentaires */

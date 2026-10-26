@@ -658,7 +658,6 @@ function remplirContenus(adminId: number, imageId: number | null) {
 				layoutStyle: fiche.layoutStyle ?? 'standard',
 				status: 'published',
 				commentsOpen: true,
-				pinned: false,
 				// Une seule fiche est illustrée : celle que `demo-image.ts` désigne.
 				coverMediaId: fiche.illustree ? imageId : null,
 				authorName: fiche.auteur ?? auteur,

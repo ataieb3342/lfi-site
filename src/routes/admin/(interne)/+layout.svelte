@@ -8,6 +8,7 @@
 	const liens = $derived([
 		{ href: '/admin', label: 'Tableau de bord', exact: true },
 		{ href: '/admin/publications', label: 'Publications' },
+		{ href: '/admin/a-la-une', label: 'À la une' },
 		{ href: '/admin/commentaires', label: 'Commentaires', badge: data.commentairesEnAttente },
 		{ href: '/admin/sources', label: 'Sources des apéros', badge: data.sourcesEnAttente },
 		{ href: '/admin/medias', label: 'Images', exact: true },

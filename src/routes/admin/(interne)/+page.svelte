@@ -4,7 +4,8 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const chiffres = $derived([
+	const chiffres: { label: string; valeur: number; href?: string }[] = $derived([
+		{ label: 'À la une', valeur: data.stats.aLaUne, href: '/admin/a-la-une' },
 		{ label: 'Articles publiés', valeur: data.stats.articles },
 		{ label: 'Actualités publiées', valeur: data.stats.actus },
 		{ label: 'Apéros', valeur: data.stats.aperos },
@@ -53,7 +54,11 @@
 	{#each chiffres as chiffre (chiffre.label)}
 		<div class="carte">
 			<p class="text-3xl font-extrabold text-ink">{chiffre.valeur}</p>
-			<p class="mt-1 text-xs text-ink-faint">{chiffre.label}</p>
+			{#if chiffre.href}
+				<a class="mt-1 block text-xs font-semibold text-brand hover:underline" href={chiffre.href}>{chiffre.label} →</a>
+			{:else}
+				<p class="mt-1 text-xs text-ink-faint">{chiffre.label}</p>
+			{/if}
 		</div>
 	{/each}
 </div>
