@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import BandeauApplication from '$lib/components/BandeauApplication.svelte';
-	import CartePublication from '$lib/components/CartePublication.svelte';
+	import CarteArticle from '$lib/components/CarteArticle.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
 	import { titreFormat } from '$lib/medias';
@@ -157,14 +157,14 @@
 	{#if data.articles.length || !data.aLaUne.length}
 		<section>
 			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-				<h2 class="text-xl font-extrabold text-ink">À lire</h2>
+				<h2 class="text-xl font-extrabold text-ink">Derniers articles</h2>
 				<a class="text-sm font-semibold text-brand hover:underline" href="/articles">Tout voir</a>
 			</div>
 
 			{#if data.articles.length}
-				<div class="space-y-6">
+				<div class="space-y-5">
 					{#each data.articles as article (article.id)}
-						<CartePublication publication={article} />
+						<CarteArticle publication={article} />
 					{/each}
 				</div>
 			{:else}
@@ -212,7 +212,7 @@
 
 <!-- Les médias qu'on recommande, sous les deux colonnes et sur toute la
      largeur. Ils étaient dans la colonne de droite : comme les fiches à la
-     une sont retirées de « À lire », la colonne de gauche était souvent bien
+     une sont retirées des derniers articles, la colonne de gauche était souvent bien
      plus courte et laissait un grand trou sur ordinateur. Sur téléphone,
      l'ordre ne change pas : ils suivent l'agenda. Pas en tête
      de page : l'accueil montre d'abord ce que fait le groupe. -->

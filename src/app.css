@@ -712,8 +712,8 @@ main > :first-child {
 	padding: 1.25rem;
 }
 
-/* Agenda : les mêmes couleurs servent à la légende, aux filtres et aux
-   événements. Sur mobile, la grille devient une liste et masque les jours
+/* Agenda : les mêmes couleurs servent aux pastilles, à la liste et aux
+   événements du calendrier. Sur mobile, la grille devient une liste et masque les jours
    vides : une semaine complète en sept colonnes serait illisible. */
 .agenda-calendrier {
 	display: grid;
@@ -749,6 +749,9 @@ main > :first-child {
 	font-weight: 800;
 	color: var(--color-ink-soft);
 }
+/* Les jours passés s'effacent : dans le mois en cours, l'œil va d'abord à
+   ce qui vient. */
+.agenda-passe > * { opacity: 0.55; }
 .agenda-aujourdhui .agenda-numero { border-radius: 9999px; background: var(--color-brand); color: var(--color-sur-brand); }
 .agenda-evenement {
 	display: block;
@@ -763,29 +766,6 @@ main > :first-child {
 	overflow-wrap: anywhere;
 }
 .agenda-evenement:hover { text-decoration: underline; }
-.agenda-filtre {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.45rem;
-	border: 1px solid currentColor;
-	border-radius: 9999px;
-	padding: 0.4rem 0.75rem;
-	background: var(--color-surface);
-	font-size: 0.8125rem;
-	font-weight: 700;
-	cursor: pointer;
-}
-.agenda-filtre span { width: 0.65rem; height: 0.65rem; border-radius: 9999px; background: currentColor; }
-.agenda-filtre strong {
-	display: grid;
-	place-items: center;
-	min-width: 1.35rem;
-	height: 1.35rem;
-	border-radius: 9999px;
-	background: color-mix(in srgb, currentColor 12%, var(--color-surface));
-	font-size: 0.7rem;
-}
-.agenda-filtre-inactif { color: var(--color-ink-faint) !important; opacity: 0.65; text-decoration: line-through; }
 /* Le fil des prochains jours de l'accueil : la barre de défilement reste
    discrète, et la première fiche se cale sur le bord du contenu. */
 .fil-jours { scrollbar-width: thin; scroll-padding-inline: 0; }
