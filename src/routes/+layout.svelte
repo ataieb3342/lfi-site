@@ -10,13 +10,13 @@
 
 	// Les publications se rangent en deux portes, d'après la question que se
 	// pose le visiteur : « où est-ce que je peux venir ? » (l'agenda) et
-	// « qu'est-ce que vous faites et pensez ? » (À lire). Pas de menu déroulant
+	// « qu'est-ce que vous faites et pensez ? » (les articles). Pas de menu déroulant
 	// pour elles : sept entrées mêlant les deux familles, on s'y perdait.
 	// `sections` liste les adresses où le lien s'allume : la fiche d'un
 	// événement est sous /actualites, celle d'un apéro sous /aperos.
 	const liensPrincipaux = [
 		{ href: '/agenda', label: 'Agenda', sections: ['/agenda', '/actualites', '/aperos'] },
-		{ href: '/articles', label: 'À lire', sections: ['/articles'] }
+		{ href: '/articles', label: 'Articles', sections: ['/articles'] }
 	];
 
 	const groupesNavigation = [
@@ -83,7 +83,7 @@
 		{
 			titre: 'Ressources',
 			liens: [
-				{ href: '/articles', label: 'À lire' },
+				{ href: '/articles', label: 'Articles' },
 				{ href: '/bibliotheque', label: 'Bibliothèque' },
 				{ href: '/boite-a-outils', label: 'Boîte à outils' },
 				{ href: '/jeux', label: 'Jeux' },

@@ -93,18 +93,19 @@ const PUBLIC_SELECT = `
  *   rendez-vous passés sont classés par date de l'action et non de publication.
  *   C'est le tri des apéros : leur fiche est publiée avant la soirée puis
  *   complétée après, et c'est la date de la soirée qui fait sens dans l'archive.
+ *
+ * Aucun ne fait remonter les fiches à la une : la une est un choix pour
+ * l'accueil. Sur la liste des articles, elle cassait l'ordre des dates - le
+ * plus récent n'était plus en tête.
  */
 const ORDRE = {
 	chronologique: `order by
-		p.pinned desc,
 		p.published_at desc`,
 	agenda: `order by
-		p.pinned desc,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		p.published_at desc`,
 	archives: `order by
-		p.pinned desc,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then 0 else 1 end,
 		case when p.event_at is not null and p.event_at >= date('now', 'localtime') then p.event_at end asc,
 		coalesce(p.event_at, substr(p.published_at, 1, 10)) desc,

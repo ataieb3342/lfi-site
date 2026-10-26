@@ -608,7 +608,7 @@ Une trentaine de personnes, dont huit qui venaient pour la première fois. Bienv
 
 ## Calendrier
 
-Les actions terminées font l’objet d’un compte rendu dans « À lire », sans information opérationnelle sur les prochaines actions.
+Les actions terminées font l’objet d’un compte rendu dans les articles, sans information opérationnelle sur les prochaines actions.
 
 ## Finances
 

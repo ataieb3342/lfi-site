@@ -163,7 +163,7 @@
 
 	/** Ce que chaque type veut dire, affiché sous le menu pour éviter les erreurs de case. */
 	const aideType: Record<string, string> = {
-		article: 'Un texte à lire : analyse, compte rendu, prise de position, guide, annonce courte. Rangé dans « À lire ».',
+		article: 'Un texte à lire : analyse, compte rendu, prise de position, guide, annonce courte. Rangé dans les articles.',
 		reunion: 'Un rendez-vous où l’on peut venir : réunion publique, mobilisation, projection… Rangé dans l’agenda.',
 		formation: 'Un atelier pour apprendre ou se former. Rangé dans l’agenda.',
 		apero: 'La soirée thématique du lundi au bar. Après la soirée, rouvrez la fiche pour écrire le résumé.'

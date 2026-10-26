@@ -49,7 +49,7 @@ native.
 | `src/lib/components/Histogramme.svelte` | Le graphique en colonnes de l'administration |
 | `src/lib/donnees-structurees.ts` | Les fiches schema.org lues par Google (article, événement, organisation, fil d'Ariane) |
 | `src/hooks.server.ts` | En-têtes de sécurité, session, garde `/admin`, limite par adresse, comptage des visites |
-| `src/routes/[rubrique=rubrique]/` | La liste « À lire » (`/articles`), les fiches de toutes les publications, et les redirections des anciennes adresses |
+| `src/routes/[rubrique=rubrique]/` | La liste des articles (`/articles`), les fiches de toutes les publications, et les redirections des anciennes adresses |
 | `src/routes/agenda/` | Page publique `/agenda` : les prochains rendez-vous puis le calendrier du mois |
 | `src/routes/aperos/` | Page publique `/aperos` : prochain apéro et archive des thèmes |
 | `src/routes/bibliotheque/` | Page publique `/bibliotheque` : sources approuvées et jeux |
@@ -226,7 +226,7 @@ Moderne et sobre, pas « affiche de campagne ». Concrètement :
 
 Le visiteur se pose deux questions, et le site range tout d'après elles :
 **« où est-ce que je peux venir ? »** (l'agenda) et **« qu'est-ce que vous
-faites, qu'est-ce que vous pensez ? »** (« À lire »). Celui qui publie se pose
+faites, qu'est-ce que vous pensez ? »** (les articles). Celui qui publie se pose
 la même : « est-ce que les gens peuvent venir ? » - oui, c'est un rendez-vous ;
 non, c'est un article.
 
@@ -234,7 +234,7 @@ Une seule table `publications`, distinguée par la colonne `kind` :
 
 | Famille | Type affiché | `kind` | `event_category` | Où il apparaît |
 | --- | --- | --- | --- | --- |
-| À lire | Article | `article` | `autre` | `/articles` (titre « À lire ») |
+| Articles | Article | `article` | `autre` | `/articles` |
 | Agenda | Événement | `actu` | `reunion` | `/agenda`, fiche sous `/actualites/…` |
 | Agenda | Formation | `actu` | `formation` | `/agenda`, fiche sous `/actualites/…` |
 | Agenda | Apéro thématique | `apero` | `apero` | `/agenda` et `/aperos` |
@@ -282,14 +282,54 @@ suivent tout seuls.
 
 ## L'agenda
 
-`/agenda` est la porte des rendez-vous : l'en-tête, le bandeau Action
-populaire, la liste **« À venir »** (les dix prochains, tous types confondus),
-puis le calendrier du mois avec ses filtres par type. La liste n'est affichée
-que sur le mois courant : c'est elle qui se lit sur téléphone, où une grille
-de sept colonnes est illisible. Elle remplace l'ancienne page Actualités.
+`/agenda` a **deux vues**, choisies par l'adresse et non par un script :
 
-Un lien sous le chapô mène à `/aperos` : les apéros n'ont plus d'entrée dans
-l'en-tête.
+- **la liste** (par défaut) : tous les rendez-vous à venir (quarante au plus),
+  regroupés par mois. Chaque ligne porte la date en grand à gauche, comme un
+  agenda papier, puis le type, l'heure, le lieu (ceux des réglages pour un
+  apéro), le titre et le chapô, avec un liseré de la couleur du type.
+  « Aujourd'hui » et « Demain » sont signalés. C'est la seule vue lisible sur
+  téléphone, et la seule indexée ;
+- **le calendrier** (`?vue=calendrier&mois=AAAA-MM`) : un mois en grille, les
+  jours passés estompés. Il sert à se projeter, ou à retrouver un rendez-vous
+  passé - la liste ne montre que l'avenir et y renvoie par un lien.
+
+Le **filtre par type** (`?type=reunion|formation|apero`) vaut pour les deux
+vues. Les pastilles et le choix de la vue sont des **liens** : tout fonctionne
+sans JavaScript et une vue filtrée se partage. Les vues filtrées et les mois du
+calendrier portent `noindex, follow`.
+
+La première version empilait la liste des dix prochains et le calendrier du
+mois en cours - deux agendas sur la même page, dont un mois à moitié passé -,
+et ses lignes reprenaient le gabarit des articles : ni heure, ni lieu, la date
+en petit. La page faisait quatre mille pixels sur téléphone.
+
+Le bandeau Action populaire est **en bas**, comme sur l'accueil : on propose
+l'application à quelqu'un qui a vu les rendez-vous. Avec le filtre « Apéros »,
+un lien mène à `/aperos`, qui garde l'archive des thèmes et leurs résumés.
+
+## La page Articles
+
+`/articles` s'appelle « Articles », simplement. Elle a d'abord été « À lire »,
+qu'on ne comprenait pas comme un titre de rubrique.
+
+La première page s'ouvre sur l'article le plus récent en grand, puis une
+grille de trois colonnes : 1 + 12, quatre rangées pleines ; les pages
+suivantes en ont douze (`PREMIERE_PAGE` et `PAR_PAGE`). Les cartes
+(`CarteArticle.svelte`, partagée avec l'accueil) n'ont pas d'étiquette
+« Article » - tout ce qui est listé en est un - et ont **toujours une
+image** : sans couverture, un aplat clair et le phi. Sans cela les articles
+sans image n'avaient pas la forme de leurs voisins et la liste paraissait
+cassée. L'aplat est clair exprès : en violet foncé, quatre articles sans image
+à la suite faisaient autant de pavés sombres. Sur téléphone, la grille
+redevient une liste à vignettes.
+
+L'ordre est celui des dates, sans faire remonter les fiches à la une : la une
+est un choix pour l'accueil, et le plus récent doit rester en tête.
+
+La bibliothèque est annoncée d'une ligne sous le chapô, et non par un encart
+coloré : posé avant le premier article, le pavé violet se lisait comme une
+publicité et repoussait la liste.
 
 ## Les apéros thématiques
 
@@ -466,14 +506,14 @@ La page tient maintenant en quatre blocs, de haut en bas :
    quinze jours faisait disparaître des fiches sans prévenir (migration 020).
    `pinned_at` ne dit plus que depuis quand. Chaque ajout, retrait et
    déplacement passe par `audit()`.
-3. **« À lire »** à gauche (les articles récents), et à droite **« Plus tard
+3. **« Derniers articles »** à gauche, et à droite **« Plus tard
    dans l'agenda »**, qui **prend la suite du fil sans le répéter** : les cinq
    rendez-vous suivants (`PLUS_TARD`). Sans rendez-vous plus lointain, la
-   colonne disparaît et « À lire » prend toute la largeur.
+   colonne disparaît et les articles prennent toute la largeur.
    Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les
    médias cochés « Sur l'accueil » dans l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
    sur ordinateur). Ils ont d'abord été dans la colonne de droite, mais les
-   fiches à la une étant retirées de « À lire », la colonne de
+   fiches à la une étant retirées des derniers articles, la colonne de
    gauche était plus courte et laissait un trou. Pas en tête de page : un lien
    sortant dès l'arrivée fait partir le visiteur avant qu'il ait vu ce que fait
    le groupe.
@@ -510,13 +550,13 @@ contenu et déborder sur mobile).
 
 ## Le bandeau Action populaire
 
-Affiché en tête de l'agenda, au bas de chaque événement et au bas
+Affiché au bas de l'agenda, au bas de chaque événement et au bas
 de l'accueil - pas ailleurs : c'est là que le visiteur cherche les prochains
 rendez-vous, donc le moment où proposer l'application a du sens. Sur l'accueil il
 est **tout en bas**, jamais en tête. Pour l'étendre à tout le site, déplacer le
 composant dans `src/routes/+layout.svelte`, juste avant le `<footer>`.
 
-C'est un `Encart` ordinaire, au même gabarit que celui de « À lire » - mais il porte les couleurs de l'application
+C'est un `Encart` ordinaire - mais il porte les couleurs de l'application
 (jaune `#f0e80d`, bleu nuit `#0b0b33`) et non celles du site, écrites en dur
 plutôt que prises dans les jetons : elles ne doivent bouger ni avec le thème
 sombre, ni si l'on retouche la palette du site. Ce contraste avec le reste de la page est voulu - c'est ce qui
@@ -534,8 +574,8 @@ plutôt que d'afficher des boutons morts.
 ## Les encarts d'appel
 
 `src/lib/components/Encart.svelte` est le gabarit **unique** des invitations
-posées en tête d'une page : la bibliothèque depuis « À lire », Action populaire
-depuis l'agenda et le bas de l'accueil. Ils avaient chacun leur mise en page ; d'une page à l'autre, le
+posées sur une page : aujourd'hui, Action populaire en bas de l'agenda et de
+l'accueil. Ils avaient chacun leur mise en page ; d'une page à l'autre, le
 visiteur ne reconnaissait pas qu'il s'agissait de la même chose.
 
 **Un encart annonce toujours une autre page.** Posé en tête d'une page pour
@@ -555,10 +595,16 @@ Ne jamais ajouter `.carte` à une surface : `.carte` est déclarée après dans
 `app.css` et écraserait le fond, ce qui donne du texte blanc sur fond blanc. La
 surface porte déjà son fond et son texte ; le composant ajoute le reste.
 
-Un encart se place **en tête**, juste sous l'en-tête de la page, jamais en bas :
-c'est une invitation, et une invitation placée après quinze publications et une
-pagination n'est jamais vue. Il mène toujours vers une page, jamais vers une
-publication précise, sinon il faut le modifier à chaque publication.
+Un encart mène toujours vers une page, jamais vers une publication précise,
+sinon il faut le modifier à chaque publication.
+
+**Avant d'en poser un en tête d'une liste, préférer une ligne de lien sous le
+chapô.** Les encarts de tête - la revue de presse sur les articles, la
+bibliothèque sur la revue de presse, Action populaire sur les actualités -
+passaient avant le contenu, se lisaient comme des publicités et repoussaient la
+liste sous la ligne de flottaison : ils ont été retirés en octobre 2026. Le
+bandeau Action populaire, lui, va **en bas** de l'agenda et de l'accueil : on
+propose l'application à quelqu'un qui a vu les rendez-vous.
 
 **Une page n'a qu'un seul pavé coloré.** La page des apéros en a déjà un en tête
 (le prochain apéro) : son renvoi vers la bibliothèque est donc un simple lien en
@@ -659,7 +705,7 @@ texte tapé restent en place.
 
 ## L'en-tête
 
-L'en-tête porte les deux portes du site, **Agenda** et **À lire**, en liens
+L'en-tête porte les deux portes du site, **Agenda** et **Articles**, en liens
 simples (`liensPrincipaux` dans `src/routes/+layout.svelte`), puis le menu
 **Ressources** (bibliothèque, outils, jeux, médias), « Qui sommes-nous ? » et le
 bouton « Nous rejoindre ». Le logo ramène à l'accueil. Le menu mobile reprend
@@ -724,7 +770,7 @@ média coché, la section de l'accueil disparaît. Chaque action passe par
 faite. **La liste reste courte** - cinq médias, c'est un conseil ; vingt,
 c'est un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
-« Ressources ». Sur l'accueil, ils sont sous « À lire » et l'agenda
+« Ressources ». Sur l'accueil, ils sont sous les articles et l'agenda
 (voir « L'accueil »).
 
 Le lien n'accepte que `https://` (il finit dans un `href` public). L'adresse

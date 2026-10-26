@@ -4,9 +4,9 @@
  *
  * - « Où est-ce que je peux venir ? » : l'agenda. Les événements et les
  *   formations (`actu`) et les apéros (`apero`), tous datés.
- * - « Qu'est-ce que vous faites, qu'est-ce que vous pensez ? » : « À lire ».
- *   Les articles, sans date de rendez-vous, qu'ils fassent trois lignes ou
- *   trois pages.
+ * - « Qu'est-ce que vous faites, qu'est-ce que vous pensez ? » : les
+ *   articles, sans date de rendez-vous, qu'ils fassent trois lignes ou trois
+ *   pages.
  *
  * La revue de presse, la brève et le retour d'action ont existé : sept types
  * pour un groupe local, c'était trop, et l'équipe elle-même se trompait de
@@ -40,7 +40,7 @@ export const LISTE_RUBRIQUE: Record<Rubrique, string> = {
 };
 
 export const TITRE_RUBRIQUE: Record<Rubrique, string> = {
-	articles: 'À lire',
+	articles: 'Articles',
 	actualites: 'Agenda',
 	aperos: 'Les apéros'
 };

@@ -3,7 +3,7 @@
 
 	/**
 	 * Invitation à installer Action populaire, la plateforme de mobilisation du
-	 * mouvement, affichée en tête de l’agenda, au bas de chaque
+	 * mouvement, affichée au bas de l’agenda, de chaque
 	 * événement et au bas de l'accueil : c'est là que le visiteur vient chercher
 	 * les prochains rendez-vous, donc le moment où lui proposer l'application a
 	 * du sens. Sur l'accueil il est tout en bas, jamais en tête : on propose
@@ -11,7 +11,7 @@
 	 * arrive.
 	 *
 	 * C'est un encart ordinaire (voir Encart.svelte), au même gabarit que celui
-	 * de « À lire » - mais il garde les couleurs de
+	 * des articles - mais il garde les couleurs de
 	 * l'application (jaune et bleu nuit) et non celles du site. C'est délibéré :
 	 * il renvoie vers un autre produit, et ce contraste avec le reste de la page
 	 * le fait remarquer.
@@ -23,7 +23,7 @@
 	 * Les adresses viennent des réglages. Quand aucune n'est renseignée, le
 	 * bandeau renvoie vers le site d'Action populaire plutôt que d'afficher des
 	 * boutons morts. C'est vrai des deux formes : `compact` est une bande d'une
-	 * seule ligne pour la tête de l’agenda, mais elle mène aux
+	 * seule ligne pour l’agenda, mais elle mène aux
 	 * mêmes magasins. Une variante qui ignorerait `android` et `ios` viderait
 	 * les réglages de leur effet sans que personne ne s'en aperçoive.
 	 */
