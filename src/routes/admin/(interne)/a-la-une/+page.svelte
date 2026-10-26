@@ -84,15 +84,17 @@
 	{#if !data.recherche}<p class="mt-5 text-xs font-bold tracking-wide text-ink-faint uppercase">Les plus récentes</p>{/if}
 	<ul class="mt-3 divide-y divide-line rounded-lg border border-line">
 		{#each data.candidates as p (p.id)}
-			<li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
-				<div class="min-w-0 grow">
+			<!-- Pas de flex-wrap : un titre long passe à la ligne dans sa colonne,
+			     le bouton reste à droite. -->
+			<li class="flex items-center gap-3 px-4 py-3">
+				<div class="min-w-0 flex-1">
 					<p class="font-semibold text-ink">{p.title}</p>
 					<p class="mt-0.5 text-xs text-ink-faint">
 						<span class="font-semibold {COULEUR_KIND[p.kind]}">{libellePublication(p.kind, p.eventCategory)}</span>
 						· Publié le {formatDate(p.publishedAt)}
 					</p>
 				</div>
-				<form method="POST" action="?/ajouter">
+				<form method="POST" action="?/ajouter" class="shrink-0">
 					<input type="hidden" name="id" value={p.id} />
 					<button class="bouton" type="submit" disabled={complete}>Mettre à la une</button>
 				</form>
