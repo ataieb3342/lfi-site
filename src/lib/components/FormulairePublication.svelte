@@ -32,7 +32,8 @@
 		libelleValider = 'Enregistrer',
 		apercu = '',
 		admins = [],
-		positionUne = null
+		positionUne = null,
+		actionUne
 	}: {
 		publication?: PublicationVue | null;
 		valeurs?: Champs;
@@ -43,6 +44,8 @@
 		admins?: { id: number; name: string; profilePublic: boolean }[];
 		/** Rang de la publication à la une (1 pour la grande fiche), ou null. */
 		positionUne?: number | null;
+		/** L'action qui enregistre puis met à la une (`?/creerEtUne`, `?/enregistrerEtUne`). */
+		actionUne: string;
 	} = $props();
 
 	/*
@@ -436,16 +439,32 @@
 				<span>Autoriser les commentaires</span>
 			</label>
 
-			<!-- La une ne se coche plus ici : elle se gère sur sa propre page, où
-			     l'on voit tout ce qui y est et dans quel ordre. -->
-			<p class="text-sm text-ink">
+			<!-- La une se range sur sa propre page, où l'on voit tout ce qui y
+			     est et dans quel ordre. Mais on n'y va jamais par un simple lien
+			     depuis ce formulaire : le lien « Gérer la une → » quittait la
+			     page sans rien enregistrer, et le texte en cours était perdu.
+			     Le bouton enregistre d'abord, puis met la fiche à la une ; la
+			     page de la une ne s'ouvre que dans un nouvel onglet. -->
+			<div class="text-sm text-ink">
 				{#if positionUne}
-					<span class="font-semibold">À la une</span>, {positionUne === 1 ? 'en grande fiche' : `en ${positionUne}ᵉ position`}.
+					<p>
+						<span class="font-semibold">À la une</span>, {positionUne === 1
+							? 'en grande fiche'
+							: `en ${positionUne}ᵉ position`}.
+						<a class="font-semibold text-brand hover:underline" href="/admin/a-la-une" target="_blank">
+							Ranger la une ↗
+						</a>
+					</p>
 				{:else}
-					Pas à la une.
+					<button type="submit" formaction={actionUne} class="bouton-secondaire">
+						Enregistrer et mettre à la une
+					</button>
+					<p class="aide">
+						Seule une publication à l'état « Publié » peut être à la une. Le texte est enregistré
+						d'abord : rien n'est perdu.
+					</p>
 				{/if}
-				<a class="font-semibold text-brand hover:underline" href="/admin/a-la-une">Gérer la une →</a>
-			</p>
+			</div>
 		</div>
 
 		<div class="carte space-y-3">

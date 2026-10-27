@@ -37,5 +37,6 @@
 		erreur={form?.erreur ?? ''}
 		apercu={form?.apercu ?? ''}
 		libelleValider="Créer la publication"
+		actionUne="?/creerEtUne"
 	/>
 </form>

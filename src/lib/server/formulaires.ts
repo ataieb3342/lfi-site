@@ -1,7 +1,8 @@
 import type { PublicationInput, Kind, Status } from './content.ts';
+import { getById, listALaUne, MAX_A_LA_UNE, mettreALaUne } from './content.ts';
 import { storeUpload } from './media.ts';
 import { renderMarkdown } from './markdown.ts';
-import { listAdmins } from './auth.ts';
+import { audit, listAdmins } from './auth.ts';
 
 /**
  * Lecture et validation du formulaire de publication, partagée entre la
@@ -151,6 +152,24 @@ export async function lirePublication(
  */
 export function apercuPublication(form: FormData) {
 	return { ...valeursSaisies(form), apercu: renderMarkdown(String(form.get('body') ?? '')) };
+}
+
+/**
+ * La seconde moitié de « Enregistrer et mettre à la une », une fois la
+ * publication enregistrée : la met à la une si c'est possible, et dit
+ * pourquoi sinon. Le refus n'est pas une erreur du formulaire - le texte est
+ * déjà en base -, c'est la page de la publication qui l'explique.
+ */
+export function enregistrerALaUne(
+	id: number,
+	locals: App.Locals
+): 'ok' | 'brouillon' | 'pleine' {
+	const publication = getById(id);
+	if (!publication || publication.status !== 'published') return 'brouillon';
+	if (!publication.pinned && listALaUne().length >= MAX_A_LA_UNE) return 'pleine';
+	mettreALaUne(id);
+	audit(locals.admin!, 'une.ajout', publication.title, '', locals.ipHash);
+	return 'ok';
 }
 
 /** Valeurs à renvoyer au formulaire après une erreur, pour ne rien perdre. */

@@ -30,7 +30,28 @@
 </header>
 
 {#if data.enregistre && !form}
-	<p class="alerte alerte-succes mb-6">Modifications enregistrées.</p>
+	<!-- Le résultat de « Enregistrer et mettre à la une ». Le texte est
+	     toujours enregistré ; seule la une a pu refuser la fiche. -->
+	{#if data.une === 'ok'}
+		<p class="alerte alerte-succes mb-6">
+			Enregistré et mis à la une, {data.positionUne === 1
+				? 'en grande fiche'
+				: `en ${data.positionUne}ᵉ position`}.
+			<a class="font-semibold underline" href="/admin/a-la-une">Ranger la une →</a>
+		</p>
+	{:else if data.une === 'brouillon'}
+		<p class="alerte mb-6">
+			Enregistré, mais pas mis à la une : c'est un brouillon. Passez l'état à « Publié », puis
+			cliquez à nouveau sur « Enregistrer et mettre à la une ».
+		</p>
+	{:else if data.une === 'pleine'}
+		<p class="alerte mb-6">
+			Enregistré, mais pas mis à la une : elle est déjà pleine.
+			<a class="font-semibold underline" href="/admin/a-la-une">Retirer une fiche de la une →</a>
+		</p>
+	{:else}
+		<p class="alerte alerte-succes mb-6">Modifications enregistrées.</p>
+	{/if}
 {/if}
 
 <form
@@ -59,6 +80,7 @@
 		erreur={form?.erreur ?? ''}
 		apercu={form?.apercu ?? ''}
 		libelleValider="Enregistrer"
+		actionUne="?/enregistrerEtUne"
 	/>
 
 	<label class="mt-4 flex items-start gap-2 text-sm text-ink">

@@ -511,7 +511,15 @@ La page tient maintenant en quatre blocs, de haut en bas :
    formulaire de publication - le formulaire dit seulement si la fiche est à
    la une et à quel rang : avec une case par fiche, il fallait rouvrir les
    publications une à une pour savoir ce qui s'affichait, et l'ordre ne se
-   réglait pas. **Rien n'expire tout seul** : l'ancienne expiration après
+   réglait pas. Le formulaire porte en revanche un bouton **« Enregistrer et
+   mettre à la une »** (actions `creerEtUne` et `enregistrerEtUne`,
+   `enregistrerALaUne` dans `formulaires.ts`) : il enregistre d'abord, puis
+   ajoute la fiche en fin de une. Il remplace un lien « Gérer la une → » qui
+   quittait la page sans rien enregistrer et faisait perdre le texte en
+   cours. Si la fiche est un brouillon ou que la une est pleine, le texte est
+   enregistré quand même et la page dit pourquoi la une a refusé. **Aucun
+   lien du formulaire ne doit changer de page** : la page de la une ne s'y
+   ouvre que dans un nouvel onglet. **Rien n'expire tout seul** : l'ancienne expiration après
    quinze jours faisait disparaître des fiches sans prévenir (migration 020).
    `pinned_at` ne dit plus que depuis quand. Chaque ajout, retrait et
    déplacement passe par `audit()`.
