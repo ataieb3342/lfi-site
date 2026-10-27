@@ -513,9 +513,12 @@ La page tient maintenant en quatre blocs, de haut en bas :
    la page entre deux sujets, pour une liste que « Tout l'agenda → » donne
    déjà. Elle a été retirée (octobre 2026) ; **l'agenda de l'accueil, c'est le
    fil du haut, et rien d'autre**.
-   Dessous, **« On recommande »** : les médias cochés « Sur l'accueil » dans
-   l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
-   sur ordinateur). Pas en tête de page : un lien sortant dès l'arrivée fait
+   Dessous, **« S'informer ailleurs »** (surlignage « On recommande ») : les
+   médias cochés « Sur l'accueil » dans l'administration. Une phrase dit
+   pourquoi, puis ils sont **rangés par format**, « À regarder » et « À lire »
+   en deux colonnes comme sur `/medias`, et la section se ferme sur le lien
+   vers la liste complète. En grille de quatre cartes sous un simple « On
+   recommande », elle n'avait ni début ni fin. Pas en tête de page : un lien sortant dès l'arrivée fait
    partir le visiteur avant qu'il ait vu ce que fait le groupe.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui

@@ -4,7 +4,7 @@
 	import CarteArticle from '$lib/components/CarteArticle.svelte';
 	import Metadonnees from '$lib/components/Metadonnees.svelte';
 	import { organisation } from '$lib/donnees-structurees';
-	import { titreFormat } from '$lib/medias';
+	import { mediasParFormat } from '$lib/medias';
 	import { COULEUR_KIND, formatDate, formatDateCourte, formatHeure, libellePublication, lienPublication, LIBELLE_EVENEMENT } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -175,30 +175,56 @@
 	</section>
 {/if}
 
-<!-- Les médias qu'on recommande, sous les articles et sur toute la largeur.
+<!-- Les médias qu'on recommande, sous les articles. Quatre cartes en
+     grille, avec « On recommande » pour seul titre, ne disaient ni ce qu'on
+     recommandait ni pourquoi, et le format (« À regarder ») se perdait sous
+     chaque nom. La section s'ouvre donc sur une phrase qui dit pourquoi,
+     range les médias par format en deux colonnes - comme la page /medias -
+     et se ferme sur le lien vers la liste complète. Les liens sortent du
+     site : la flèche ↗ l'annonce, nouvel onglet, `noopener noreferrer`.
      Pas en tête de page : l'accueil montre d'abord ce que fait le groupe. -->
 {#if data.medias.length}
-<section class="mt-8" aria-labelledby="titre-medias">
-	<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-		<h2 id="titre-medias" class="text-xl font-extrabold text-ink">On recommande</h2>
-		<a class="text-sm font-semibold text-brand hover:underline" href="/medias">Tout voir</a>
-	</div>
-	<ul class="grid gap-4 sm:grid-cols-2">
-		{#each data.medias as media (media.id)}
-			<li class="carte relative flex gap-3 transition hover:border-brand">
-				<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
-				<img class="size-10 shrink-0 rounded-lg object-cover" src={media.logo} alt="" width="40" height="40" loading="lazy" />
-				<div class="min-w-0">
-					<h3 class="text-sm font-bold text-ink">
-						<a class="after:absolute after:inset-0" href={media.lien} target="_blank" rel="noopener noreferrer">{media.nom}</a>
-					</h3>
-					<p class="text-xs text-ink-faint">{titreFormat(media.format)}</p>
-					<p class="mt-1 text-sm leading-snug text-ink-soft">{media.description}</p>
+	{@const formats = mediasParFormat(data.medias)}
+	<section class="mt-8 border-t border-line pt-6" aria-labelledby="titre-medias">
+		<p class="text-xs font-bold tracking-[0.14em] text-pourpre uppercase">On recommande</p>
+		<h2 id="titre-medias" class="titre-affiche mt-1 text-2xl text-ink">S’informer ailleurs</h2>
+		<p class="mt-2 max-w-2xl text-ink-soft">
+			Des médias indépendants, hors des groupes de milliardaires, que nous regardons et lisons nous-mêmes.
+		</p>
+
+		<div class="mt-5 grid gap-6 {formats.length > 1 ? 'md:grid-cols-2' : ''}">
+			{#each formats as format (format.id)}
+				<div>
+					<h3 class="text-xs font-bold tracking-[0.15em] text-ink-faint uppercase">{format.titre}</h3>
+					<ul class="mt-3 space-y-3">
+						{#each format.medias as media (media.id)}
+							<li class="carte group relative flex items-start gap-3 transition hover:border-brand">
+								<!-- Logo décoratif : le nom du média suit, `alt` vide pour ne pas le lire deux fois. -->
+								<img class="size-10 shrink-0 rounded-lg object-cover" src={media.logo} alt="" width="40" height="40" loading="lazy" />
+								<div class="min-w-0">
+									<p class="font-bold text-ink">
+										<a
+											class="after:absolute after:inset-0 group-hover:text-brand"
+											href={media.lien}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{media.nom}<span class="ml-1 text-ink-faint" aria-hidden="true">↗</span>
+										</a>
+									</p>
+									<p class="mt-0.5 text-sm leading-snug text-ink-soft">{media.description}</p>
+								</div>
+							</li>
+						{/each}
+					</ul>
 				</div>
-			</li>
-		{/each}
-	</ul>
-</section>
+			{/each}
+		</div>
+
+		<a class="mt-5 inline-block text-sm font-semibold text-brand hover:underline" href="/medias">
+			Tous les médias qu’on recommande →
+		</a>
+	</section>
 {/if}
 
 <BandeauApplication actif={data.app.actif} android={data.app.android} ios={data.app.ios} />
