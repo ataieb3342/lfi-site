@@ -6,9 +6,9 @@
  * (`src/lib/server/medias-recommandes.ts`). Ce fichier ne garde que ce que
  * les pages partagent : les formats et le regroupement par format.
  *
- * Elle doit rester courte. Vingt médias, c'est un annuaire ; cinq, c'est un
- * conseil. Chaque média porte une phrase qui dit pourquoi on le recommande,
- * pas seulement ce qu'il est.
+ * Chaque média porte une phrase qui dit pourquoi on le recommande, pas
+ * seulement ce qu'il est : c'est ce qui fait de la liste un conseil et non
+ * un annuaire.
  *
  * Les logos sont servis par le site et jamais chargés depuis celui du média :
  * la CSP l'interdit (`img-src 'self'`), et chaque affichage de l'accueil

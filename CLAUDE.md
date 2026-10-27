@@ -3,6 +3,11 @@
 Site d'information d'un groupe militant local : publication d'articles et de
 actualités par des administrateurs, commentaires anonymes modérés.
 
+**Le site en ligne : https://lfi-dijon.fr/** (production, mise à jour par
+`main`, voir « Déploiement »). Pour savoir ce qui est réellement publié - les
+médias recommandés, les rendez-vous, les articles -, regarder ce site plutôt
+que la base de démonstration : le dépôt ne contient que les données de départ.
+
 Le site est une cible politique. Les choix techniques privilégient
 systématiquement la robustesse et la lisibilité sur la sophistication.
 
@@ -515,11 +520,14 @@ La page tient maintenant en quatre blocs, de haut en bas :
    fil du haut, et rien d'autre**.
    Dessous, **« S'informer ailleurs »** (surlignage « On recommande ») : les
    médias cochés « Sur l'accueil » dans l'administration. Une phrase dit
-   pourquoi, puis ils sont **rangés par format**, « À regarder » et « À lire »
-   en deux colonnes comme sur `/medias`, et la section se ferme sur le lien
-   vers la liste complète. En grille de quatre cartes sous un simple « On
-   recommande », elle n'avait ni début ni fin. Pas en tête de page : un lien sortant dès l'arrivée fait
-   partir le visiteur avant qu'il ait vu ce que fait le groupe.
+   pourquoi, puis ils sont **rangés par format**, une rangée « À regarder »,
+   une rangée « À lire ». **La liste peut être longue** et la section doit
+   tenir quel que soit le nombre : sur ordinateur, tous sont visibles en
+   grille de trois cartes compactes ; sur téléphone, chaque rangée défile au
+   doigt comme le fil des rendez-vous (`scroll-snap`, aucun script). Pas de
+   carrousel à diapositives : presque personne ne dépasse la première, les
+   autres médias seraient cachés. Pas en tête de page : un lien sortant dès
+   l'arrivée fait partir le visiteur avant qu'il ait vu ce que fait le groupe.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
    arrive.
@@ -770,8 +778,8 @@ et se gèrent dans Administration → Médias recommandés
 reprend la section « On recommande ». Tous sont sur `/medias` ; sans aucun
 média coché, la section de l'accueil disparaît. Chaque action passe par
 `audit()` : la recommandation est un choix politique, on doit savoir qui l'a
-faite. **La liste reste courte** - cinq médias, c'est un conseil ; vingt,
-c'est un annuaire.
+faite. Chaque média porte une phrase qui dit **pourquoi** on le
+recommande : c'est ce qui fait de la liste un conseil et non un annuaire.
 Même place que les jeux : carte en bas de la bibliothèque, pied de page, menu
 « Ressources ». Sur l'accueil, ils sont sous les articles et l'agenda
 (voir « L'accueil »).
