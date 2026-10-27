@@ -282,19 +282,16 @@ h1, h2, h3, h4 {
 	color: #fff;
 }
 
-/* L'image d'un article qui n'en a pas (`CarteArticle.svelte`). Un aplat
-   lavande presque de la couleur de la page, avec un petit phi pâle au milieu,
-   se lisait comme une image qui n'a pas chargé. C'est désormais une surface
-   assumée : la construction de `.fond-degrade` (un fond, deux lueurs, rouge
-   en haut à droite, violette en bas à gauche), mais en clair, pour que
-   plusieurs articles sans image à la suite ne fassent pas autant de pavés
-   sombres. Les teintes viennent des jetons : elle suit le thème sombre. */
+/* L'image d'un article qui n'en a pas (`CarteArticle.svelte`) : le phi
+   officiel, en couleur, sur une carte. Deux essais avant celui-ci : un aplat
+   lavande presque de la couleur de la page avec un phi pâle, qui se lisait
+   comme une image qui n'a pas chargé ; puis la construction de `.fond-degrade`
+   en clair, qui tournait au rose-mauve délavé, une teinte que le site n'a
+   nulle part ailleurs. Le logo en couleur sur `--color-carte` est la signature
+   du groupe, comme dans l'en-tête, et tient dans les deux thèmes. */
 .vignette-article {
-	background-color: color-mix(in srgb, var(--color-brand) 20%, var(--color-brand-soft));
-	background-image:
-		radial-gradient(90% 110% at 100% 0%, color-mix(in srgb, var(--color-accent) 40%, transparent) 0%, transparent 70%),
-		radial-gradient(100% 120% at 0% 100%, color-mix(in srgb, var(--color-brand) 50%, transparent) 0%, transparent 75%);
-	color: #fff;
+	background: var(--color-carte);
+	border: 1px solid var(--color-line);
 }
 
 /* Le bouton d'une surface colorée. Ses couleurs sont fixes, comme celles des

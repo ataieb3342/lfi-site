@@ -323,13 +323,14 @@ grille de trois colonnes : 1 + 12, quatre rangées pleines ; les pages
 suivantes en ont douze (`PREMIERE_PAGE` et `PAR_PAGE`). Les cartes
 (`CarteArticle.svelte`, partagée avec l'accueil) n'ont pas d'étiquette
 « Article » - tout ce qui est listé en est un - et ont **toujours une
-image** : sans couverture, une surface `.vignette-article` et le phi blanc.
-Sans cela les articles sans image n'avaient pas la forme de leurs voisins et la
-liste paraissait cassée. La surface reprend la construction de `.fond-degrade`
-(un fond, une lueur rouge, une lueur violette) **en clair**, pour que quatre
-articles sans image à la suite ne fassent pas autant de pavés sombres. Elle a
-d'abord été un aplat lavande presque de la couleur de la page avec un phi
-pâle : on aurait dit une image qui n'avait pas chargé. Sur téléphone, la grille
+image** : sans couverture, le phi officiel en couleur sur une carte
+(`.vignette-article`). Sans cela les articles sans image n'avaient pas la forme
+de leurs voisins et la liste paraissait cassée. Deux essais l'ont précédé : un
+aplat lavande presque de la couleur de la page avec un phi pâle, qu'on prenait
+pour une image qui n'avait pas chargé, puis une version claire de
+`.fond-degrade`, d'un rose-mauve délavé que le site n'a nulle part ailleurs. Le
+violet profond de `.fond-degrade` lui-même est exclu : quatre articles sans
+image à la suite feraient autant de pavés sombres. Sur téléphone, la grille
 redevient une liste à vignettes.
 
 L'ordre est celui des dates, sans faire remonter les fiches à la une : la une

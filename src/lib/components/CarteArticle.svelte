@@ -12,10 +12,10 @@
 	 *   sur ordinateur ; sur téléphone elle redevient une ligne, sinon quinze
 	 *   images pleine largeur feraient défiler cinq écrans.
 	 *
-	 * **Toujours une image**, même sans couverture : la surface claire
-	 * `.vignette-article` et le phi blanc la remplacent (voir `app.css`). Sans image du tout,
-	 * ces articles n'avaient pas la même forme que leurs voisins, et la liste
-	 * avait l'air cassée.
+	 * **Toujours une image**, même sans couverture : le phi officiel en
+	 * couleur sur une carte la remplace (`.vignette-article`, voir `app.css`).
+	 * Sans image du tout, ces articles n'avaient pas la même forme que leurs
+	 * voisins, et la liste avait l'air cassée.
 	 *
 	 * Pas d'étiquette « Article » : tout ce qui est listé ici en est un.
 	 * Toute la carte est cliquable (le lien du titre est étendu par `::after`).
@@ -50,7 +50,7 @@
 		/>
 	{:else}
 		<div class="{classeImage[forme]} vignette-article grid place-items-center rounded-xl" aria-hidden="true">
-			<Logo variante="mono" class="h-2/5 max-h-20 w-auto opacity-90" />
+			<Logo class="h-2/5 max-h-20 w-auto" />
 		</div>
 	{/if}
 
