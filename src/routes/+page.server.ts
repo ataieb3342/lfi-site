@@ -11,8 +11,8 @@ import { listMediasRecommandes } from '$lib/server/medias-recommandes';
  * chargées.
  */
 const DANS_LE_FIL = 6;
-/** Rendez-vous suivants, listés dans la colonne « Plus tard dans l'agenda ». */
-const PLUS_TARD = 5;
+/** Derniers articles : deux rangées pleines de la grille de trois colonnes. */
+const DERNIERS_ARTICLES = 6;
 
 /** AAAA-MM-JJ à l'heure du serveur, comme la page /agenda. */
 function jourIso(date: Date): string {
@@ -80,14 +80,11 @@ export const load: PageServerLoad = async () => {
 		...rdv,
 		jour: rdv.eventAt === aujourdhui ? 'Aujourd’hui' : rdv.eventAt === demain ? 'Demain' : null
 	}));
-	// La colonne de droite prend la suite du fil, sans le répéter.
-	const plusTard = aVenir.slice(DANS_LE_FIL, DANS_LE_FIL + PLUS_TARD).filter((rdv) => !idsALaUne.has(rdv.id));
 
 	return {
 		aLaUne,
-		articles: articles.filter((article) => !idsALaUne.has(article.id)).slice(0, 5),
+		articles: articles.filter((article) => !idsALaUne.has(article.id)).slice(0, DERNIERS_ARTICLES),
 		prochainsRendezVous,
-		plusTard,
 		// Les médias cochés « Sur l'accueil » dans l'administration.
 		medias: listMediasRecommandes({ accueil: true }).map(presentMediaRecommande)
 	};

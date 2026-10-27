@@ -506,17 +506,17 @@ La page tient maintenant en quatre blocs, de haut en bas :
    quinze jours faisait disparaître des fiches sans prévenir (migration 020).
    `pinned_at` ne dit plus que depuis quand. Chaque ajout, retrait et
    déplacement passe par `audit()`.
-3. **« Derniers articles »** à gauche, et à droite **« Plus tard
-   dans l'agenda »**, qui **prend la suite du fil sans le répéter** : les cinq
-   rendez-vous suivants (`PLUS_TARD`). Sans rendez-vous plus lointain, la
-   colonne disparaît et les articles prennent toute la largeur.
-   Sous les deux colonnes, sur toute la largeur, **« On recommande »** : les
-   médias cochés « Sur l'accueil » dans l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
-   sur ordinateur). Ils ont d'abord été dans la colonne de droite, mais les
-   fiches à la une étant retirées des derniers articles, la colonne de
-   gauche était plus courte et laissait un trou. Pas en tête de page : un lien
-   sortant dès l'arrivée fait partir le visiteur avant qu'il ait vu ce que fait
-   le groupe.
+3. **« Derniers articles »**, sur toute la largeur, dans la grille de la page
+   Articles (`CarteArticle`, six fiches, deux rangées pleines :
+   `DERNIERS_ARTICLES`). La moitié droite a longtemps porté « Plus tard dans
+   l'agenda », les rendez-vous suivant ceux du fil : elle coupait le milieu de
+   la page entre deux sujets, pour une liste que « Tout l'agenda → » donne
+   déjà. Elle a été retirée (octobre 2026) ; **l'agenda de l'accueil, c'est le
+   fil du haut, et rien d'autre**.
+   Dessous, **« On recommande »** : les médias cochés « Sur l'accueil » dans
+   l'administration, en cartes, avec leur logo et leur phrase (deux par ligne
+   sur ordinateur). Pas en tête de page : un lien sortant dès l'arrivée fait
+   partir le visiteur avant qu'il ait vu ce que fait le groupe.
 4. **Le bandeau Action populaire**, tout en bas - jamais en tête : on propose
    d'installer quelque chose à quelqu'un qui a lu la page, pas à quelqu'un qui
    arrive.

@@ -149,73 +149,34 @@
 	</section>
 {/if}
 
-<!-- `pt-6` et non `py-6` : le bandeau qui suit apporte sa propre marge haute,
-     les deux s'ajoutaient. -->
-<div class="grid gap-8 pt-6 {data.plusTard.length ? 'lg:grid-cols-[1fr_20rem]' : ''}">
-	<!-- Masquée quand le seul article existant est déjà « à la une » :
-	     un titre de section suivi du vide fait plus négligé qu'utile. -->
-	{#if data.articles.length || !data.aLaUne.length}
-		<section>
-			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-				<h2 class="text-xl font-extrabold text-ink">Derniers articles</h2>
-				<a class="text-sm font-semibold text-brand hover:underline" href="/articles">Tout voir</a>
-			</div>
+<!-- Les derniers articles, sur toute la largeur et dans la grille de la page
+     Articles. La moitié droite portait « Plus tard dans l'agenda », la suite
+     du fil du haut : on coupait la page entre deux sujets, et une liste de
+     rendez-vous lointains n'apprenait rien que « Tout l'agenda » ne donne
+     déjà. `pt-6` et non `py-6` : ce qui suit apporte sa propre marge haute.
+     Masquée quand le seul article existant est déjà « à la une » : un titre
+     de section suivi du vide fait plus négligé qu'utile. -->
+{#if data.articles.length || !data.aLaUne.length}
+	<section class="pt-6">
+		<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
+			<h2 class="text-xl font-extrabold text-ink">Derniers articles</h2>
+			<a class="text-sm font-semibold text-brand hover:underline" href="/articles">Tout voir</a>
+		</div>
 
-			{#if data.articles.length}
-				<div class="space-y-5">
-					{#each data.articles as article (article.id)}
-						<CarteArticle publication={article} />
-					{/each}
-				</div>
-			{:else}
-				<p class="text-ink-soft">Aucun article publié pour le moment.</p>
-			{/if}
-		</section>
-	{:else}
-		<div></div>
-	{/if}
-
-	<!-- La suite du fil, sans le répéter : les rendez-vous qui viennent après
-	     les six du haut. Une ligne par rendez-vous, la date en colonne à
-	     gauche : la liste se parcourt d'un coup d'œil, comme un agenda de poche.
-	     Sans rendez-vous plus lointain, la colonne disparaît. -->
-	{#if data.plusTard.length}
-		<aside>
-			<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">
-				<h2 class="text-xl font-extrabold text-ink">Plus tard dans l’agenda</h2>
-			</div>
-			<ul>
-				{#each data.plusTard as rdv (rdv.id)}
-					<li class="border-b border-line py-2.5 first:pt-0 last:border-0">
-						<a href={lienPublication(rdv.kind, rdv.slug)} class="flex gap-3 hover:text-brand">
-							<span
-								class="w-24 shrink-0 self-start rounded whitespace-nowrap bg-accent-soft px-1.5 py-0.5 text-center text-xs font-bold text-accent-dark"
-							>
-								{formatDateCourte(rdv.eventAt)}
-							</span>
-							<span class="min-w-0">
-								<span class="line-clamp-2 text-sm leading-snug font-semibold">{rdv.title}</span>
-								{#if rdv.autresDates}
-									<span class="block text-xs text-ink-faint">
-										+ {rdv.autresDates} autre{rdv.autresDates > 1 ? 's' : ''} date{rdv.autresDates > 1 ? 's' : ''}
-									</span>
-								{/if}
-							</span>
-						</a>
-					</li>
+		{#if data.articles.length}
+			<div class="grid gap-5 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-3">
+				{#each data.articles as article (article.id)}
+					<CarteArticle publication={article} />
 				{/each}
-			</ul>
-			<a class="mt-3 inline-block text-sm font-semibold text-brand hover:underline" href="/agenda">Tout l’agenda</a>
-		</aside>
-	{/if}
-</div>
+			</div>
+		{:else}
+			<p class="text-ink-soft">Aucun article publié pour le moment.</p>
+		{/if}
+	</section>
+{/if}
 
-<!-- Les médias qu'on recommande, sous les deux colonnes et sur toute la
-     largeur. Ils étaient dans la colonne de droite : comme les fiches à la
-     une sont retirées des derniers articles, la colonne de gauche était souvent bien
-     plus courte et laissait un grand trou sur ordinateur. Sur téléphone,
-     l'ordre ne change pas : ils suivent l'agenda. Pas en tête
-     de page : l'accueil montre d'abord ce que fait le groupe. -->
+<!-- Les médias qu'on recommande, sous les articles et sur toute la largeur.
+     Pas en tête de page : l'accueil montre d'abord ce que fait le groupe. -->
 {#if data.medias.length}
 <section class="mt-8" aria-labelledby="titre-medias">
 	<div class="mb-6 flex items-baseline justify-between border-b border-line pb-2">

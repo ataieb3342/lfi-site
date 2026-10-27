@@ -8,10 +8,9 @@
 	 *
 	 * - `grande` : le plus récent, en tête de la page Articles. Image et texte
 	 *   côte à côte sur ordinateur.
-	 * - `carte` : la grille de la page Articles. Image au-dessus sur
-	 *   ordinateur ; sur téléphone elle redevient une ligne, sinon quinze images
-	 *   pleine largeur feraient défiler cinq écrans.
-	 * - `ligne` : vignette à gauche, texte à droite. La colonne de l'accueil.
+	 * - `carte` : la grille de la page Articles et de l'accueil. Image au-dessus
+	 *   sur ordinateur ; sur téléphone elle redevient une ligne, sinon quinze
+	 *   images pleine largeur feraient défiler cinq écrans.
 	 *
 	 * **Toujours une image**, même sans couverture : un aplat clair et le phi
 	 * la remplacent - clair et non violet foncé, sinon quatre articles sans
@@ -22,25 +21,22 @@
 	 * Pas d'étiquette « Article » : tout ce qui est listé ici en est un.
 	 * Toute la carte est cliquable (le lien du titre est étendu par `::after`).
 	 */
-	let { publication, forme = 'ligne' }: { publication: PublicationVue; forme?: 'grande' | 'carte' | 'ligne' } =
+	let { publication, forme = 'carte' }: { publication: PublicationVue; forme?: 'grande' | 'carte' } =
 		$props();
 
 	const lien = $derived(lienPublication(publication.kind, publication.slug));
 
 	const classeCarte = {
 		grande: 'flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:gap-6',
-		carte: 'flex gap-4 sm:flex-col sm:gap-3',
-		ligne: 'flex gap-4'
+		carte: 'flex gap-4 sm:flex-col sm:gap-3'
 	};
 	const classeImage = {
 		grande: 'aspect-[16/10] w-full',
-		carte: 'size-20 shrink-0 sm:aspect-[16/10] sm:size-auto sm:w-full',
-		ligne: 'size-20 shrink-0 sm:size-28'
+		carte: 'size-20 shrink-0 sm:aspect-[16/10] sm:size-auto sm:w-full'
 	};
 	const classeTitre = {
 		grande: 'titre-affiche text-2xl sm:text-3xl',
-		carte: 'text-base leading-snug font-bold sm:text-lg',
-		ligne: 'text-base leading-snug font-bold sm:text-lg'
+		carte: 'text-base leading-snug font-bold sm:text-lg'
 	};
 </script>
 
