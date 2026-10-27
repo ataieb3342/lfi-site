@@ -12,9 +12,8 @@
 	 *   sur ordinateur ; sur téléphone elle redevient une ligne, sinon quinze
 	 *   images pleine largeur feraient défiler cinq écrans.
 	 *
-	 * **Toujours une image**, même sans couverture : un aplat clair et le phi
-	 * la remplacent - clair et non violet foncé, sinon quatre articles sans
-	 * image à la suite faisaient autant de pavés sombres. Sans image du tout,
+	 * **Toujours une image**, même sans couverture : la surface claire
+	 * `.vignette-article` et le phi blanc la remplacent (voir `app.css`). Sans image du tout,
 	 * ces articles n'avaient pas la même forme que leurs voisins, et la liste
 	 * avait l'air cassée.
 	 *
@@ -50,8 +49,8 @@
 			class="{classeImage[forme]} rounded-xl bg-surface-alt object-cover"
 		/>
 	{:else}
-		<div class="{classeImage[forme]} grid place-items-center rounded-xl bg-brand-soft" aria-hidden="true">
-			<Logo variante="mono" class="h-1/3 max-h-12 w-auto text-brand/25" />
+		<div class="{classeImage[forme]} vignette-article grid place-items-center rounded-xl" aria-hidden="true">
+			<Logo variante="mono" class="h-2/5 max-h-20 w-auto opacity-90" />
 		</div>
 	{/if}
 
@@ -69,10 +68,13 @@
 			>
 		</h3>
 		{#if publication.summary}
+			<!-- Masqué sur téléphone par `max-sm:hidden` et non `hidden sm:block` :
+			     `sm:block` écrasait le `display` de `line-clamp`, et le chapô
+			     s'affichait en entier sur ordinateur. -->
 			<p
 				class="mt-1.5 whitespace-pre-line text-ink-soft
 					{forme === 'grande' ? 'line-clamp-4 sm:text-lg' : 'line-clamp-2 text-sm'}
-					{forme === 'carte' ? 'hidden sm:block' : ''}"
+					{forme === 'carte' ? 'max-sm:hidden' : ''}"
 			>
 				{publication.summary}
 			</p>

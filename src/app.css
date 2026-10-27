@@ -282,6 +282,21 @@ h1, h2, h3, h4 {
 	color: #fff;
 }
 
+/* L'image d'un article qui n'en a pas (`CarteArticle.svelte`). Un aplat
+   lavande presque de la couleur de la page, avec un petit phi pâle au milieu,
+   se lisait comme une image qui n'a pas chargé. C'est désormais une surface
+   assumée : la construction de `.fond-degrade` (un fond, deux lueurs, rouge
+   en haut à droite, violette en bas à gauche), mais en clair, pour que
+   plusieurs articles sans image à la suite ne fassent pas autant de pavés
+   sombres. Les teintes viennent des jetons : elle suit le thème sombre. */
+.vignette-article {
+	background-color: color-mix(in srgb, var(--color-brand) 20%, var(--color-brand-soft));
+	background-image:
+		radial-gradient(90% 110% at 100% 0%, color-mix(in srgb, var(--color-accent) 40%, transparent) 0%, transparent 70%),
+		radial-gradient(100% 120% at 0% 100%, color-mix(in srgb, var(--color-brand) 50%, transparent) 0%, transparent 75%);
+	color: #fff;
+}
+
 /* Le bouton d'une surface colorée. Ses couleurs sont fixes, comme celles des
    surfaces elles-mêmes : `text-brand` deviendrait un lavande clair en thème
    sombre, donc illisible sur la pastille blanche. */
