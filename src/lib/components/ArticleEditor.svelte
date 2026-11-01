@@ -15,7 +15,7 @@
 	let imageForm = $state(false);
 	let imageUrl = $state('');
 	let imageAlt = $state('');
-	let sourceMode = $state(false);
+	let editingMode = $state<'markdown' | 'visual'>('markdown');
 	let linkForm = $state(false);
 	let linkUrl = $state('');
 	let savedRange: Range | null = null;
@@ -23,7 +23,7 @@
 	let undoStack = $state<string[]>([]);
 	let redoStack = $state<string[]>([]);
 	const dirtyText = new Set<string>();
-	let paper: HTMLDivElement;
+	let paper = $state<HTMLDivElement>(undefined!);
 	const current = $derived(blocks.find(block => block.id === selected));
 	const currentElement = $derived(current?.element);
 	const converter = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', emDelimiter: '*', bulletListMarker: '-' });
@@ -200,6 +200,14 @@
 
 <svelte:window onkeydown={keyboard} />
 <div class="article-editor" role="group" aria-label="Éditeur visuel de l’article">
+	<div class="article-editor-toolbar" role="group" aria-label="Mode d’édition">
+		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'markdown'} onclick={() => editingMode = 'markdown'}>Markdown</button>
+		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'visual'} onclick={() => editingMode = 'visual'}>Visuel</button>
+	</div>
+	{#if editingMode === 'markdown'}
+		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" bind:value={body}></textarea>
+		<p class="aide">Écrivez en Markdown, ou choisissez « Visuel » pour déplacer les images et les bulles. Le contenu est partagé entre les deux modes.</p>
+	{:else}
 	<div class="article-editor-toolbar" aria-label="Outils d’édition">
 		<button type="button" class="bouton-secondaire" disabled={!undoStack.length} onclick={undo}>Annuler</button>
 		<button type="button" class="bouton-secondaire" disabled={!redoStack.length} onclick={redo}>Rétablir</button>
@@ -283,8 +291,5 @@
 		</div>
 	</div>
 	<p role="status" class="aide">{message}</p>
-	<details class="mt-3" ontoggle={event => { sourceMode = event.currentTarget.open; }}>
-		<summary class="cursor-pointer text-sm">Texte source et mise en forme avancée</summary>
-		{#if sourceMode}<textarea class="champ mt-2 font-mono text-sm" rows="16" aria-label="Texte source de l’article" bind:value={body}></textarea>{/if}
-	</details>
+	{/if}
 </div>

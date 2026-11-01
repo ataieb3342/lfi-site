@@ -606,6 +606,7 @@ h1, h2, h3, h4 {
 .article-editor { min-width: 0; }
 .article-editor-toolbar, .article-element-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .article-editor-toolbar { margin-bottom: 0.8rem; }
+.article-editor-toolbar button[aria-pressed='true'] { background: var(--color-brand); border-color: var(--color-brand); color: white; }
 .article-editor-extra { margin: 0.5rem 0; font-size: 0.8rem; }
 .article-editor-extra label { display: grid; gap: 0.25rem; }
 .article-editor-toolbar .bouton-secondaire, .article-element-settings .bouton-secondaire { padding: 0.4rem 0.65rem; font-size: 0.8rem; }
