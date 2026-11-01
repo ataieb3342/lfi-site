@@ -274,6 +274,10 @@
 				<code>![aquarelle-droite | Description de l’image](/media/nom-du-fichier.png)</code>.
 				Placez cette ligne avant le paragraphe à accompagner. Sur téléphone, l’image est centrée.
 			</p>
+			<p class="aide">
+				Pour l’illustration CGT et ses quatre bulles de dialogue :
+				<code>![dialogue-cgt | Devant un local de la CGT](/images/articles/cgt3-fondu-detoure.png)</code>.
+			</p>
 			<div class="mt-3 rounded-lg border border-brand/25 bg-brand-soft/40 px-3 py-2 text-sm text-ink">
 				<p class="font-bold text-brand">Conseil aux administrateurs</p>
 				<p class="mt-1">

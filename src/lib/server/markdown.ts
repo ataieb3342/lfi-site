@@ -130,6 +130,16 @@ function personnageDepuisAlt(altBrut: string, nomParDefaut: string) {
 md.renderer.rules.image = (tokens, idx, options, env, self) => {
 	const src = String(tokens[idx].attrGet('src') ?? '');
 	const altBrut = tokens[idx].content || 'Illustration à l’aquarelle';
+	const dialogueCgt = /^dialogue-cgt\s*\|\s*(.*)$/is.exec(altBrut);
+	if (dialogueCgt) {
+		return `<span class="illustration-dialogue-cgt">
+			<img src="${escapeHtml(src)}" alt="${escapeHtml(dialogueCgt[1].trim())}">
+			<span class="replique-cgt replique-cgt-syndicat">Vous travaillez dans quoi ?<br>Il faut aller dans votre branche pour vous syndiquer !</span>
+			<span class="replique-cgt replique-cgt-visiteur">Ma branche ?…<br>Mais, je suis chômeur.<br>Ce que je trouve… c’est aléatoire.</span>
+			<span class="replique-cgt replique-cgt-syndicat">Ah, mais vous travaillez dans quoi d’habitude ?</span>
+			<span class="replique-cgt replique-cgt-visiteur">Ah oui…</span>
+		</span>`;
+	}
 	const illustrationDroite = /^aquarelle-droite\s*\|\s*(.*)$/is.exec(altBrut);
 	if (illustrationDroite) {
 		return `<img class="illustration-aquarelle-droite" src="${escapeHtml(src)}" alt="${escapeHtml(illustrationDroite[1].trim())}">`;

@@ -568,6 +568,56 @@ h1, h2, h3, h4 {
 	transform: rotate(-0.6deg);
 }
 .contenu:has(.illustration-aquarelle-droite) { display: flow-root; }
+.contenu:has(.illustration-dialogue-cgt) { display: flow-root; }
+.illustration-dialogue-cgt {
+	display: block;
+	float: right;
+	width: min(45%, 21rem);
+	margin: 0.35rem 0 1rem 1.5rem;
+}
+.contenu .illustration-dialogue-cgt img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 0;
+	margin: 0 0 1rem;
+}
+.replique-cgt {
+	position: relative;
+	display: block;
+	width: 92%;
+	box-sizing: border-box;
+	margin: 0 0 1.1rem;
+	padding: 0.85rem 1rem;
+	border: 2px solid currentColor;
+	border-radius: 46% 54% 48% 52% / 30% 35% 65% 70%;
+	font-family: "Arial Rounded MT Bold", "Trebuchet MS", var(--font-sans);
+	font-size: 0.85rem;
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+}
+.replique-cgt::after {
+	position: absolute;
+	bottom: -0.45rem;
+	width: 0.8rem;
+	height: 0.8rem;
+	border-bottom: 2px solid currentColor;
+	content: '';
+}
+.replique-cgt-syndicat {
+	margin-left: auto;
+	color: color-mix(in srgb, #b27800 75%, var(--color-ink) 25%);
+	background: color-mix(in srgb, #d49a16 9%, transparent);
+}
+.replique-cgt-syndicat::after { right: 1.5rem; border-right: 2px solid currentColor; transform: skewY(35deg); }
+.replique-cgt-visiteur {
+	color: color-mix(in srgb, #167daa 75%, var(--color-ink) 25%);
+	background: color-mix(in srgb, #167daa 7%, transparent);
+	border-radius: 53% 47% 54% 46% / 38% 44% 56% 62%;
+}
+.replique-cgt-visiteur::after { left: 1.5rem; border-left: 2px solid currentColor; transform: skewY(-35deg); }
+.contenu:has(.illustration-dialogue-cgt) h3 { clear: both; }
 .contenu img.illustration-aquarelle-droite {
 	float: right;
 	width: min(42%, 19rem);
@@ -577,6 +627,11 @@ h1, h2, h3, h4 {
 }
 .contenu:has(.illustration-aquarelle-droite) h3 { clear: both; }
 @media (max-width: 520px) {
+	.illustration-dialogue-cgt {
+		float: none;
+		width: min(95%, 21rem);
+		margin: 1.25rem auto;
+	}
 	.contenu img.illustration-aquarelle-droite {
 		float: none;
 		width: min(85%, 19rem);
