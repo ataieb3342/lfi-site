@@ -77,6 +77,13 @@
 		undoStack = [...undoStack, body];
 		restore(next);
 	}
+	function updateMarkdown(event: Event) {
+		const value = (event.currentTarget as HTMLTextAreaElement).value;
+		if (value === body) return;
+		undoStack = [...undoStack.slice(-79), body];
+		redoStack = [];
+		body = value;
+	}
 	function updateText(event: Event, block: EditorBlock) {
 		if (event.type === 'input') dirtyText.add(block.id);
 		const node = event.currentTarget as HTMLElement;
@@ -205,7 +212,7 @@
 		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'visual'} onclick={() => editingMode = 'visual'}>Visuel</button>
 	</div>
 	{#if editingMode === 'markdown'}
-		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" bind:value={body}></textarea>
+		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" value={body} oninput={updateMarkdown}></textarea>
 		<p class="aide">Écrivez en Markdown, ou choisissez « Visuel » pour déplacer les images et les bulles. Le contenu est partagé entre les deux modes.</p>
 	{:else}
 	<div class="article-editor-toolbar" aria-label="Outils d’édition">
