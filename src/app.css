@@ -567,6 +567,22 @@ h1, h2, h3, h4 {
 	content: '';
 	transform: rotate(-0.6deg);
 }
+.contenu:has(.illustration-aquarelle-droite) { display: flow-root; }
+.contenu img.illustration-aquarelle-droite {
+	float: right;
+	width: min(42%, 19rem);
+	height: auto;
+	margin: 0.35rem 0 1rem 1.5rem;
+	border-radius: 0;
+}
+.contenu:has(.illustration-aquarelle-droite) h3 { clear: both; }
+@media (max-width: 520px) {
+	.contenu img.illustration-aquarelle-droite {
+		float: none;
+		width: min(85%, 19rem);
+		margin: 1.25rem auto;
+	}
+}
 .personnage-amfis {
 	position: relative;
 	z-index: 1;

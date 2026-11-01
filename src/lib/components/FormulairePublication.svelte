@@ -269,6 +269,11 @@
 				<code>*italique*</code>, <code>[lien](https://…)</code>, <code>&gt; citation</code>, une
 				liste avec des tirets. Le HTML n'est pas interprété, c'est volontaire.
 			</p>
+			<p class="aide">
+				Image à droite avec le texte autour, sans bulle :
+				<code>![aquarelle-droite | Description de l’image](/media/nom-du-fichier.png)</code>.
+				Placez cette ligne avant le paragraphe à accompagner. Sur téléphone, l’image est centrée.
+			</p>
 			<div class="mt-3 rounded-lg border border-brand/25 bg-brand-soft/40 px-3 py-2 text-sm text-ink">
 				<p class="font-bold text-brand">Conseil aux administrateurs</p>
 				<p class="mt-1">

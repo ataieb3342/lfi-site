@@ -130,6 +130,10 @@ function personnageDepuisAlt(altBrut: string, nomParDefaut: string) {
 md.renderer.rules.image = (tokens, idx, options, env, self) => {
 	const src = String(tokens[idx].attrGet('src') ?? '');
 	const altBrut = tokens[idx].content || 'Illustration à l’aquarelle';
+	const illustrationDroite = /^aquarelle-droite\s*\|\s*(.*)$/is.exec(altBrut);
+	if (illustrationDroite) {
+		return `<img class="illustration-aquarelle-droite" src="${escapeHtml(src)}" alt="${escapeHtml(illustrationDroite[1].trim())}">`;
+	}
 	const alt = escapeHtml(altBrut);
 	const stickerR = src === '/images/articles/sticker-rita.png' || /^R\s*\|/i.test(altBrut);
 	const stickerRaissa =
