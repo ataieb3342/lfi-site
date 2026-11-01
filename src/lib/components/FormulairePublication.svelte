@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PublicationVue } from '$lib/types';
+	import BubbleEditor from './BubbleEditor.svelte';
 
 	type Champs = {
 		kind?: string;
@@ -264,6 +265,9 @@
 				</div>
 			{/if}
 			<textarea id="body" name="body" class="champ font-mono text-sm" rows="22" bind:this={zone} bind:value={corps}></textarea>
+			{#if scriptActif}
+				<BubbleEditor bind:body={corps} insertionPoint={() => zone?.selectionStart ?? corps.length} />
+			{/if}
 			<p class="aide">
 				Mise en forme au format Markdown : <code>## Titre</code>, <code>**gras**</code>,
 				<code>*italique*</code>, <code>[lien](https://…)</code>, <code>&gt; citation</code>, une
@@ -273,10 +277,6 @@
 				Image à droite avec le texte autour, sans bulle :
 				<code>![aquarelle-droite | Description de l’image](/media/nom-du-fichier.png)</code>.
 				Placez cette ligne avant le paragraphe à accompagner. Sur téléphone, l’image est centrée.
-			</p>
-			<p class="aide">
-				Pour l’illustration CGT et ses quatre bulles de dialogue :
-				<code>![dialogue-cgt | Devant un local de la CGT](/images/articles/cgt3-fondu-detoure.png)</code>.
 			</p>
 			<div class="mt-3 rounded-lg border border-brand/25 bg-brand-soft/40 px-3 py-2 text-sm text-ink">
 				<p class="font-bold text-brand">Conseil aux administrateurs</p>

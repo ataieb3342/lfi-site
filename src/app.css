@@ -567,6 +567,57 @@ h1, h2, h3, h4 {
 	content: '';
 	transform: rotate(-0.6deg);
 }
+.contenu:has(.bubble-scene) { display: flow-root; }
+.contenu .bubble-scene {
+	width: min(48%, 25rem);
+	margin: 0.35rem 0 1.25rem 1.5rem;
+}
+.bubble-scene-right { float: right; }
+.contenu .bubble-scene-left { float: left; margin: 0.35rem 1.5rem 1.25rem 0; }
+.contenu .bubble-scene-center { float: none; width: min(100%, 30rem); margin: 1.25rem auto; }
+.contenu:has(.bubble-scene) h3 { clear: both; }
+.bubble-canvas {
+	position: relative;
+	container-type: inline-size;
+	aspect-ratio: 0.55;
+}
+.bubble-canvas img.bubble-drawing {
+	position: absolute;
+	left: 5%;
+	top: 0;
+	width: 90%;
+	height: 45%;
+	margin: 0;
+	object-fit: contain;
+	border-radius: 0;
+}
+.speech-bubble {
+	position: absolute;
+	display: block;
+	box-sizing: border-box;
+	border: 2px solid currentColor;
+	border-radius: 46% 54% 48% 52% / 32% 36% 64% 68%;
+	padding: 3% 4%;
+	font-family: "Arial Rounded MT Bold", "Trebuchet MS", var(--font-sans);
+	font-weight: 700;
+	font-size: clamp(0.65rem, 3.3cqw, 1rem);
+	line-height: 1.4;
+	text-align: center;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.speech-bubble-ochre { color: color-mix(in srgb, #b27800 70%, var(--color-ink) 30%); background: color-mix(in srgb, #d49a16 12%, var(--color-carte) 88%); }
+.speech-bubble-blue { color: color-mix(in srgb, #167daa 70%, var(--color-ink) 30%); background: color-mix(in srgb, #167daa 9%, var(--color-carte) 91%); }
+.speech-bubble::after { content: ''; position: absolute; bottom: -0.5rem; width: 0.75rem; height: 0.75rem; border-bottom: 2px solid currentColor; }
+.speech-bubble-ochre::after { right: 16%; border-right: 2px solid currentColor; transform: skewY(35deg); }
+.speech-bubble-blue::after { left: 16%; border-left: 2px solid currentColor; transform: skewY(-35deg); }
+.bubble-editor-preview { max-width: 32rem; margin-inline: auto; border: 1px dashed var(--color-line-forte); background: var(--color-carte); }
+.bubble-editor-preview .speech-bubble { cursor: grab; touch-action: none; }
+.bubble-editor-preview .speech-bubble:active { cursor: grabbing; }
+.bubble-editor-preview .speech-bubble.selected { outline: 2px dashed var(--color-brand); outline-offset: 4px; }
+@media (max-width: 520px) {
+	.contenu .bubble-scene { float: none; width: min(100%, 25rem); margin: 1.25rem auto; }
+}
 .contenu:has(.illustration-aquarelle-droite) { display: flow-root; }
 .contenu:has(.illustration-dialogue-cgt) { display: flow-root; }
 .illustration-dialogue-cgt {

@@ -1,4 +1,5 @@
 import MarkdownIt from 'markdown-it';
+import { parseScene, sceneMarkup, scenePattern } from '../speech-bubbles.ts';
 
 /**
  * Rendu Markdown des articles.
@@ -14,6 +15,15 @@ const md = new MarkdownIt({
 	typographer: true,
 	breaks: true
 });
+
+const defaultFence = md.renderer.rules.fence!;
+md.renderer.rules.fence = (tokens, index, options, env, self) => {
+	if (tokens[index].info.trim() === 'illustration-bulles') {
+		const scene = parseScene(tokens[index].content);
+		if (scene) return sceneMarkup(scene);
+	}
+	return defaultFence(tokens, index, options, env, self);
+};
 
 /*
  * Mises en forme proposées dans l'administration.
@@ -255,7 +265,10 @@ export function toPlainText(source: string, maxLength = 300): string {
 	// Plusieurs mises en forme peuvent entourer le même passage. Les retirer
 	// de l'intérieur vers l'extérieur évite de laisser une balise dans les
 	// résumés, le flux RSS ou les métadonnées.
-	let sansStyles = source ?? '';
+	let sansStyles = (source ?? '').replace(new RegExp(scenePattern.source, 'g'), (_block, content) => {
+		const scene = parseScene(content);
+		return scene ? scene.bubbles.map(b => b.text).join(' ') : '';
+	});
 	let precedent = '';
 	do {
 		precedent = sansStyles;
