@@ -58,9 +58,15 @@ scripts/           sauvegarde et restauration
 | Ajouter un compte à quelqu'un | Administration → Comptes (rôle « responsable ») |
 | Changer mon mot de passe, mon téléphone | Administration → Mon compte |
 
-Les publications s'écrivent en **Markdown** : `## Titre`, `**gras**`,
-`*italique*`, `[lien](https://…)`, `> citation`, listes à tirets. Le HTML n'est
-pas interprété, c'est une protection volontaire.
+Les publications se rédigent directement dans leur mise en page. Cliquez dans
+un paragraphe pour écrire. Ajoutez une image ou une bulle, puis déplacez chaque
+élément avec sa poignée ou les boutons Remonter et Descendre. Le texte s'adapte
+autour. Un clic sur l'élément donne accès à son placement et à sa largeur, au
+cadrage d'une image ou à la couleur d'une bulle. Enregistrez la publication
+pour conserver les modifications.
+
+Le volet « Texte source et mise en forme avancée » conserve l'accès au Markdown.
+Les anciens articles restent compatibles. Le HTML brut n'est pas interprété.
 
 Un retour d’action ne peut porter que sur une action terminée. Le titre et le
 chapô sont préparés à partir du type d’action et de sa date, puis restent

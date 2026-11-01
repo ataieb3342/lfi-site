@@ -716,12 +716,25 @@ page déjà partagée avant ce changement ne le montre pas tout de suite.
 
 ## Le formulaire de publication
 
-`src/lib/components/FormulairePublication.svelte` offre une barre d'outils
-(gras, titre, lien, image…) qui insère la syntaxe Markdown dans le texte, et
-un bouton « Aperçu du texte ». L'aperçu est rendu **par le serveur** (action
-`apercu` des pages nouvelle et modification, via `apercuPublication` dans
-`formulaires.ts`) avec exactement le code des pages publiques : pas de second
-moteur Markdown côté navigateur, donc pas d'écart entre l'aperçu et le site,
+`FormulairePublication.svelte` utilise `ArticleEditor.svelte` pour éditer les
+paragraphes dans la mise en page. Chaque image et chaque bulle est indépendante :
+glisser-déposer avant un paragraphe, placement gauche/droite/centré, largeur,
+cadrage des images et couleur des bulles. Les boutons de déplacement servent
+aussi au clavier et sur téléphone. Les bulles n'ont pas de pointes décoratives.
+
+`src/lib/markdown.ts` partage le moteur de rendu entre l'éditeur et les pages
+publiques ; `server/markdown.ts` réexporte ses fonctions pour les imports
+existants. `article-layout.ts` valide les blocs `element-article` avant leur
+rendu : types, URL, alignements, dimensions et couleurs sont fermés. Le HTML
+brut reste désactivé. Turndown reconvertit uniquement le bloc de texte modifié,
+avec les styles éditoriaux autorisés ; les autres sources sont conservées.
+Les scènes de l'ancien éditeur s'ouvrent en éléments indépendants sans modifier
+le corps enregistré avant une action d'édition. Les tableaux, le code et les
+anciens personnages Amfis gardent leur rendu et restent accessibles en source.
+
+Le volet source conserve le Markdown ; l'absence de JavaScript laisse un champ
+texte utilisable. « Aperçu du texte » reste rendu par l'action serveur
+`apercuPublication` avec le même moteur partagé,
 et `html: false` s'applique aussi à l'aperçu. Le formulaire est envoyé sans
 rechargement (`use:enhance`, `reset: false`) pour que l'image choisie et le
 texte tapé restent en place.

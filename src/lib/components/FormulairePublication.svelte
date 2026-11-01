@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PublicationVue } from '$lib/types';
-	import BubbleEditor from './BubbleEditor.svelte';
+	import ArticleEditor from './ArticleEditor.svelte';
 
 	type Champs = {
 		kind?: string;
@@ -49,64 +49,8 @@
 		actionUne: string;
 	} = $props();
 
-	/*
-	 * Barre d'outils du texte. Chaque bouton insère la syntaxe Markdown à
-	 * l'endroit du curseur, ou autour du passage sélectionné : on n'a plus à
-	 * connaître la syntaxe par cœur. Elle n'apparaît que lorsque le script est
-	 * chargé, puisqu'elle ne sert à rien sans lui.
-	 */
-	let zone = $state<HTMLTextAreaElement | null>(null);
 	let scriptActif = $state(false);
-	$effect(() => {
-		scriptActif = true;
-	});
-
-	/** Entoure la sélection (ou un mot d'exemple) de `avant` et `apres`. */
-	function entourer(avant: string, apres = avant, exemple = 'texte') {
-		if (!zone) return;
-		const debut = zone.selectionStart;
-		const fin = zone.selectionEnd;
-		const selection = zone.value.slice(debut, fin) || exemple;
-		zone.setRangeText(avant + selection + apres, debut, fin, 'select');
-		corps = zone.value;
-		zone.setSelectionRange(debut + avant.length, debut + avant.length + selection.length);
-		zone.focus();
-	}
-
-	/** Place `prefixe` au début de chaque ligne de la sélection. */
-	function prefixerLignes(prefixe: string) {
-		if (!zone) return;
-		const fin = zone.selectionEnd;
-		const debutLigne = zone.value.lastIndexOf('\n', zone.selectionStart - 1) + 1;
-		const bloc = zone.value.slice(debutLigne, fin);
-		const nouveau = bloc
-			.split('\n')
-			.map((ligne) => prefixe + ligne)
-			.join('\n');
-		zone.setRangeText(nouveau, debutLigne, fin, 'end');
-		corps = zone.value;
-		zone.focus();
-	}
-
-	/**
-	 * Ajoute une mise en forme éditoriale sûre. Le serveur n'accepte que les
-	 * noms de police et de couleur connus : ce menu ne permet donc jamais
-	 * d'injecter du CSS ou du HTML dans une publication.
-	 */
-	function appliquerStyle(type: 'police' | 'couleur', valeur: string) {
-		if (!valeur) return;
-		entourer(`[[${type}:${valeur}|`, ']]', 'texte à mettre en forme');
-	}
-
-	const outils = [
-		{ label: 'Gras', titre: 'Mettre en gras', action: () => entourer('**') },
-		{ label: 'Italique', titre: 'Mettre en italique', action: () => entourer('*') },
-		{ label: 'Titre', titre: 'Transformer la ligne en titre', action: () => prefixerLignes('## ') },
-		{ label: 'Lien', titre: 'Insérer un lien', action: () => entourer('[', '](https://)', 'texte du lien') },
-		{ label: 'Image', titre: 'Insérer une image (adresse à copier depuis la page Images)', action: () => entourer('![', '](/media/nom-du-fichier.jpg)', "description de l'image") },
-		{ label: 'Citation', titre: 'Transformer en citation', action: () => prefixerLignes('> ') },
-		{ label: 'Liste', titre: 'Transformer en liste', action: () => prefixerLignes('- ') }
-	];
+	$effect(() => { scriptActif = true; });
 
 	// Les valeurs renvoyées après une erreur de validation ont la priorité,
 	// pour ne pas faire perdre son texte à la personne qui rédige.
@@ -216,79 +160,13 @@
 		</div>
 
 		<div>
-			<label class="etiquette" for="body">Texte</label>
+			<p class="etiquette" id="article-body-label">Texte</p>
 			{#if scriptActif}
-				<div class="mb-1 flex flex-wrap items-center gap-1" role="toolbar" aria-label="Mise en forme du texte" aria-controls="body">
-					{#each outils as outil (outil.label)}
-						<button
-							type="button"
-							class="rounded border border-line-forte bg-carte px-2.5 py-1 text-xs font-semibold text-ink hover:bg-surface-alt"
-							title={outil.titre}
-							onclick={outil.action}>{outil.label}</button
-						>
-					{/each}
-					<label class="sr-only" for="outil-police">Police du passage sélectionné</label>
-					<select
-						id="outil-police"
-						class="rounded border border-line-forte bg-carte px-2 py-1 text-xs font-semibold text-ink"
-						aria-label="Choisir une police pour le passage sélectionné"
-						onchange={(event) => {
-							appliquerStyle('police', event.currentTarget.value);
-							event.currentTarget.value = '';
-						}}
-					>
-						<option value="">Police…</option>
-						<option value="public-sans">Public Sans</option>
-						<option value="gowun-batang">Gowun Batang</option>
-						<option value="union-gothic">Union Gothic</option>
-						<option value="stack-sans">Stack Sans Headline</option>
-						<option value="condensee">Titre condensé</option>
-					</select>
-					<label class="sr-only" for="outil-couleur">Couleur du passage sélectionné</label>
-					<select
-						id="outil-couleur"
-						class="rounded border border-line-forte bg-carte px-2 py-1 text-xs font-semibold text-ink"
-						aria-label="Choisir une couleur pour le passage sélectionné"
-						onchange={(event) => {
-							appliquerStyle('couleur', event.currentTarget.value);
-							event.currentTarget.value = '';
-						}}
-					>
-						<option value="">Couleur…</option>
-						<option value="violet">Violet LFI</option>
-						<option value="rouge">Rouge LFI</option>
-						<option value="turquoise">Turquoise</option>
-						<option value="vert">Vert</option>
-						<option value="rose">Rose</option>
-						<option value="jaune">Jaune sur fond sombre</option>
-					</select>
-				</div>
+				<input type="hidden" name="body" value={corps} />
+				<ArticleEditor bind:body={corps} layout={miseEnPage} title={titre} summary={resume} />
+			{:else}
+				<textarea id="body" name="body" aria-labelledby="article-body-label" class="champ font-mono text-sm" rows="22" bind:value={corps}></textarea>
 			{/if}
-			<textarea id="body" name="body" class="champ font-mono text-sm" rows="22" bind:this={zone} bind:value={corps}></textarea>
-			{#if scriptActif}
-				<BubbleEditor bind:body={corps} insertionPoint={() => zone?.selectionStart ?? corps.length} />
-			{/if}
-			<p class="aide">
-				Mise en forme au format Markdown : <code>## Titre</code>, <code>**gras**</code>,
-				<code>*italique*</code>, <code>[lien](https://…)</code>, <code>&gt; citation</code>, une
-				liste avec des tirets. Le HTML n'est pas interprété, c'est volontaire.
-			</p>
-			<p class="aide">
-				Image à droite avec le texte autour, sans bulle :
-				<code>![aquarelle-droite | Description de l’image](/media/nom-du-fichier.png)</code>.
-				Placez cette ligne avant le paragraphe à accompagner. Sur téléphone, l’image est centrée.
-			</p>
-			<div class="mt-3 rounded-lg border border-brand/25 bg-brand-soft/40 px-3 py-2 text-sm text-ink">
-				<p class="font-bold text-brand">Conseil aux administrateurs</p>
-				<p class="mt-1">
-					La hiérarchie est automatique : Public Sans pour le texte, Union Gothic pour les titres
-					<code>##</code>, Stack Sans pour les sous-titres <code>###</code> et Gowun Batang pour les
-					citations <code>&gt;</code>. Utilisez le menu Police seulement pour une exception. Réservez
-					les couleurs à quelques mots :
-					violet pour le féminisme, vert pour l’écologie, rouge pour le social. Vérifiez toujours avec
-					« Aperçu du texte », notamment en mode sombre.
-				</p>
-			</div>
 			<div class="mt-3 flex flex-wrap items-center gap-3">
 				<!-- L'aperçu est rendu par le serveur, avec exactement le code qui
 				     affiche les pages publiques : ce qu'on voit est ce qu'on aura.
