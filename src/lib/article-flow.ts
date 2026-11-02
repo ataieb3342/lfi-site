@@ -21,6 +21,6 @@ export function groupArticleFlow<T extends FlowBlock>(blocks: T[]): ArticleFlow<
 }
 
 export function articleFlowClass(items: FlowBlock[]): string {
-	if (items.every(item => item.element)) return 'article-flow article-flow-objects';
+	if (items.every(item => item.element)) return 'article-flow article-flow-objects' + (items.every(item => item.element?.kind === 'bubble') && items[0].element?.dialogueLayout === 'staggered' ? ' article-flow-staggered' : '');
 	return `article-flow article-flow-${items[0].element?.align ?? 'left'}`;
 }

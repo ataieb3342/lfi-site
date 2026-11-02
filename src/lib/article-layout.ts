@@ -12,6 +12,8 @@ export type ArticleElement = {
 	color?: 'ochre' | 'blue';
 	bubbleStyle?: 'speech-left' | 'speech-right' | 'thought';
 	nearImage?: true;
+	bubbleSize?: 'small';
+	dialogueLayout?: 'staggered';
 };
 
 export const layoutFence = 'element-article';
@@ -38,7 +40,7 @@ export function parseArticleElement(source: string): ArticleElement | null {
 		}
 		if (typeof data.text !== 'string') return null;
 		const bubbleStyle = data.bubbleStyle === 'speech-left' || data.bubbleStyle === 'speech-right' || data.bubbleStyle === 'thought' ? data.bubbleStyle as ArticleElement['bubbleStyle'] : undefined;
-		return { kind: 'bubble', ...common, text: data.text.slice(0, 1500), color: data.color === 'blue' ? 'blue' : 'ochre', ...(bubbleStyle ? { bubbleStyle } : {}), ...(data.nearImage === true && bubbleStyle?.startsWith('speech-') ? { nearImage: true as const } : {}) };
+		return { kind: 'bubble', ...common, text: data.text.slice(0, 1500), color: data.color === 'blue' ? 'blue' : 'ochre', ...(bubbleStyle ? { bubbleStyle } : {}), ...(data.nearImage === true && bubbleStyle?.startsWith('speech-') ? { nearImage: true as const } : {}), ...(data.bubbleSize === 'small' ? { bubbleSize: 'small' as const } : {}), ...(data.dialogueLayout === 'staggered' ? { dialogueLayout: 'staggered' as const } : {}) };
 	} catch { return null; }
 }
 
@@ -54,7 +56,7 @@ export function articleElementClass(element: ArticleElement): string {
 }
 
 export function articleBubbleClass(element: ArticleElement): string {
-	return `article-bubble article-bubble-${element.color}${element.bubbleStyle ? ` article-bubble-shaped article-bubble-${element.bubbleStyle}` : ''}`;
+	return `article-bubble article-bubble-${element.color}${element.bubbleStyle ? ` article-bubble-shaped article-bubble-${element.bubbleStyle}` : ''}${element.bubbleSize === 'small' ? ' article-bubble-small' : ''}`;
 }
 
 /** Text stays separate and editable; each speech contour is a single closed path. */

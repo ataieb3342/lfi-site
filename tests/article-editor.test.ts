@@ -152,3 +152,28 @@ test('preserves editorial Markdown styles and source through the visual parser',
  const html=renderMarkdown(source);
  for(const expected of ['texte-couleur-violet','texte-couleur-rouge','texte-police-gowun-batang','<strong>','<em>','<blockquote>','<ul>','<table>','href="https://example.org"']) assert.ok(html.includes(expected),expected);
 });
+
+test('compact bubbles are optional, safe and preserved in both editing modes', () => {
+ const base={kind:'bubble',align:'right',width:32,clear:true,color:'ochre',bubbleStyle:'speech-right',text:'Une question ?'} as const;
+ const compact={...base,bubbleSize:'small'} as const;
+ const source=serializeArticleElement(compact);
+ assert.deepEqual(parseEditorDocument(source)[0].element,compact);
+ assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+ assert.match(renderMarkdown(source),/article-bubble-small/);
+ assert.ok(!renderArticleElement(base).includes('article-bubble-small'));
+ assert.equal(parseArticleElement(JSON.stringify({...base,bubbleSize:'url(evil)'}))?.bubbleSize,undefined);
+ assert.equal(parseArticleElement(JSON.stringify({kind:'image',src:'/a.png',bubbleSize:'small'}))?.bubbleSize,undefined);
+ assert.equal(toPlainText(source),'Une question ?');
+});
+
+test('staggered dialogue contains both replies before the following paragraph', () => {
+ const question=serializeArticleElement({kind:'bubble',text:'Question ?',align:'right',width:42,clear:true,color:'ochre',keepWithNext:true,dialogueLayout:'staggered',bubbleSize:'small'});
+ const answer=serializeArticleElement({kind:'bubble',text:'Réponse.',align:'left',width:30,clear:true,color:'blue',bubbleSize:'small'});
+ const source=[question,answer,'Le texte reprend sur toute la largeur.'].join('\n\n');
+ const html=renderMarkdown(source);
+ assert.match(html,/article-flow-objects article-flow-staggered/);
+ assert.match(html,/Question \?[\s\S]*Réponse\.[\s\S]*<\/aside><\/div><p>Le texte/);
+ assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+ assert.equal(parseArticleElement('{"kind":"bubble","text":"test","dialogueLayout":"<script>"}')?.dialogueLayout,undefined);
+ assert.equal(parseArticleElement('{"kind":"image","src":"/a.png","dialogueLayout":"staggered"}')?.dialogueLayout,undefined);
+});

@@ -321,6 +321,8 @@
 				<label>Cadrage<input type="range" min="1" max="1.6" step="0.05" bind:value={currentElement.crop} oninput={() => queueMicrotask(changeElement)} /></label>
 				<label>Description<input class="champ" bind:value={currentElement.alt} onchange={changeElement} /></label>
 			{:else}
+				<label><span><input type="checkbox" checked={currentElement.bubbleSize === 'small'} onchange={event => { currentElement.bubbleSize = event.currentTarget.checked ? 'small' : undefined; changeElement(); }} /> Petite bulle</span></label>
+				{#if currentElement.keepWithNext}<label><span><input type="checkbox" checked={currentElement.dialogueLayout === 'staggered'} onchange={event => { currentElement.dialogueLayout = event.currentTarget.checked ? 'staggered' : undefined; changeElement(); }} /> Décaler les bulles liées</span></label>{/if}
 				<label>Type de bulle<select class="champ" value={currentElement.bubbleStyle ?? ''} onchange={event => { currentElement.bubbleStyle = event.currentTarget.value as ArticleElement['bubbleStyle']; changeElement(); }}><option value="">Simple</option><option value="speech-left">Parole, pointe à gauche</option><option value="speech-right">Parole, pointe à droite</option><option value="thought">Pensée</option></select></label>
 				{#if currentElement.bubbleStyle?.startsWith('speech-')}<label><span><input type="checkbox" checked={currentElement.nearImage === true} onchange={event => { currentElement.nearImage = event.currentTarget.checked ? true : undefined; changeElement(); }} /> Rapprocher de l’image</span></label>{/if}
 				<label>Couleur<select class="champ" bind:value={currentElement.color} onchange={() => queueMicrotask(changeElement)}><option value="ochre">Ocre</option><option value="blue">Bleu</option></select></label>

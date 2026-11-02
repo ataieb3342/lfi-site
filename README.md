@@ -74,7 +74,10 @@ sans modifier son fichier. Ces deux options sont désactivées par défaut.
 Le choix « Type de bulle » propose Simple, Parole avec pointe à gauche ou à droite,
 et Pensée. La forme Simple reste celle des anciennes bulles. « Rapprocher de
 l’image » rapproche une bulle de parole placée après une image dans un même
-groupe, sur grand écran. La pointe suit la bulle, sans modifier le dessin.
+groupe, sur grand écran. La pointe suit la bulle, sans modifier le dessin. « Petite bulle » réduit
+la taille du texte et les marges intérieures pour cet élément seulement.
+« Décaler les bulles liées » place les répliques liées sur des lignes successives,
+en respectant leur ordre dans le Markdown.
 Les anciens articles restent compatibles. Le HTML brut n'est pas interprété.
 
 Un retour d’action ne peut porter que sur une action terminée. Le titre et le
