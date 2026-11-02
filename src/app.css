@@ -656,9 +656,9 @@ h1, h2, h3, h4 {
 @media (min-width: 700px) {
 	.contenu .article-flow-left:has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child { margin-top: 4.5rem; margin-left: -38%; position: relative; z-index: 2; }
 	.contenu .article-flow-right:has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child { margin-top: 4.5rem; margin-left: 38%; position: relative; z-index: 2; }
-	.article-flow:has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-decoration { display: none; }
-	.article-flow:has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-decoration-extended { display: block; left: -90px; width: calc(100% + 90px); height: calc(100% + 31px); }
-	.article-flow:has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-speech-right .article-bubble-decoration-extended { left: 0; }
+	.article-flow:is(.article-flow-left, .article-flow-right):has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-decoration { display: none; }
+	.article-flow:is(.article-flow-left, .article-flow-right):has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-decoration-extended { display: block; left: -90px; width: calc(100% + 90px); height: calc(100% + 31px); }
+	.article-flow:is(.article-flow-left, .article-flow-right):has(> .article-element-image) > .article-flow-content > .article-element-near-image:first-child .article-bubble-speech-right .article-bubble-decoration-extended { left: 0; }
 }
 .article-editor { min-width: 0; }
 .article-editor-toolbar, .article-element-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }

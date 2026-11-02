@@ -127,3 +127,28 @@ test('new decoration options cannot change legacy bubbles or leak into image set
  assert.equal(image.bubbleStyle,undefined);
  assert.equal(image.nearImage,undefined);
 });
+
+test('reuses every bubble shape with unrelated images, widths and placements', () => {
+ for (const align of ['left','right','center'] as const) {
+  for (const width of [25,44,70]) {
+   for (const bubbleStyle of [undefined,'speech-left','speech-right','thought'] as const) {
+    const image=serializeArticleElement({kind:'image',src:'/media/atelier-velo.png',alt:'Atelier vélo',align,width,clear:true,keepWithNext:true});
+    const bubble=serializeArticleElement({kind:'bubble',text:'La roue est prête ?\nOui, vous pouvez repartir.',align:'right',width:40,clear:false,color:'ochre',bubbleStyle,nearImage:true,keepWithNext:true});
+    const source=[image,bubble,'Un paragraphe sur la réparation des vélos.'].join('\n\n');
+    const html=renderMarkdown(source);
+    assert.match(html,new RegExp('article-flow-'+align));
+    assert.match(html,/atelier-velo\.png/);
+    assert.ok(!/CGT|syndiqu|Amfis/.test(html));
+    assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+    assert.equal(toPlainText(source),'La roue est prête ? Oui, vous pouvez repartir. Un paragraphe sur la réparation des vélos.');
+   }
+  }
+ }
+});
+
+test('preserves editorial Markdown styles and source through the visual parser', () => {
+ const source='## Atelier\n\n[[couleur:violet|***Une phrase***]] et [[police:gowun-batang|du texte]].\n\n> [[couleur:rouge|**Une citation**]]\n\n- Un point\n- Un [lien][ref]\n\n| A | B |\n| - | - |\n| 1 | 2 |\n\n[ref]: https://example.org';
+ assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+ const html=renderMarkdown(source);
+ for(const expected of ['texte-couleur-violet','texte-couleur-rouge','texte-police-gowun-batang','<strong>','<em>','<blockquote>','<ul>','<table>','href="https://example.org"']) assert.ok(html.includes(expected),expected);
+});
