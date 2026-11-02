@@ -1,6 +1,7 @@
 import MarkdownIt from 'markdown-it';
 import { parseScene, sceneMarkup, scenePattern } from './speech-bubbles.ts';
 import { layoutFence, parseArticleElement, renderArticleElement } from './article-layout.ts';
+import { groupArticleFlow, articleFlowClass } from './article-flow.ts';
 
 /**
  * Rendu Markdown des articles.
@@ -264,23 +265,38 @@ md.renderer.rules.bloc_video = (tokens, idx) => {
 export function renderMarkdown(source: string, documentSource?: string): string {
 	const env = {};
 	if (documentSource) md.parse(documentSource, env);
-	return md.render(source ?? '', env);
+	const tokens = md.parse(source ?? '', env);
+	if (!tokens.some(token => token.level === 0 && token.type === 'fence' && token.info.trim() === layoutFence && parseArticleElement(token.content)?.keepWithNext)) {
+		return md.renderer.render(tokens, md.options, env);
+	}
+	return groupArticleFlow(tokenBlocks(source ?? '', tokens, env)).map(group => {
+		if (!group.grouped) return group.items[0].html;
+		const content = group.items.every(item => item.element)
+			? group.items.map(item => item.html).join('')
+			: group.items[0].html + '<div class="article-flow-content">' + group.items.slice(1).map(item => item.html).join('') + '</div>';
+		return `<div class="${articleFlowClass(group.items)}" style="--group-width:${group.items[0].element!.width}%">${content}</div>`;
+	}).join('');
 }
 
 /** Source-preserving top-level blocks, including link-reference definitions. */
 export function markdownBlocks(source: string): { source: string; html: string; type: string }[] {
 	const env = {};
 	const tokens = md.parse(source, env);
+	return tokenBlocks(source, tokens, env);
+}
+
+function tokenBlocks(source: string, tokens: ReturnType<typeof md.parse>, env: Parameters<typeof md.renderer.render>[2]) {
 	const lines = source.split('\n');
 	const starts = tokens.flatMap((token, index) => token.level === 0 && token.map ? [{ token, index }] : []);
-	const blocks: { source: string; html: string; type: string }[] = [];
+	const blocks: { source: string; html: string; type: string; element?: NonNullable<ReturnType<typeof parseArticleElement>> }[] = [];
 	let previousEnd = 0;
 	for (let i = 0; i < starts.length; i++) {
 		const { token, index } = starts[i];
 		const [start, end] = token.map!;
 		const gap = lines.slice(previousEnd, start).join('\n');
 		if (gap.trim()) blocks.push({ source: gap, html: '', type: 'source' });
-		blocks.push({ source: lines.slice(start, end).join('\n'), html: md.renderer.render(tokens.slice(index, starts[i + 1]?.index ?? tokens.length), md.options, env), type: token.type });
+		const element = token.type === 'fence' && token.info.trim() === layoutFence ? parseArticleElement(token.content) : null;
+		blocks.push({ source: lines.slice(start, end).join('\n'), html: md.renderer.render(tokens.slice(index, starts[i + 1]?.index ?? tokens.length), md.options, env), type: token.type, ...(element ? { element } : {}) });
 		previousEnd = end;
 	}
 	const tail = lines.slice(previousEnd).join('\n');

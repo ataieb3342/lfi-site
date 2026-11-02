@@ -3,6 +3,8 @@ export type ArticleElement = {
 	align: 'left' | 'right' | 'center';
 	width: number;
 	clear: boolean;
+	keepWithNext?: true;
+	halo?: 'parchment';
 	src?: string;
 	alt?: string;
 	crop?: number;
@@ -25,11 +27,12 @@ export function parseArticleElement(source: string): ArticleElement | null {
 		const common = {
 			align: data.align === 'left' || data.align === 'center' ? data.align : 'right',
 			width: bounded(data.width, 35, 20, 100),
-			clear: data.clear !== false
+			clear: data.clear !== false,
+			...(data.keepWithNext === true ? { keepWithNext: true as const } : {})
 		} as const;
 		if (data.kind === 'image') {
 			if (!safeImageUrl(data.src)) return null;
-			return { kind: 'image', ...common, src: data.src, alt: typeof data.alt === 'string' ? data.alt.slice(0, 500) : '', crop: bounded(data.crop, 1, 1, 1.6) };
+			return { kind: 'image', ...common, src: data.src, alt: typeof data.alt === 'string' ? data.alt.slice(0, 500) : '', crop: bounded(data.crop, 1, 1, 1.6), ...(data.halo === 'parchment' ? { halo: 'parchment' as const } : {}) };
 		}
 		if (typeof data.text !== 'string') return null;
 		return { kind: 'bubble', ...common, text: data.text.slice(0, 1500), color: data.color === 'blue' ? 'blue' : 'ochre' };
@@ -44,7 +47,7 @@ export function serializeArticleElement(element: ArticleElement): string {
 export const escapeAttribute = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
 export function articleElementClass(element: ArticleElement): string {
-	return `article-element article-element-${element.kind} article-element-${element.align}${element.clear ? ' article-element-clear' : ''}`;
+	return `article-element article-element-${element.kind} article-element-${element.align}${element.clear ? ' article-element-clear' : ''}${element.kind === 'image' && element.halo === 'parchment' ? ' article-element-parchment' : ''}`;
 }
 
 export function articleElementContent(element: ArticleElement): string {

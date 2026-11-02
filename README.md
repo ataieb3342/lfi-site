@@ -65,7 +65,12 @@ autour. Un clic sur l'élément donne accès à son placement et à sa largeur, 
 cadrage d'une image ou à la couleur d'une bulle. Enregistrez la publication
 pour conserver les modifications.
 
-Le volet « Texte source et mise en forme avancée » conserve l'accès au Markdown.
+Les boutons « Markdown » et « Visuel » permettent de changer de mode sans
+perdre le contenu. « Garder avec le bloc suivant » associe une image ou une
+bulle au paragraphe qui suit ; plusieurs éléments consécutifs peuvent ainsi
+rester ensemble. Les groupes ne traversent pas les titres ou les tableaux.
+L'option « Voile parchemin » ajoute un lavis discret derrière une image,
+sans modifier son fichier. Ces deux options sont désactivées par défaut.
 Les anciens articles restent compatibles. Le HTML brut n'est pas interprété.
 
 Un retour d’action ne peut porter que sur une action terminée. Le titre et le

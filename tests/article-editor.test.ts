@@ -4,6 +4,41 @@ import { parseArticleElement, serializeArticleElement, renderArticleElement } fr
 import { parseEditorDocument, serializeEditorDocument } from '../src/lib/article-editor.ts';
 import { markdownBlocks, renderMarkdown, toPlainText } from '../src/lib/markdown.ts';
 import { defaultScene, serializeScene } from '../src/lib/speech-bubbles.ts';
+import { groupArticleFlow } from '../src/lib/article-flow.ts';
+
+test('keeps the image, opening bubble and paragraph in the same bounded group', () => {
+ const image = serializeArticleElement({kind:'image',src:'/media/a.png',alt:'Dessin',width:44,align:'left',clear:true,keepWithNext:true,halo:'parchment'});
+ const bubble = serializeArticleElement({kind:'bubble',text:'Bonjour',width:52,align:'right',clear:false,keepWithNext:true,color:'blue'});
+ const source = [image,bubble,'La question du syndicalisme.','Un autre paragraphe.'].join('\n\n');
+ const blocks = parseEditorDocument(source);
+ const groups = groupArticleFlow(blocks);
+ assert.deepEqual(groups.map(group => group.items.length),[3,1]);
+ assert.equal(serializeEditorDocument(blocks),source);
+ const html = renderMarkdown(source);
+ assert.match(html,/article-flow-left/);
+ assert.match(html,/article-element-parchment/);
+ assert.match(html,/<div class="article-flow-content">[\s\S]*Bonjour[\s\S]*La question du syndicalisme\.<\/p>\n<\/div><\/div><p>Un autre paragraphe\./);
+});
+
+test('never attaches a group across headings, tables, code or reference definitions', () => {
+ const bubble = serializeArticleElement({kind:'bubble',text:'Réplique',width:36,align:'right',clear:true,keepWithNext:true,color:'ochre'});
+ for(const following of ['## Section','| A | B |\n| - | - |\n| 1 | 2 |','```js\nconst x = 1;\n```','[ref]: https://example.org\n\nUn [lien][ref].']) {
+  const source = bubble+'\n\n'+following;
+  assert.equal(groupArticleFlow(parseEditorDocument(source))[0].grouped,false);
+  assert.ok(!renderMarkdown(source).includes('class="article-flow '));
+ }
+});
+
+test('groups paired bubbles without changing their text or order in plain text', () => {
+ const first=serializeArticleElement({kind:'bubble',text:'Question ?',width:48,align:'right',clear:true,keepWithNext:true,color:'ochre'});
+ const second=serializeArticleElement({kind:'bubble',text:'Réponse.',width:23,align:'left',clear:false,color:'blue'});
+ const source=first+'\n\n'+second;
+ assert.match(renderMarkdown(source),/article-flow-objects/);
+ assert.equal(toPlainText(source),'Question ? Réponse.');
+ assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+ assert.equal(parseArticleElement('{"kind":"image","src":"/media/a.png","keepWithNext":"true","halo":"url(evil)"}')?.halo,undefined);
+ assert.equal(parseArticleElement('{"kind":"image","src":"/media/a.png","keepWithNext":"true"}')?.keepWithNext,undefined);
+});
 
 test('preserves untouched text blocks, lists, references and code when moving an illustration', () => {
  const source = '## Titre\n\nUn **mot** et [un lien][ref].\n\n- un\n- deux\n\n```js\nconst a = 1;\n```\n\n[ref]: https://example.org/source';

@@ -2,7 +2,7 @@ import { markdownBlocks } from './markdown.ts';
 import { defaultScene, parseScene, scenePattern } from './speech-bubbles.ts';
 import { parseArticleElement, serializeArticleElement, safeImageUrl, type ArticleElement } from './article-layout.ts';
 
-export type EditorBlock = { id: string; source: string; html: string; editable: boolean; element?: ArticleElement };
+export type EditorBlock = { id: string; source: string; html: string; editable: boolean; element?: ArticleElement; type?: string };
 let sequence = 0;
 export const blockId = () => `article-block-${++sequence}`;
 
@@ -30,7 +30,7 @@ export function parseEditorDocument(source: string): EditorBlock[] {
 			const right = /^aquarelle-droite\s*\|/i.test(image[1]);
 			return [{ ...elementBlock({ kind: 'image', src: image[2], alt: image[1].replace(/^aquarelle-droite\s*\|\s*/i, ''), align: right ? 'right' : 'center', width: right ? 35 : 100, clear: false, crop: 1 }), source: block.source }];
 		}
-		return [{ id: blockId(), source: block.source, html: block.html, editable: ['paragraph_open', 'heading_open', 'bullet_list_open', 'ordered_list_open', 'blockquote_open'].includes(block.type) && !/<(?:img|aside|table)\b/.test(block.html) }];
+		return [{ id: blockId(), source: block.source, html: block.html, type: block.type, editable: ['paragraph_open', 'heading_open', 'bullet_list_open', 'ordered_list_open', 'blockquote_open'].includes(block.type) && !/<(?:img|aside|table)\b/.test(block.html) }];
 	});
 }
 

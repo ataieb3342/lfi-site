@@ -732,7 +732,14 @@ Les scènes de l'ancien éditeur s'ouvrent en éléments indépendants sans modi
 le corps enregistré avant une action d'édition. Les tableaux, le code et les
 anciens personnages Amfis gardent leur rendu et restent accessibles en source.
 
-Le volet source conserve le Markdown ; l'absence de JavaScript laisse un champ
+Les modes Markdown et Visuel partagent le même contenu. `article-flow.ts`
+regroupe les éléments portant `keepWithNext: true` avec le bloc qui suit,
+sans traverser un titre, un tableau ou du code. Le même regroupement est utilisé
+dans l'éditeur et au rendu public. L'option d'image `halo: 'parchment'` ajoute
+uniquement un fond en CSS ; elle ne retouche jamais le fichier envoyé.
+Les anciens blocs sans ces options gardent leur disposition.
+
+L'absence de JavaScript laisse un champ
 texte utilisable. « Aperçu du texte » reste rendu par l'action serveur
 `apercuPublication` avec le même moteur partagé,
 et `html: false` s'applique aussi à l'aperçu. Le formulaire est envoyé sans

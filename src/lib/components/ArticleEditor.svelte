@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TurndownService from 'turndown';
 	import { renderMarkdown } from '../markdown.ts';
+	import { groupArticleFlow, articleFlowClass } from '../article-flow.ts';
 	import { blockId, elementBlock, parseEditorDocument, serializeEditorDocument, type EditorBlock } from '../article-editor.ts';
 	import { articleElementClass, articleElementContent, parseArticleElement, safeImageUrl, type ArticleElement } from '../article-layout.ts';
 
@@ -24,6 +25,7 @@
 	const dirtyText = new Set<string>();
 	let paper = $state<HTMLDivElement>(undefined!);
 	let markdownArea = $state<HTMLTextAreaElement>();
+	const flow = $derived(groupArticleFlow(blocks));
 	const current = $derived(blocks.find(block => block.id === selected));
 	const currentElement = $derived(current?.element);
 	const converter = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', emDelimiter: '*', bulletListMarker: '-' });
@@ -227,6 +229,34 @@
 </script>
 
 <svelte:window onkeydown={keyboard} />
+
+{#snippet editorBlock(block: EditorBlock)}
+			{#if block.element}
+				<aside class="{articleElementClass(block.element)} article-editor-object" class:article-editor-selected={selected === block.id}
+					style="--element-width:{block.element.width}%" data-block-id={block.id}>
+					<button type="button" class="article-editor-handle" draggable="true"
+						onclick={() => { selected = block.id; imageForm = false; }}
+						ondragstart={event => { dragged = block.id; selected = block.id; event.dataTransfer?.setData('text/plain', block.id); }}
+						ondragend={() => { dragged = null; dropTarget = null; }}>{block.element.kind === 'image' ? 'Déplacer l’image' : 'Déplacer la bulle'}</button>
+					{#if block.element.kind === 'bubble'}
+						<div class="article-bubble article-bubble-{block.element.color}" contenteditable="true" role="textbox" aria-label="Texte de la bulle" aria-multiline="true" tabindex="0"
+							bind:innerText={block.element.text} onfocus={() => { selected = block.id; active = block.id; }} oninput={() => queueMicrotask(commit)} onpaste={pasteText}></div>
+					{:else}
+						<!-- HTML generated only from validated image settings. -->
+						<button type="button" class="article-editor-image" aria-label="Sélectionner l’image : {block.element.alt || 'illustration'}" onclick={() => { selected = block.id; imageForm = false; }}>{@html articleElementContent(block.element)}</button>
+					{/if}
+				</aside>
+			{:else if block.html}
+				<div class="article-editor-text" class:article-editor-drop={dropTarget === block.id} data-block-id={block.id}
+					contenteditable={block.editable} role={block.editable ? 'textbox' : 'group'} aria-label={block.editable ? 'Texte de l’article' : 'Bloc conservé dans sa mise en forme'} aria-multiline={block.editable ? 'true' : undefined}
+					onfocus={() => { selected = null; active = block.id; }} oninput={event => updateText(event, block)} onblur={event => { if (block.editable) finishText(event, block); }} onpaste={pasteText}
+					ondragover={event => { if (dragged) { event.preventDefault(); dropTarget = block.id; } }} ondragleave={() => dropTarget = null} ondrop={event => drop(event, block)}>
+					<!-- HTML uses the same safe renderer as the published article. -->
+					{@html block.html}
+				</div>
+			{/if}
+
+{/snippet}
 <div class="article-editor" role="group" aria-label="Éditeur visuel de l’article">
 	<div class="article-editor-toolbar" role="group" aria-label="Mode d’édition">
 		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'markdown'} onclick={() => editingMode = 'markdown'}>Markdown</button>
@@ -281,8 +311,10 @@
 		<div class="article-element-settings" aria-label="Réglages de l’élément sélectionné">
 			<span>{currentElement.kind === 'image' ? 'Image sélectionnée' : 'Bulle sélectionnée'}</span>
 			<label>Placement<select class="champ" bind:value={currentElement.align} onchange={() => queueMicrotask(changeElement)}><option value="left">À gauche du texte</option><option value="right">À droite du texte</option><option value="center">Entre les paragraphes</option></select></label>
+			<label><span><input type="checkbox" checked={currentElement.keepWithNext === true} onchange={event => { currentElement.keepWithNext = event.currentTarget.checked ? true : undefined; changeElement(); }} /> Garder avec le bloc suivant</span></label>
 			<label>Largeur : {currentElement.width} %<input type="range" min="20" max="100" bind:value={currentElement.width} oninput={() => queueMicrotask(changeElement)} /></label>
 			{#if currentElement.kind === 'image'}
+				<label><span><input type="checkbox" checked={currentElement.halo === 'parchment'} onchange={event => { currentElement.halo = event.currentTarget.checked ? 'parchment' : undefined; changeElement(); }} /> Voile parchemin</span></label>
 				<label>Cadrage<input type="range" min="1" max="1.6" step="0.05" bind:value={currentElement.crop} oninput={() => queueMicrotask(changeElement)} /></label>
 				<label>Description<input class="champ" bind:value={currentElement.alt} onchange={changeElement} /></label>
 			{:else}
@@ -296,30 +328,20 @@
 	<p class="aide">Écrivez directement dans l’article. Pour déplacer une image ou une bulle, saisissez sa poignée et déposez-la avant un paragraphe. Les boutons Remonter et Descendre permettent aussi de la placer.</p>
 	<div class="article-editor-paper contenu" class:article-carnet-apercu={layout === 'carnet-aquarelle'} bind:this={paper}>
 		{#if title}<header class="article-editor-heading"><h1>{title}</h1>{#if summary}<p>{summary}</p>{/if}</header>{/if}
-		{#each blocks as block (block.id)}
-			{#if block.element}
-				<aside class="{articleElementClass(block.element)} article-editor-object" class:article-editor-selected={selected === block.id}
-					style="--element-width:{block.element.width}%" data-block-id={block.id}>
-					<button type="button" class="article-editor-handle" draggable="true"
-						onclick={() => { selected = block.id; imageForm = false; }}
-						ondragstart={event => { dragged = block.id; selected = block.id; event.dataTransfer?.setData('text/plain', block.id); }}
-						ondragend={() => { dragged = null; dropTarget = null; }}>{block.element.kind === 'image' ? 'Déplacer l’image' : 'Déplacer la bulle'}</button>
-					{#if block.element.kind === 'bubble'}
-						<div class="article-bubble article-bubble-{block.element.color}" contenteditable="true" role="textbox" aria-label="Texte de la bulle" aria-multiline="true" tabindex="0"
-							bind:innerText={block.element.text} onfocus={() => { selected = block.id; active = block.id; }} oninput={() => queueMicrotask(commit)} onpaste={pasteText}></div>
+		{#each flow as group (group.items[0].id)}
+			{#if group.grouped}
+				<div class={articleFlowClass(group.items)} style="--group-width:{group.items[0].element!.width}%">
+					{#if group.items.every(item => item.element)}
+						{#each group.items as block (block.id)}{@render editorBlock(block)}{/each}
 					{:else}
-						<!-- HTML generated only from validated image settings. -->
-						<button type="button" class="article-editor-image" aria-label="Sélectionner l’image : {block.element.alt || 'illustration'}" onclick={() => { selected = block.id; imageForm = false; }}>{@html articleElementContent(block.element)}</button>
+						{@render editorBlock(group.items[0])}
+						<div class="article-flow-content">
+							{#each group.items.slice(1) as block (block.id)}{@render editorBlock(block)}{/each}
+						</div>
 					{/if}
-				</aside>
-			{:else if block.html}
-				<div class="article-editor-text" class:article-editor-drop={dropTarget === block.id} data-block-id={block.id}
-					contenteditable={block.editable} role={block.editable ? 'textbox' : 'group'} aria-label={block.editable ? 'Texte de l’article' : 'Bloc conservé dans sa mise en forme'} aria-multiline={block.editable ? 'true' : undefined}
-					onfocus={() => { selected = null; active = block.id; }} oninput={event => updateText(event, block)} onblur={event => { if (block.editable) finishText(event, block); }} onpaste={pasteText}
-					ondragover={event => { if (dragged) { event.preventDefault(); dropTarget = block.id; } }} ondragleave={() => dropTarget = null} ondrop={event => drop(event, block)}>
-					<!-- HTML uses the same safe renderer as the published article. -->
-					{@html block.html}
 				</div>
+			{:else}
+				{@render editorBlock(group.items[0])}
 			{/if}
 		{/each}
 		{#if !blocks.length}
