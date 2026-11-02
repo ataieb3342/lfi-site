@@ -3,7 +3,6 @@
 	import { renderMarkdown } from '../markdown.ts';
 	import { blockId, elementBlock, parseEditorDocument, serializeEditorDocument, type EditorBlock } from '../article-editor.ts';
 	import { articleElementClass, articleElementContent, parseArticleElement, safeImageUrl, type ArticleElement } from '../article-layout.ts';
-	import { defaultScene } from '../speech-bubbles.ts';
 
 	let { body = $bindable(''), layout = 'standard', title = '', summary = '' }: { body: string; layout?: string; title?: string; summary?: string } = $props();
 	let blocks = $state<EditorBlock[]>([]);
@@ -225,9 +224,6 @@
 			if (event.shiftKey) redo(); else undo();
 		}
 	}
-	function addDialogue() {
-		for (const bubble of defaultScene().bubbles) insert({ kind: 'bubble', text: bubble.text, color: bubble.color, align: bubble.color === 'blue' ? 'left' : 'right', width: bubble.text === 'Ah oui…' ? 23 : 33, clear: true });
-	}
 </script>
 
 <svelte:window onkeydown={keyboard} />
@@ -289,7 +285,6 @@
 			{#if currentElement.kind === 'image'}
 				<label>Cadrage<input type="range" min="1" max="1.6" step="0.05" bind:value={currentElement.crop} oninput={() => queueMicrotask(changeElement)} /></label>
 				<label>Description<input class="champ" bind:value={currentElement.alt} onchange={changeElement} /></label>
-				{#if /cgt/i.test((currentElement.src ?? '') + currentElement.alt)}<button type="button" class="bouton-secondaire" onclick={addDialogue}>Ajouter les répliques CGT</button>{/if}
 			{:else}
 				<label>Couleur<select class="champ" bind:value={currentElement.color} onchange={() => queueMicrotask(changeElement)}><option value="ochre">Ocre</option><option value="blue">Bleu</option></select></label>
 			{/if}
