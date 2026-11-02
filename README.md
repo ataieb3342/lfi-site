@@ -71,6 +71,10 @@ bulle au paragraphe qui suit ; plusieurs éléments consécutifs peuvent ainsi
 rester ensemble. Les groupes ne traversent pas les titres ou les tableaux.
 L'option « Voile parchemin » ajoute un lavis discret derrière une image,
 sans modifier son fichier. Ces deux options sont désactivées par défaut.
+Le choix « Type de bulle » propose Simple, Parole avec pointe à gauche ou à droite,
+et Pensée. La forme Simple reste celle des anciennes bulles. « Rapprocher de
+l’image » rapproche une bulle de parole placée après une image dans un même
+groupe, sur grand écran. La pointe suit la bulle, sans modifier le dessin.
 Les anciens articles restent compatibles. Le HTML brut n'est pas interprété.
 
 Un retour d’action ne peut porter que sur une action terminée. Le titre et le

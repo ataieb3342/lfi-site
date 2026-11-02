@@ -3,7 +3,7 @@
 	import { renderMarkdown } from '../markdown.ts';
 	import { groupArticleFlow, articleFlowClass } from '../article-flow.ts';
 	import { blockId, elementBlock, parseEditorDocument, serializeEditorDocument, type EditorBlock } from '../article-editor.ts';
-	import { articleElementClass, articleElementContent, parseArticleElement, safeImageUrl, type ArticleElement } from '../article-layout.ts';
+	import { articleElementClass, articleElementContent, articleBubbleClass, articleBubbleDecoration, parseArticleElement, safeImageUrl, type ArticleElement } from '../article-layout.ts';
 
 	let { body = $bindable(''), layout = 'standard', title = '', summary = '' }: { body: string; layout?: string; title?: string; summary?: string } = $props();
 	let blocks = $state<EditorBlock[]>([]);
@@ -239,8 +239,11 @@
 						ondragstart={event => { dragged = block.id; selected = block.id; event.dataTransfer?.setData('text/plain', block.id); }}
 						ondragend={() => { dragged = null; dropTarget = null; }}>{block.element.kind === 'image' ? 'Déplacer l’image' : 'Déplacer la bulle'}</button>
 					{#if block.element.kind === 'bubble'}
-						<div class="article-bubble article-bubble-{block.element.color}" contenteditable="true" role="textbox" aria-label="Texte de la bulle" aria-multiline="true" tabindex="0"
-							bind:innerText={block.element.text} onfocus={() => { selected = block.id; active = block.id; }} oninput={() => queueMicrotask(commit)} onpaste={pasteText}></div>
+						<div class={articleBubbleClass(block.element)}>
+							{@html articleBubbleDecoration(block.element)}
+							<div class="article-bubble-text" contenteditable="true" role="textbox" aria-label="Texte de la bulle" aria-multiline="true" tabindex="0"
+								bind:innerText={block.element.text} onfocus={() => { selected = block.id; active = block.id; }} oninput={() => queueMicrotask(commit)} onpaste={pasteText}></div>
+						</div>
 					{:else}
 						<!-- HTML generated only from validated image settings. -->
 						<button type="button" class="article-editor-image" aria-label="Sélectionner l’image : {block.element.alt || 'illustration'}" onclick={() => { selected = block.id; imageForm = false; }}>{@html articleElementContent(block.element)}</button>
@@ -318,6 +321,8 @@
 				<label>Cadrage<input type="range" min="1" max="1.6" step="0.05" bind:value={currentElement.crop} oninput={() => queueMicrotask(changeElement)} /></label>
 				<label>Description<input class="champ" bind:value={currentElement.alt} onchange={changeElement} /></label>
 			{:else}
+				<label>Type de bulle<select class="champ" value={currentElement.bubbleStyle ?? ''} onchange={event => { currentElement.bubbleStyle = event.currentTarget.value as ArticleElement['bubbleStyle']; changeElement(); }}><option value="">Simple</option><option value="speech-left">Parole, pointe à gauche</option><option value="speech-right">Parole, pointe à droite</option><option value="thought">Pensée</option></select></label>
+				{#if currentElement.bubbleStyle?.startsWith('speech-')}<label><span><input type="checkbox" checked={currentElement.nearImage === true} onchange={event => { currentElement.nearImage = event.currentTarget.checked ? true : undefined; changeElement(); }} /> Rapprocher de l’image</span></label>{/if}
 				<label>Couleur<select class="champ" bind:value={currentElement.color} onchange={() => queueMicrotask(changeElement)}><option value="ochre">Ocre</option><option value="blue">Bleu</option></select></label>
 			{/if}
 			<button type="button" class="bouton-secondaire" onclick={() => moveSelected(-1)}>Remonter</button>

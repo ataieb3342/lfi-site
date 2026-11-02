@@ -97,3 +97,33 @@ test('validates URLs, coordinates and colors, and escapes HTML in text and attri
  assert.equal(parseArticleElement('{bad'),null);
  assert.ok(!renderMarkdown('<script>alert(1)</script>').includes('<script>'));
 });
+
+test('bubble shapes survive both editor modes and keep dialogue escaped and readable', () => {
+ for (const bubbleStyle of ['speech-left','speech-right','thought'] as const) {
+  const element = {kind:'bubble',align:'right',width:40,clear:true,color:'blue',text:'Bonjour <script>\nEt après ?',bubbleStyle,...(bubbleStyle==='thought'?{}:{nearImage:true as const})} as const;
+  const source=serializeArticleElement(element);
+  assert.deepEqual(parseEditorDocument(source)[0].element,element);
+  assert.equal(serializeEditorDocument(parseEditorDocument(source)),source);
+  const html=renderMarkdown(source);
+  assert.match(html,new RegExp('article-bubble-'+bubbleStyle));
+  assert.match(html,/aria-hidden="true"/);
+  assert.match(html,/&lt;script&gt;/);
+  assert.ok(!html.includes('<script>'));
+  assert.equal(toPlainText(source),'Bonjour <script Et après ?');
+  assert.equal(html.includes('<ellipse'),bubbleStyle==='thought');
+ }
+});
+
+test('new decoration options cannot change legacy bubbles or leak into image settings', () => {
+ const plain=parseArticleElement('{"kind":"bubble","text":"Bonjour","color":"blue"}')!;
+ assert.match(renderArticleElement(plain),/<div class="article-bubble article-bubble-blue">Bonjour<\/div>/);
+ assert.ok(!renderArticleElement(plain).includes('<svg'));
+ for(const bubbleStyle of ['<script>','',null,'thought']) {
+  const parsed=parseArticleElement(JSON.stringify({kind:'bubble',text:'Texte',bubbleStyle,nearImage:true}))!;
+  assert.equal(parsed.nearImage,undefined);
+  if(bubbleStyle!=='thought') assert.equal(parsed.bubbleStyle,undefined);
+ }
+ const image=parseArticleElement('{"kind":"image","src":"/a.png","bubbleStyle":"speech-left","nearImage":true}')!;
+ assert.equal(image.bubbleStyle,undefined);
+ assert.equal(image.nearImage,undefined);
+});

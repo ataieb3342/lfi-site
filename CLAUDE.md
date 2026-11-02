@@ -720,7 +720,7 @@ page déjà partagée avant ce changement ne le montre pas tout de suite.
 paragraphes dans la mise en page. Chaque image et chaque bulle est indépendante :
 glisser-déposer avant un paragraphe, placement gauche/droite/centré, largeur,
 cadrage des images et couleur des bulles. Les boutons de déplacement servent
-aussi au clavier et sur téléphone. Les bulles n'ont pas de pointes décoratives.
+aussi au clavier et sur téléphone. Les bulles proposent les formes simple (par défaut), parole à gauche/droite et pensée. `bubbleStyle` est optionnel et validé ; `nearImage` n'est accepté que pour une bulle de parole. La pointe et le contour utilisent un même chemin SVG, séparé du texte éditable. Le rapprochement ne s'applique qu'à la première bulle d'un groupe commençant par une image, sur grand écran.
 
 `src/lib/markdown.ts` partage le moteur de rendu entre l'éditeur et les pages
 publiques ; `server/markdown.ts` réexporte ses fonctions pour les imports
