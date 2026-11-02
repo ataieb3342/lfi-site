@@ -24,6 +24,7 @@
 	let redoStack = $state<string[]>([]);
 	const dirtyText = new Set<string>();
 	let paper = $state<HTMLDivElement>(undefined!);
+	let markdownArea = $state<HTMLTextAreaElement>();
 	const current = $derived(blocks.find(block => block.id === selected));
 	const currentElement = $derived(current?.element);
 	const converter = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', emDelimiter: '*', bulletListMarker: '-' });
@@ -78,11 +79,35 @@
 		restore(next);
 	}
 	function updateMarkdown(event: Event) {
-		const value = (event.currentTarget as HTMLTextAreaElement).value;
+		setMarkdown((event.currentTarget as HTMLTextAreaElement).value);
+	}
+	function setMarkdown(value: string) {
 		if (value === body) return;
 		undoStack = [...undoStack.slice(-79), body];
 		redoStack = [];
 		body = value;
+	}
+	function wrapMarkdown(before: string, after = before, placeholder = 'texte') {
+		if (!markdownArea) return;
+		const start = markdownArea.selectionStart;
+		const end = markdownArea.selectionEnd;
+		const text = markdownArea.value.slice(start, end) || placeholder;
+		markdownArea.setRangeText(before + text + after, start, end, 'select');
+		setMarkdown(markdownArea.value);
+		markdownArea.focus();
+		markdownArea.setSelectionRange(start + before.length, start + before.length + text.length);
+	}
+	function prefixMarkdown(prefix: string) {
+		if (!markdownArea) return;
+		const end = markdownArea.selectionEnd;
+		const start = markdownArea.value.lastIndexOf('\n', markdownArea.selectionStart - 1) + 1;
+		const text = markdownArea.value.slice(start, end).split('\n').map(line => prefix + line).join('\n');
+		markdownArea.setRangeText(text, start, end, 'end');
+		setMarkdown(markdownArea.value);
+		markdownArea.focus();
+	}
+	function styleMarkdown(type: 'police' | 'couleur', value: string) {
+		if (value) wrapMarkdown(`[[${type}:${value}|`, ']]', 'texte à mettre en forme');
 	}
 	function updateText(event: Event, block: EditorBlock) {
 		if (event.type === 'input') dirtyText.add(block.id);
@@ -212,7 +237,20 @@
 		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'visual'} onclick={() => editingMode = 'visual'}>Visuel</button>
 	</div>
 	{#if editingMode === 'markdown'}
-		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" value={body} oninput={updateMarkdown}></textarea>
+		<div class="article-editor-toolbar" role="toolbar" aria-label="Mise en forme Markdown">
+			<button type="button" class="bouton-secondaire" disabled={!undoStack.length} onclick={undo}>Annuler</button>
+			<button type="button" class="bouton-secondaire" disabled={!redoStack.length} onclick={redo}>Rétablir</button>
+			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('**')}>Gras</button>
+			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('*')}>Italique</button>
+			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('## ')}>Titre</button>
+			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('[', '](https://)', 'texte du lien')}>Lien</button>
+			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('![', '](/media/nom-du-fichier.jpg)', 'description de l’image')}>Image</button>
+			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('> ')}>Citation</button>
+			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('- ')}>Liste</button>
+			<label>Police<select class="champ" onchange={event => { styleMarkdown('police', event.currentTarget.value); event.currentTarget.value = ''; }}><option value="">Choisir une police</option><option value="public-sans">Public Sans</option><option value="gowun-batang">Gowun Batang</option><option value="union-gothic">Union Gothic</option><option value="stack-sans">Stack Sans Headline</option><option value="condensee">Titre condensé</option></select></label>
+			<label>Couleur<select class="champ" onchange={event => { styleMarkdown('couleur', event.currentTarget.value); event.currentTarget.value = ''; }}><option value="">Choisir une couleur</option><option value="violet">Violet LFI</option><option value="rouge">Rouge LFI</option><option value="turquoise">Turquoise</option><option value="vert">Vert</option><option value="rose">Rose</option><option value="jaune">Jaune sur fond sombre</option></select></label>
+		</div>
+		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" bind:this={markdownArea} value={body} oninput={updateMarkdown}></textarea>
 		<p class="aide">Écrivez en Markdown, ou choisissez « Visuel » pour déplacer les images et les bulles. Le contenu est partagé entre les deux modes.</p>
 	{:else}
 	<div class="article-editor-toolbar" aria-label="Outils d’édition">
