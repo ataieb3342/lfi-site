@@ -1,3 +1,4 @@
+import { canPublishArticle, getReview, reviewHistory, reviewAction, reviewLabel, ReviewError } from '$lib/server/reviews';
 import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { deletePublication, getById, positionALaUne, updatePublication } from '$lib/server/content';
@@ -27,6 +28,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			profilePublic: !!profile_public
 		})),
 		corps: publication.body,
+ articleValidated: canPublishArticle(publication.id),
+ review: getReview(publication.id),
+ reviewLabel: reviewLabel(getReview(publication.id)),
+ history: reviewHistory(publication.id),
+ reviewAuthor: publication.byline_admin_id ?? publication.author_id,
 		positionUne: positionALaUne(publication.id),
 		enregistre: url.searchParams.has('enregistre'),
 		// Ce qu'a donné « Enregistrer et mettre à la une » : `ok`, `brouillon`
@@ -54,7 +60,7 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
 		audit(admin, 'publication.modification', saisie.title, saisie.status, locals.ipHash);
 		return null;
 	} catch (err) {
-		if (err instanceof ErreurFormulaire) {
+		if (err instanceof ErreurFormulaire || err instanceof ReviewError) {
 			return fail(400, { ...valeursSaisies(form), erreur: err.message });
 		}
 		throw err;
@@ -62,6 +68,13 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
 }
 
 export const actions: Actions = {
+ verifier: async ({request,params,locals}) => {
+ const f=await request.formData();
+ try {
+ reviewAction(Number(params.id),locals.admin!.id,String(f.get('decision')),Number(f.get('revision')),String(f.get('note')??'').trim(),Number(f.get('target')),Number(f.get('priority')));
+ } catch(e) { if(e instanceof ReviewError) return fail(400,{erreur:e.message}); throw e; }
+ redirect(303, `/admin/publications/${params.id}?enregistre=1`);
+ },
 	enregistrer: async (event) => {
 		const echec = await enregistrer(event);
 		if (echec) return echec;

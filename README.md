@@ -46,6 +46,7 @@ scripts/           sauvegarde et restauration
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
 | Mettre temporairement une publication à la une | Cocher « Épingler à la une » ; l’épinglage expire automatiquement après 15 jours |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
+| Vérifier un article avant publication | Administration → Vérifications |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
@@ -93,6 +94,41 @@ lien d’inscription. Pour un apéro, les informations propres à la fiche prime
 sur le lieu et l’horaire habituels définis dans les réglages ; ces derniers ne
 servent que de valeurs de repli.
 
+## Validation des articles
+
+Le circuit concerne uniquement le type « Article ». Les événements, formations
+et apéros conservent leur publication habituelle.
+
+L'auteur enregistre son article en brouillon, puis clique sur « Je valide mon
+texte ». Un autre administrateur peut alors le relire et cliquer sur « Valider
+l'article ». Cette validation autorise la publication ; elle ne publie pas
+automatiquement. L'auteur peut ensuite choisir « Publié » et enregistrer.
+Le contrôle est aussi effectué côté serveur.
+
+Dans Administration → Vérifications, les articles non publiés sont classés par
+urgence puis par ancienneté. Un filtre permet de choisir leur état : brouillon
+(gris), à valider après accord de l'auteur (orange), ou validé (vert). La priorité
+est distincte de l'état : normale, prioritaire ou urgente.
+
+Le relecteur peut corriger le texte, enregistrer, puis valider directement la
+version corrigée. L'accord initial de l'auteur reste acquis. Une modification
+du contenu annule la validation du relecteur et remet l'article en brouillon ;
+une nouvelle validation suffit. Un changement d'auteur nécessite l'accord du
+nouvel auteur. Les décisions sur une ancienne version du texte sont refusées.
+
+« Ajouter un commentaire » conserve le texte et l'état actuels. Les commentaires
+sont internes à l'administration et restent dans l'historique. « Demander des
+corrections » exige un commentaire et remet les accords à zéro.
+
+En cas de doute, le relecteur peut demander un troisième avis en choisissant une
+personne différente de lui et de l'auteur, avec un commentaire obligatoire.
+La publication reste bloquée jusqu'à validation par la personne sollicitée.
+Une correction du texte conserve cette demande en cours.
+
+Les articles déjà publiés restent en ligne lors de la mise à jour du logiciel.
+La base est migrée automatiquement au démarrage. Les exemples de la prévisualisation
+utilisent une base séparée et ne sont pas transférés en production.
+
 ## Navigation et agenda
 
 La navigation publique est regroupée en deux ensembles :
@@ -127,6 +163,7 @@ Avant tout changement : `npm run check`. Avant livraison :
 ```bash
 npm run check
 npm run build
+node --experimental-strip-types --test tests/*.test.ts
 node --test src/lib/jeux/mythology-rts/tests/*.test.js
 ```
 

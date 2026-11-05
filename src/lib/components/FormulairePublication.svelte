@@ -28,6 +28,7 @@
 
 	let {
 		publication = null,
+		articleValidated = false,
 		valeurs = {},
 		erreur = '',
 		libelleValider = 'Enregistrer',
@@ -37,6 +38,7 @@
 		actionUne
 	}: {
 		publication?: PublicationVue | null;
+		articleValidated?: boolean;
 		valeurs?: Champs;
 		erreur?: string;
 		libelleValider?: string;
@@ -231,7 +233,7 @@
 				<label class="etiquette" for="status">État</label>
 				<select id="status" name="status" class="champ">
 					<option value="draft" selected={v.status === 'draft'}>Brouillon</option>
-					<option value="published" selected={v.status === 'published'}>Publié</option>
+					<option value="published" disabled={typeSelectionne === 'article' && !articleValidated && publication?.status !== 'published'} selected={v.status === 'published'}>Publié</option>
 				</select>
 				<p class="aide">Un brouillon n'est visible que par les administrateurs connectés.</p>
 			</div>

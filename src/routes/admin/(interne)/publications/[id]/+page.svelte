@@ -8,7 +8,7 @@
 
 	// Après une erreur, on réaffiche ce qui venait d'être saisi ; sinon le
 	// contenu enregistré en base.
-	const valeurs = $derived(form ? { ...form } : { body: data.corps });
+	const valeurs = $derived(form && ('body' in form) ? { ...form } : { body: data.corps });
 </script>
 
 <svelte:head><title>{data.publication.title} - Administration</title></svelte:head>
@@ -54,6 +54,32 @@
 	{/if}
 {/if}
 
+{#if data.publication.kind === 'article'}
+<section class="mb-6 rounded-lg border border-line p-5">
+ <h2 class="font-bold">Vérification de l'article</h2>
+ <p class="my-3"><span class="rounded px-3 py-1 {data.review.requested_id ? 'bg-orange-100 text-orange-900' : data.review.reviewer_id ? 'bg-green-100 text-green-900' : data.review.author_approved_by ? 'bg-amber-100 text-amber-900' : 'bg-gray-100 text-gray-800'}">{data.reviewLabel}</span> · Version {data.review.revision}</p>
+ <p class="text-sm">Enregistrez vos modifications avant de valider. Vous pouvez corriger le texte, enregistrer, puis valider directement. L'accord de l'auteur reste acquis ; la validation du relecteur doit être renouvelée après une modification.</p>
+ {#if data.review.author_approved_at}<p class="mt-2 text-sm">Accord de l'auteur : {formatDateTime(data.review.author_approved_at)}</p>{/if}
+ {#if data.review.requested_id}<p class="mt-2 text-sm">Avis demandé à {data.admins.find(a => a.id === data.review.requested_id)?.name ?? 'Compte indisponible'} : {data.review.request_note}</p>{/if}
+ <form method="POST" action="?/verifier" class="mt-4 space-y-3">
+ <input type="hidden" name="revision" value={data.review.revision} />
+ <label class="block">Priorité <select name="priority" class="champ"><option value="0" selected={data.review.priority===0}>Normale</option><option value="1" selected={data.review.priority===1}>Prioritaire</option><option value="2" selected={data.review.priority===2}>Urgente</option></select></label>
+ <button class="bouton-secondaire" name="decision" value="priority">Enregistrer la priorité</button>
+ <label class="block">Commentaire<textarea name="note" class="champ" maxlength="2000"></textarea></label>
+ <label class="block">Personne à solliciter<select name="target" class="champ"><option value="">Choisir une personne</option>{#each data.admins.filter(a => a.id !== data.adminCourant.id && a.id !== data.reviewAuthor) as admin}<option value={admin.id}>{admin.name}</option>{/each}</select></label>
+ <div class="flex flex-wrap gap-2">
+ {#if data.adminCourant.id===data.reviewAuthor}<button class="bouton" name="decision" value="author">Je valide mon texte</button>{:else if data.review.author_approved_by}
+ <button class="bouton" name="decision" value="approve" disabled={!!data.review.requested_id && data.review.requested_id!==data.adminCourant.id}>Valider l'article</button>
+ <button class="bouton-secondaire" name="decision" value="request" disabled={!!data.review.requested_id}>Demander un troisième avis</button>
+ {/if}
+ <button class="bouton-secondaire" name="decision" value="comment">Ajouter un commentaire</button>
+ <button class="bouton-secondaire" name="decision" value="corrections">Demander des corrections</button>
+ </div>
+ </form>
+ <details class="mt-4"><summary>Historique des vérifications</summary>{#each data.history as h}<p class="mt-2 text-sm">{formatDateTime(h.created_at)} · {h.name} · Version {h.revision} · {{comment:'Commentaire',author:'Accord de l’auteur',approve:'Validation',request:'Troisième avis demandé',corrections:'Corrections demandées',priority:'Priorité modifiée'}[h.action] ?? h.action}{h.note ? ` : ${h.note}` : ''}</p>{/each}</details>
+</section>
+{/if}
+
 <form
 	method="POST"
 	action="?/enregistrer"
@@ -74,6 +100,7 @@
 >
 	<FormulairePublication
 		publication={data.publication}
+        articleValidated={data.articleValidated}
 		admins={data.admins}
 		positionUne={data.positionUne}
 		{valeurs}

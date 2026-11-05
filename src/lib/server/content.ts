@@ -1,3 +1,4 @@
+import { canPublishArticle, ReviewError } from './reviews.ts';
 import { db, now } from './db.ts';
 import { supprimerPdf } from './bibliotheque.ts';
 
@@ -251,6 +252,7 @@ export type PublicationInput = {
 };
 
 export function createPublication(input: PublicationInput, authorId: number): number {
+	if (input.kind === 'article' && input.status === 'published') throw new ReviewError('Enregistrez cet article en brouillon pour le faire valider.');
 	const timestamp = now();
 	const result = db()
 		.prepare(
@@ -299,6 +301,15 @@ export function createPublication(input: PublicationInput, authorId: number): nu
 export function updatePublication(id: number, input: PublicationInput, opts: { reslug: boolean }) {
 	const existing = getById(id);
 	if (!existing) throw new Error('Publication introuvable');
+ const changed = existing.kind !== input.kind || existing.title !== input.title || existing.summary !== input.summary
+ || existing.body !== input.body || existing.cover_media_id !== input.coverMediaId
+ || existing.byline_admin_id !== (input.authorAdminId ?? null) || existing.author_name !== input.authorName
+ || existing.layout_style !== (input.layoutStyle ?? 'standard');
+ if (input.kind === 'article' && input.status === 'published') {
+ if (changed) input = { ...input, status: 'draft' };
+ else if (existing.status !== 'published' && !canPublishArticle(id)) throw new ReviewError('Cet article doit être validé par son auteur et un autre administrateur.');
+ }
+
 
 	// On ne change l'URL que si on le demande explicitement : les liens déjà
 	// partagés sur les réseaux sociaux continuent de fonctionner.

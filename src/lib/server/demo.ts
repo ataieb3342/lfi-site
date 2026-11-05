@@ -651,7 +651,7 @@ function remplirContenus(adminId: number, imageId: number | null) {
 				summary: fiche.summary,
 				body: fiche.body,
 				layoutStyle: fiche.layoutStyle ?? 'standard',
-				status: 'published',
+				status: 'draft',
 				commentsOpen: true,
 				// Une seule fiche est illustrée : celle que `demo-image.ts` désigne.
 				coverMediaId: fiche.illustree ? imageId : null,
@@ -671,7 +671,7 @@ function remplirContenus(adminId: number, imageId: number | null) {
 		const publieIlYa = typeof fiche.publieIlYa === 'function' ? fiche.publieIlYa() : fiche.publieIlYa;
 		const date = ilYaNJours(publieIlYa);
 		base
-			.prepare('update publications set published_at = ?, created_at = ?, updated_at = ? where id = ?')
+			.prepare("update publications set status = 'published', published_at = ?, created_at = ?, updated_at = ? where id = ?")
 			.run(date, date, date, id);
 
 		for (const [i, c] of (fiche.commentaires ?? []).entries()) {

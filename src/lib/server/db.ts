@@ -514,6 +514,75 @@ const MIGRATIONS: string[] = [
 	update publications set event_category = 'reunion'
 	 where kind = 'actu' and event_category = 'autre';
 	`
+, `
+ create table article_reviews (
+ publication_id integer primary key references publications(id) on delete cascade,
+ revision integer not null default 1,
+ author_approved_by integer references admins(id),
+ author_approved_at text,
+ reviewer_id integer references admins(id),
+ reviewed_at text,
+ requested_by integer references admins(id),
+ requested_id integer references admins(id),
+ request_note text not null default '',
+ priority integer not null default 0 check(priority in (0,1,2))
+ );
+ insert into article_reviews(publication_id) select id from publications where kind='article';
+ create trigger article_review_create after insert on publications when new.kind='article'
+ begin insert into article_reviews(publication_id) values(new.id); end;
+ create trigger article_review_convert after update of kind on publications when new.kind='article'
+ begin insert or ignore into article_reviews(publication_id) values(new.id); end;
+ create table article_review_history (
+ id integer primary key,
+ publication_id integer not null references publications(id) on delete cascade,
+ revision integer not null,
+ admin_id integer not null references admins(id),
+ action text not null,
+ note text not null default '',
+ created_at text not null
+ );
+ create trigger article_review_reset after update of title,summary,body,cover_media_id,byline_admin_id,author_name,layout_style,kind on publications
+ when old.title is not new.title or old.summary is not new.summary or old.body is not new.body
+ or old.cover_media_id is not new.cover_media_id or old.byline_admin_id is not new.byline_admin_id
+ or old.author_name is not new.author_name or old.layout_style is not new.layout_style or old.kind is not new.kind
+ begin
+ update article_reviews set revision=revision+1,author_approved_by=null,author_approved_at=null,
+ reviewer_id=null,reviewed_at=null,requested_by=null,requested_id=null,request_note=''
+ where publication_id=new.id;
+ update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=new.id and new.kind='article';
+ end;
+ `
+, `
+ drop trigger article_review_reset;
+ create trigger article_review_reset after update of title,summary,body,cover_media_id,byline_admin_id,author_name,layout_style,kind on publications
+ when old.title is not new.title or old.summary is not new.summary or old.body is not new.body
+ or old.cover_media_id is not new.cover_media_id or old.byline_admin_id is not new.byline_admin_id
+ or old.author_name is not new.author_name or old.layout_style is not new.layout_style or old.kind is not new.kind
+ begin
+ update article_reviews set revision=revision+1,
+ author_approved_by=case when old.byline_admin_id is not new.byline_admin_id or old.author_name is not new.author_name or old.kind is not new.kind then null else author_approved_by end,
+ author_approved_at=case when old.byline_admin_id is not new.byline_admin_id or old.author_name is not new.author_name or old.kind is not new.kind then null else author_approved_at end,
+ reviewer_id=null,reviewed_at=null
+ where publication_id=new.id;
+ update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=new.id and new.kind='article';
+ end;
+ `
+, `
+ drop trigger article_review_reset;
+ create trigger article_review_reset after update of title,summary,body,cover_media_id,byline_admin_id,author_name,layout_style,kind on publications
+ when old.title is not new.title or old.summary is not new.summary or old.body is not new.body
+ or old.cover_media_id is not new.cover_media_id or old.byline_admin_id is not new.byline_admin_id
+ or old.author_name is not new.author_name or old.layout_style is not new.layout_style or old.kind is not new.kind
+ begin
+ update article_reviews set revision=revision+1,
+ author_approved_by=case when old.byline_admin_id is not new.byline_admin_id or old.author_name is not new.author_name or old.kind is not new.kind then null else author_approved_by end,
+ author_approved_at=case when old.byline_admin_id is not new.byline_admin_id or old.author_name is not new.author_name or old.kind is not new.kind then null else author_approved_at end,
+ reviewer_id=null,reviewed_at=null
+ where publication_id=new.id;
+ update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=new.id and new.kind='article';
+ end;
+ `
+
 ];
 
 function migrer(base: DatabaseSync) {

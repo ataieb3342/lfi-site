@@ -1,3 +1,4 @@
+import { ReviewError } from '$lib/server/reviews';
 import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { createPublication } from '$lib/server/content';
@@ -23,7 +24,7 @@ async function creer({ request, locals }: RequestEvent) {
 		audit(admin, 'publication.creation', saisie.title, saisie.status, locals.ipHash);
 		return id;
 	} catch (err) {
-		if (err instanceof ErreurFormulaire) {
+		if (err instanceof ErreurFormulaire || err instanceof ReviewError) {
 			return fail(400, { ...valeursSaisies(form), erreur: err.message });
 		}
 		throw err;
