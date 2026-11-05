@@ -6,7 +6,7 @@ import { join } from 'node:path';
 process.env.DATABASE_PATH = join(mkdtempSync(join(tmpdir(), 'lfi-review-')), 'test.db');
 const { db } = await import('../src/lib/server/db.ts');
 const { createPublication, updatePublication, getById, getPublishedBySlug } = await import('../src/lib/server/content.ts');
-const { reviewAction, getReview, canPublishArticle, reviewHistory, listArticlesForReview } = await import('../src/lib/server/reviews.ts');
+const { reviewAction, getReview, canPublishArticle, reviewHistory, listArticlesForReview, countArticlesAwaitingReview } = await import('../src/lib/server/reviews.ts');
 const base = db();
 for (let i = 1; i <= 4; i++) {
  base.prepare("insert into admins(username,display_name,password_hash,role,created_at) values(?,?,?,'admin',?)")
@@ -200,4 +200,23 @@ test('informal advice and its reply never submit or approve an article', () => {
  assert.equal(getReview(id).advice_requested_id, null);
  assert.equal(listArticlesForReview().some(p => p.id === id), true);
  assert.throws(() => act(id, 2, 'advice', 'Question', 3));
+});
+
+
+test('review counter counts pending submitted articles and third opinions only', () => {
+ const initial = countArticlesAwaitingReview();
+ const id = create();
+ assert.equal(countArticlesAwaitingReview(), initial);
+ act(id, 1, 'advice', 'Draft question', 2);
+ assert.equal(countArticlesAwaitingReview(), initial);
+ act(id, 1, 'author');
+ assert.equal(countArticlesAwaitingReview(), initial + 1);
+ act(id, 2, 'request', 'Check before publication', 3);
+ assert.equal(countArticlesAwaitingReview(), initial + 1);
+ act(id, 3, 'approve');
+ assert.equal(countArticlesAwaitingReview(), initial);
+ updatePublication(id, {...input,body:'Changed after approval'}, {reslug:false});
+ assert.equal(countArticlesAwaitingReview(), initial + 1);
+ act(id, 2, 'corrections', 'More drafting needed');
+ assert.equal(countArticlesAwaitingReview(), initial);
 });

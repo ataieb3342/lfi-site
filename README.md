@@ -67,6 +67,9 @@ autour. Un clic sur l'élément donne accès à son placement et à sa largeur, 
 cadrage d'une image ou à la couleur d'une bulle. Enregistrez la publication
 pour conserver les modifications.
 
+En mode Markdown, les outils sont regroupés en historique, texte et insertion.
+Le volet « Police et couleur » rassemble les réglages complémentaires.
+
 Les boutons « Markdown » et « Visuel » permettent de changer de mode sans
 perdre le contenu. « Garder avec le bloc suivant » associe une image ou une
 bulle au paragraphe qui suit ; plusieurs éléments consécutifs peuvent ainsi
@@ -111,7 +114,9 @@ Le contrôle est aussi effectué côté serveur.
 Les brouillons non soumis restent dans Rédaction et n'apparaissent pas dans
 Vérifications. Dans Vérifications, les articles soumis non publiés sont classés
 par urgence puis par ancienneté : à valider (orange), troisième avis demandé,
-ou validé (vert). La priorité
+ou validé (vert). Le compteur de Vérifications indique les articles soumis
+qui attendent encore une validation, y compris un troisième avis ; les brouillons
+non soumis et les articles déjà validés ne sont pas comptés. La priorité
 est distincte de l'état : normale, prioritaire ou urgente.
 
 Le relecteur peut corriger le texte, enregistrer, puis valider directement la
@@ -133,6 +138,8 @@ corrections » exige un commentaire et remet les accords à zéro.
 En cas de doute, le relecteur peut demander un troisième avis en choisissant une
 personne différente de lui et de l'auteur, avec un commentaire obligatoire.
 La publication reste bloquée jusqu'à validation par la personne sollicitée.
+Le bouton de demande disparaît tant qu'un troisième avis est en cours.
+Le bloc de vérification se trouve au-dessus du texte de l'article.
 Une correction du texte conserve cette demande en cours.
 
 Les articles déjà publiés restent en ligne lors de la mise à jour du logiciel.

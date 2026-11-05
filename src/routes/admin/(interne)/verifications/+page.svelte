@@ -4,7 +4,7 @@
  let state=$state('all');
 </script>
 <svelte:head><title>Vérifications - Administration</title></svelte:head>
-<h1 class="text-2xl font-extrabold">Vérifications</h1>
+<h1 class="text-2xl font-extrabold">Vérifications <span class="text-lg text-ink-soft">({data.pendingCount} à faire)</span></h1>
 <p class="mt-2 text-ink-soft">Articles soumis par leur auteur, classés par urgence puis par ancienneté.</p>
 <label class="mt-4 block">État<select class="champ" bind:value={state}><option value="all">Tous</option><option>À valider</option><option>Troisième avis demandé</option><option>Validé</option></select></label>
 <div class="mt-6 space-y-4">

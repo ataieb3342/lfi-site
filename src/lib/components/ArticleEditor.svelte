@@ -266,19 +266,30 @@
 		<button type="button" class="bouton-secondaire" aria-pressed={editingMode === 'visual'} onclick={() => editingMode = 'visual'}>Visuel</button>
 	</div>
 	{#if editingMode === 'markdown'}
-		<div class="article-editor-toolbar" role="toolbar" aria-label="Mise en forme Markdown">
+		<div class="article-markdown-tools" role="group" aria-label="Mise en forme Markdown">
+			<div class="article-markdown-group" role="group" aria-label="Historique">
 			<button type="button" class="bouton-secondaire" disabled={!undoStack.length} onclick={undo}>Annuler</button>
 			<button type="button" class="bouton-secondaire" disabled={!redoStack.length} onclick={redo}>Rétablir</button>
+			</div>
+			<div class="article-markdown-group" role="group" aria-label="Texte">
 			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('**')}>Gras</button>
 			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('*')}>Italique</button>
 			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('## ')}>Titre</button>
+			</div>
+			<div class="article-markdown-group" role="group" aria-label="Insertion">
 			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('[', '](https://)', 'texte du lien')}>Lien</button>
 			<button type="button" class="bouton-secondaire" onclick={() => wrapMarkdown('![', '](/media/nom-du-fichier.jpg)', 'description de l’image')}>Image</button>
 			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('> ')}>Citation</button>
 			<button type="button" class="bouton-secondaire" onclick={() => prefixMarkdown('- ')}>Liste</button>
+			</div>
+		</div>
+		<details class="article-editor-extra article-markdown-extra">
+			<summary>Police et couleur</summary>
+			<div class="article-markdown-styles">
 			<label>Police<select class="champ" onchange={event => { styleMarkdown('police', event.currentTarget.value); event.currentTarget.value = ''; }}><option value="">Choisir une police</option><option value="public-sans">Public Sans</option><option value="gowun-batang">Gowun Batang</option><option value="union-gothic">Union Gothic</option><option value="stack-sans">Stack Sans Headline</option><option value="condensee">Titre condensé</option></select></label>
 			<label>Couleur<select class="champ" onchange={event => { styleMarkdown('couleur', event.currentTarget.value); event.currentTarget.value = ''; }}><option value="">Choisir une couleur</option><option value="violet">Violet LFI</option><option value="rouge">Rouge LFI</option><option value="turquoise">Turquoise</option><option value="vert">Vert</option><option value="rose">Rose</option><option value="jaune">Jaune sur fond sombre</option></select></label>
-		</div>
+			</div>
+		</details>
 		<textarea class="champ font-mono text-sm" rows="22" aria-label="Texte Markdown de l’article" bind:this={markdownArea} value={body} oninput={updateMarkdown}></textarea>
 		<p class="aide">Écrivez en Markdown, ou choisissez « Visuel » pour déplacer les images et les bulles. Le contenu est partagé entre les deux modes.</p>
 	{:else}
@@ -362,3 +373,15 @@
 	<p role="status" class="aide">{message}</p>
 	{/if}
 </div>
+
+<style>
+ .article-markdown-tools { display:flex; flex-wrap:wrap; gap:0.45rem 0.8rem; padding:0.55rem; margin-bottom:0.5rem; border:1px solid var(--color-line); border-radius:0.5rem; background:var(--color-surface-alt); }
+ .article-markdown-group { display:flex; flex-wrap:wrap; align-items:center; gap:0.25rem; }
+ .article-markdown-tools button { padding:0.35rem 0.5rem; min-height:2rem; border-radius:0.3rem; font-size:0.78rem; line-height:1.2; }
+ .article-markdown-extra { margin-bottom:0.75rem; }
+ .article-markdown-extra summary { font-size:0.8rem; color:var(--color-ink-soft); cursor:pointer; }
+ .article-markdown-styles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.75rem; margin-top:0.6rem; }
+ .article-markdown-styles label { min-width:0; font-size:0.8rem; }
+ .article-markdown-styles select { margin-top:0.25rem; font-size:0.8rem; }
+ @media(max-width:480px) { .article-markdown-styles { grid-template-columns:1fr; } }
+</style>

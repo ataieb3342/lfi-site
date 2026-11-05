@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
+import { countArticlesAwaitingReview } from '$lib/server/reviews';
 import { countPendingComments, countPendingSources } from '$lib/server/content';
 
 /** Pages accessibles avant d'avoir activé la double authentification. */
@@ -24,6 +25,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 			role: locals.admin.role,
 			totpEnabled: locals.admin.totpEnabled
 		},
+		verificationsEnAttente: countArticlesAwaitingReview(),
 		commentairesEnAttente: countPendingComments(),
 		sourcesEnAttente: countPendingSources()
 	};

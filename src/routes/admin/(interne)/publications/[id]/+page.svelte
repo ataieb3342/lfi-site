@@ -56,6 +56,42 @@
 {/if}
 
 
+{#if data.publication.kind === 'article' && (data.publication.status === 'draft' || data.review.author_approved_by)}
+<section class="mb-6 rounded-lg border border-line p-5">
+ <h2 class="font-bold">{data.review.author_approved_by ? 'Vérification' : 'Avis sur le brouillon'}</h2>
+ <p class="my-3"><span class="rounded px-3 py-1 {data.review.requested_id ? 'bg-orange-100 text-orange-900' : data.review.reviewer_id ? 'bg-green-100 text-green-900' : data.review.author_approved_by ? 'bg-amber-100 text-amber-900' : 'bg-gray-100 text-gray-800'}">{data.reviewLabel}</span> · Version {data.review.revision}</p>
+ <p class="text-sm">{data.review.requested_id ? "Un troisième avis est en cours. La publication attend la validation de la personne sollicitée." : data.review.author_approved_by ? "Relisez le texte enregistré, puis validez-le ou demandez un troisième avis. Les corrections conservent l'accord de l'auteur." : "Vous pouvez demander un avis pendant la rédaction. Cette demande ne soumet pas l'article à validation."}</p>
+ {#if data.review.author_approved_at}<p class="mt-2 text-sm">Accord de l'auteur : {formatDateTime(data.review.author_approved_at)}</p>{/if}
+ {#if data.review.advice_requested_id}<p class="mt-2 text-sm">Avis demandé à {data.admins.find(a => a.id === data.review.advice_requested_id)?.name ?? 'Compte indisponible'} : {data.review.advice_note}</p>{/if}
+ {#if data.review.requested_id}<p class="mt-2 text-sm">Avis demandé à {data.admins.find(a => a.id === data.review.requested_id)?.name ?? 'Compte indisponible'} : {data.review.request_note}</p>{/if}
+ <form method="POST" action="?/verifier" class="mt-4 space-y-3">
+ <input type="hidden" name="revision" value={data.review.revision} />
+ {#if data.review.author_approved_by}
+ <label class="block">Priorité <select name="priority" class="champ"><option value="0" selected={data.review.priority===0}>Normale</option><option value="1" selected={data.review.priority===1}>Prioritaire</option><option value="2" selected={data.review.priority===2}>Urgente</option></select></label>
+ <button class="bouton-secondaire" name="decision" value="priority">Enregistrer la priorité</button>
+ {/if}
+ <label class="block">Commentaire<textarea name="note" class="champ" maxlength="2000"></textarea></label>
+ {#if !data.review.requested_id && !data.review.advice_requested_id}
+ <label class="block">Personne à solliciter<select name="target" class="champ"><option value="">Choisir une personne</option>{#each data.admins.filter(a => a.id !== data.adminCourant.id && (!data.review.author_approved_by || a.id !== data.reviewAuthor)) as admin}<option value={admin.id}>{admin.name}</option>{/each}</select></label>
+ {/if}
+ <div class="flex flex-wrap gap-2">
+ {#if data.review.author_approved_by && data.adminCourant.id!==data.reviewAuthor}
+ <button class="bouton" name="decision" value="approve" disabled={!!data.review.requested_id && data.review.requested_id!==data.adminCourant.id}>Valider l'article</button>
+ {#if !data.review.requested_id}<button class="bouton-secondaire" name="decision" value="request">Demander un troisième avis</button>{/if}
+ {/if}
+ {#if !data.review.author_approved_by}
+ {#if data.review.advice_requested_id===data.adminCourant.id}<button class="bouton" name="decision" value="advice_reply">Donner mon avis</button>
+ {:else if !data.review.advice_requested_id}<button class="bouton-secondaire" name="decision" value="advice">Demander un avis à quelqu'un</button>{/if}
+ {/if}
+ <button class="bouton-secondaire" name="decision" value="comment">Ajouter un commentaire</button>
+ {#if data.review.author_approved_by}<button class="bouton-secondaire" name="decision" value="corrections">Demander des corrections</button>{/if}
+ </div>
+ </form>
+ <details class="mt-4"><summary>Historique des vérifications</summary>{#each data.history as h}<p class="mt-2 text-sm">{formatDateTime(h.created_at)} · {h.name} · Version {h.revision} · {{advice:'Avis demandé sur le brouillon',advice_reply:'Avis sur le brouillon',comment:'Commentaire',author:'Soumis à validation par l’auteur',approve:'Validation',request:'Troisième avis demandé',corrections:'Corrections demandées',priority:'Priorité modifiée'}[h.action] ?? h.action}{h.note ? ` : ${h.note}` : ''}</p>{/each}</details>
+</section>
+{/if}
+
+
 <form
 	method="POST"
 	action="?/enregistrer"
@@ -98,38 +134,6 @@
 	</label>
 </form>
 
-{#if data.publication.kind === 'article' && (data.publication.status === 'draft' || data.review.author_approved_by)}
-<section class="mb-6 rounded-lg border border-line p-5">
- <h2 class="font-bold">{data.review.author_approved_by ? 'Vérification' : 'Avis sur le brouillon'}</h2>
- <p class="my-3"><span class="rounded px-3 py-1 {data.review.requested_id ? 'bg-orange-100 text-orange-900' : data.review.reviewer_id ? 'bg-green-100 text-green-900' : data.review.author_approved_by ? 'bg-amber-100 text-amber-900' : 'bg-gray-100 text-gray-800'}">{data.reviewLabel}</span> · Version {data.review.revision}</p>
- <p class="text-sm">{data.review.author_approved_by ? "Relisez le texte enregistré, puis validez-le ou demandez un troisième avis. Les corrections conservent l'accord de l'auteur." : "Vous pouvez demander un avis pendant la rédaction. Cette demande ne soumet pas l'article à validation."}</p>
- {#if data.review.author_approved_at}<p class="mt-2 text-sm">Accord de l'auteur : {formatDateTime(data.review.author_approved_at)}</p>{/if}
- {#if data.review.advice_requested_id}<p class="mt-2 text-sm">Avis demandé à {data.admins.find(a => a.id === data.review.advice_requested_id)?.name ?? 'Compte indisponible'} : {data.review.advice_note}</p>{/if}
- {#if data.review.requested_id}<p class="mt-2 text-sm">Avis demandé à {data.admins.find(a => a.id === data.review.requested_id)?.name ?? 'Compte indisponible'} : {data.review.request_note}</p>{/if}
- <form method="POST" action="?/verifier" class="mt-4 space-y-3">
- <input type="hidden" name="revision" value={data.review.revision} />
- {#if data.review.author_approved_by}
- <label class="block">Priorité <select name="priority" class="champ"><option value="0" selected={data.review.priority===0}>Normale</option><option value="1" selected={data.review.priority===1}>Prioritaire</option><option value="2" selected={data.review.priority===2}>Urgente</option></select></label>
- <button class="bouton-secondaire" name="decision" value="priority">Enregistrer la priorité</button>
- {/if}
- <label class="block">Commentaire<textarea name="note" class="champ" maxlength="2000"></textarea></label>
- <label class="block">Personne à solliciter<select name="target" class="champ"><option value="">Choisir une personne</option>{#each data.admins.filter(a => a.id !== data.adminCourant.id && (!data.review.author_approved_by || a.id !== data.reviewAuthor)) as admin}<option value={admin.id}>{admin.name}</option>{/each}</select></label>
- <div class="flex flex-wrap gap-2">
- {#if data.review.author_approved_by && data.adminCourant.id!==data.reviewAuthor}
- <button class="bouton" name="decision" value="approve" disabled={!!data.review.requested_id && data.review.requested_id!==data.adminCourant.id}>Valider l'article</button>
- <button class="bouton-secondaire" name="decision" value="request" disabled={!!data.review.requested_id}>Demander un troisième avis</button>
- {/if}
- {#if !data.review.author_approved_by}
- {#if data.review.advice_requested_id===data.adminCourant.id}<button class="bouton" name="decision" value="advice_reply">Donner mon avis</button>
- {:else if !data.review.advice_requested_id}<button class="bouton-secondaire" name="decision" value="advice">Demander un avis à quelqu'un</button>{/if}
- {/if}
- <button class="bouton-secondaire" name="decision" value="comment">Ajouter un commentaire</button>
- {#if data.review.author_approved_by}<button class="bouton-secondaire" name="decision" value="corrections">Demander des corrections</button>{/if}
- </div>
- </form>
- <details class="mt-4"><summary>Historique des vérifications</summary>{#each data.history as h}<p class="mt-2 text-sm">{formatDateTime(h.created_at)} · {h.name} · Version {h.revision} · {{advice:'Avis demandé sur le brouillon',advice_reply:'Avis sur le brouillon',comment:'Commentaire',author:'Soumis à validation par l’auteur',approve:'Validation',request:'Troisième avis demandé',corrections:'Corrections demandées',priority:'Priorité modifiée'}[h.action] ?? h.action}{h.note ? ` : ${h.note}` : ''}</p>{/each}</details>
-</section>
-{/if}
 
 <section class="mt-10 rounded-lg border border-brand p-5">
 	<h2 class="font-bold text-brand">Supprimer cette publication</h2>

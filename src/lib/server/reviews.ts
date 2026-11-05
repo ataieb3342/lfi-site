@@ -78,3 +78,10 @@ export function listArticlesForReview(submitted = true) {
  order by r.priority desc,coalesce(r.author_approved_at,p.created_at),p.id`).all(submitted ? 1 : 0) as {id:number;title:string;author_name:string;created_at:string;status:string}[];
  return rows.map(p => ({...p,review:getReview(p.id),label:reviewLabel(getReview(p.id))}));
 }
+
+export function countArticlesAwaitingReview(): number {
+ return Number((db().prepare(`select count(*) as n from publications p
+ join article_reviews r on r.publication_id=p.id
+ where p.kind='article' and p.status='draft' and r.author_approved_by is not null
+ and (r.reviewer_id is null or r.requested_id is not null)`).get() as {n:number}).n);
+}
