@@ -95,8 +95,13 @@ servent que de valeurs de repli.
 
 Le circuit concerne uniquement le type « Article ». Les événements, formations
 et apéros conservent leur publication habituelle dans Publications.
-Tout nouvel article est créé en brouillon : l’option « Publié » est désactivée
-à la création. Le serveur refuse aussi une tentative de publication directe,
+La création d’un article propose directement « Enregistrer le brouillon » et
+« Enregistrer et soumettre ». Le second bouton crée le texte et l’envoie à la
+relecture en une seule opération, puis ouvre « Mes articles » avec une
+confirmation. Il n’est plus nécessaire d’enregistrer puis de soumettre sur
+une deuxième page. Seul l’auteur responsable peut soumettre ; un brouillon
+créé pour un autre auteur attend sa soumission depuis son propre compte.
+Le serveur refuse une tentative de publication directe,
 y compris par le raccourci de mise à la une. Après validation, seule l’action
 « Publier » de l’auteur met l’article en ligne ; enregistrer ou mettre à la une
 ne permet pas de contourner cette étape.
@@ -109,11 +114,13 @@ personnellement sur un brouillon. Le compteur du menu correspond à cet onglet.
 Un brouillon non soumis apparaît dans « À vérifier » uniquement chez la
 personne à laquelle l’auteur a demandé un avis.
 
-L'auteur rédige et enregistre son article, puis choisit « Enregistrer et
-soumettre » quand il est prêt. Pendant la relecture, il consulte le texte et
-les commentaires et peut répondre, sans modifier le texte ni le valider.
-Ces restrictions sont aussi contrôlées côté serveur. Une demande explicite de
-corrections lui rend la rédaction ; un commentaire seul conserve l'état.
+L’auteur et le relecteur peuvent modifier le texte jusqu’à sa publication,
+y compris après une première validation. Les modifications du texte retirent
+la validation du relecteur, sans retirer la soumission de l’auteur : la
+relecture continue sans nouvelle soumission. Un enregistrement fondé sur une
+ancienne version est refusé pour ne pas écraser les corrections de l’autre.
+L’auteur ne peut pas valider sa propre relecture. Une demande explicite de
+corrections remet le texte en rédaction ; un commentaire seul conserve l’état.
 
 Un autre administrateur ouvre l'article, le corrige si besoin et choisit
 « Valider cet article », disponible en haut et à la fin du formulaire. Les
@@ -122,6 +129,10 @@ l'accord initial de l'auteur. Les décisions sur une
 ancienne version du texte sont refusées. L'auteur peut ensuite utiliser le
 bouton « Publier » sur la version validée. La validation ne publie pas
 automatiquement et un auteur ne peut jamais assurer sa propre relecture.
+Le bouton « Publier » enregistre aussi les champs du formulaire : si le texte
+a changé depuis sa validation, les modifications sont conservées et l’article
+reste à relire. S’il n’a pas changé, il est mis en ligne. Aucun texte modifié
+ne peut ainsi être publié avec une ancienne validation.
 
 Le bloc de suivi se trouve au-dessus du texte. Après validation, il confirme
 que l'auteur peut publier. Il affiche l'action attendue ; les commentaires

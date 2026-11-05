@@ -32,6 +32,7 @@
 		canSubmitArticle = false,
         articleWorkflow = false,
         canReviewArticle = false,
+		currentAdminId,
 		valeurs = {},
 		erreur = '',
 		libelleValider = 'Enregistrer',
@@ -45,6 +46,7 @@
 		canSubmitArticle?: boolean;
         articleWorkflow?: boolean;
         canReviewArticle?: boolean;
+		currentAdminId?: number;
 		valeurs?: Champs;
 		erreur?: string;
 		libelleValider?: string;
@@ -236,7 +238,8 @@
 			{/if}
 
             {#if articleWorkflow && typeSelectionne === 'article'}
-            <input type="hidden" name="status" value={v.status} />
+            <input type="hidden" name="status" value={publication ? v.status : 'draft'} />
+            {#if !publication}<p class="aide">Enregistrez un brouillon pour continuer plus tard, ou soumettez directement votre article à la relecture. Il sera publié après validation.</p>{/if}
             {:else}
 			<div>
 				<label class="etiquette" for="status">État</label>
@@ -344,6 +347,7 @@
 			     page sans rien enregistrer, et le texte en cours était perdu.
 			     Le bouton enregistre d'abord, puis met la fiche à la une ; la
 			     page de la une ne s'ouvre que dans un nouvel onglet. -->
+			{#if !(articleWorkflow && typeSelectionne === 'article' && !positionUne)}
 			<div class="text-sm text-ink">
 				{#if positionUne}
 					<p>
@@ -364,6 +368,7 @@
 					</p>
 				{/if}
 			</div>
+			{/if}
 		</div>
 
 		<div class="carte space-y-3">
@@ -393,9 +398,10 @@
 		</div>
 
         {#if articleWorkflow && typeSelectionne === 'article'}
-        {#if canSubmitArticle}<button class="bouton w-full justify-center" type="submit" name="articleAction" value="submit">Enregistrer et soumettre</button>{/if}
+        {#if canSubmitArticle && (publication || !currentAdminId || !auteurChoisi || auteurChoisi === 'other' || auteurChoisi === String(currentAdminId))}<button class="bouton w-full justify-center" type="submit" name="articleAction" value="submit">Enregistrer et soumettre</button>{/if}
+        {#if !publication && currentAdminId && auteurChoisi && auteurChoisi !== 'other' && auteurChoisi !== String(currentAdminId)}<p class="aide">L’auteur choisi pourra soumettre ce brouillon depuis son compte.</p>{/if}
         {#if canReviewArticle}<button class="bouton w-full justify-center" type="submit" formaction="?/enregistrerEtValider">{articleValidated ? 'Enregistrer et confirmer les corrections' : 'Valider cet article'}</button><p class="aide">Enregistre vos corrections et autorise l’auteur à publier.</p>{/if}
-        <button class="bouton-secondaire w-full justify-center" type="submit">Enregistrer</button>
+        <button class="bouton-secondaire w-full justify-center" type="submit">{publication ? 'Enregistrer' : 'Enregistrer le brouillon'}</button>
         {:else}
         <button class="bouton w-full justify-center" type="submit">{libelleValider}</button>
         {/if}

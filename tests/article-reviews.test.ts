@@ -244,11 +244,11 @@ test('personal queues exclude own articles and only count actionable work', () =
  assert.equal(articleReviewWorkspace(1).mine.find(p=>p.id===id)!.label,'Prêt à publier');
 });
 
-test('author can consult and comment during review, then publish the approved version', () => {
+test('author can edit and comment during review, then publish the approved version', () => {
  const id=create();
  assertArticleEditable(id,1);
  act(id,1,'author');
- assert.throws(()=>assertArticleEditable(id,1));
+ assertArticleEditable(id,1);
  assert.equal(articleReviewPermissions(id,1).canReview,false);
  assert.equal(articleReviewPermissions(id,1).canComment,true);
  assert.throws(()=>act(id,1,'approve'));
@@ -257,6 +257,7 @@ test('author can consult and comment during review, then publish the approved ve
  act(id,1,'comment','Thank you for reviewing');
  assertArticleEditable(id,2);
  act(id,2,'request','Please check this',3);
+ assertArticleEditable(id,1);
  assert.throws(()=>assertArticleEditable(id,2));
  assertArticleEditable(id,3);
  act(id,3,'corrections','Complete the source');
@@ -269,4 +270,28 @@ test('author can consult and comment during review, then publish the approved ve
  publishReviewedArticle(id,1,getReview(id).revision);
  assert.equal(getById(id)!.status,'published');
  assert.equal(articleReviewWorkspace(1).mine.some(p=>p.id===id),false);
+});
+
+test('author and reviewer remain editable until publication and changes require review without resubmission', () => {
+ const id=create();
+ approve(id);
+ for (const actor of [1,2]) assertArticleEditable(id,actor);
+ assert.throws(()=>assertArticleEditable(id,3));
+ const previous=getReview(id).revision;
+ updatePublication(id,{...input,body:'Author revision after approval'},{reslug:false});
+ assert.equal(getReview(id).author_approved_by,1);
+ assert.equal(getReview(id).reviewer_id,null);
+ assert.equal(articleReviewPermissions(id,1).canSubmit,false);
+ assert.equal(articleReviewPermissions(id,2).canReview,true);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),true);
+ assert.throws(()=>reviewAction(id,2,'approve',previous,'',0,0));
+ assert.throws(()=>publishReviewedArticle(id,1,getReview(id).revision));
+ act(id,2,'approve');
+ assertArticleEditable(id,2);
+ updatePublication(id,{...input,body:'Reviewer revision after approval'},{reslug:false});
+ assert.equal(canPublishArticle(id),false);
+ assert.equal(getReview(id).author_approved_by,1);
+ act(id,2,'approve');
+ publishReviewedArticle(id,1,getReview(id).revision);
+ assert.equal(getById(id)!.body,'Reviewer revision after approval');
 });

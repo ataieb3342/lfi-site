@@ -16,7 +16,7 @@
  {#if error}<p class="alerte mt-3" role="alert">{error}</p>{/if}
  {#if review.request_note}<p class="mt-2 text-sm text-ink-soft">{review.request_note}</p>{/if}
  {#if review.advice_note}<p class="mt-2 text-sm text-ink-soft">Question : {review.advice_note}</p>{/if}
- {#if permissions.canPublish}<form method="POST" action="?/publier" class="mt-4"><input type="hidden" name="revision" value={review.revision}/><button class="bouton" type="submit">Publier</button></form>{/if}
+ {#if permissions.canPublish}<div class="mt-4"><button class="bouton" type="submit" form="publication-edit" formaction="?/enregistrerEtPublier">Publier</button><p class="mt-2 text-sm text-ink-soft">Enregistre le formulaire avant de publier. Si le texte a changé, il sera enregistré pour une nouvelle relecture.</p></div>{/if}
  {#if permissions.canReview}
  <div class="mt-4 flex flex-wrap items-center gap-3">
  {#if !review.reviewer_id}<button class="bouton review-primary" type="submit" form="publication-edit" formaction="?/enregistrerEtValider" aria-describedby="validation-help">Valider cet article</button>{/if}
@@ -25,6 +25,7 @@
  {#if !review.reviewer_id}<p class="mt-2 text-sm text-ink-soft" id="validation-help">Enregistre vos corrections et autorise l'auteur à publier.</p>{/if}
  {/if}
  {#if permissions.canSubmit}<p class="mt-2 text-sm text-ink-soft">Enregistrez votre texte, puis choisissez « Enregistrer et soumettre » quand il est prêt.</p>{/if}
+ {#if status==='draft' && review.author_approved_by && permissions.canEdit}<p class="mt-2 text-sm text-ink-soft">L’auteur et le relecteur peuvent modifier le texte jusqu’à sa publication. Toute modification du texte retire sa validation ; la relecture continue sans nouvelle soumission.</p>{/if}
  {#if remarks.length}<div class="mt-4 space-y-2">{#each remarks as h}<p class="rounded bg-surface-alt p-3 text-sm"><span class="font-semibold">{h.name}</span> : {h.note}</p>{/each}</div>{/if}
  {#if permissions.canReplyAdvice}<form method="POST" action="?/verifier" class="mt-4 space-y-3"><input type="hidden" name="revision" value={review.revision}/><label class="block text-sm">Votre avis<textarea class="champ mt-1" name="note" maxlength="2000" required></textarea></label><button class="bouton" name="decision" value="advice_reply">Donner mon avis</button></form>{/if}
  <div class="mt-4 flex flex-wrap items-start gap-4">

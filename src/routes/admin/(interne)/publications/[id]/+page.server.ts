@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
  reviewAuthor: publication.byline_admin_id ?? publication.author_id,
 		positionUne: positionALaUne(publication.id),
 		enregistre: url.searchParams.has('enregistre'),
+		relecture: url.searchParams.get('relecture') === '1',
 		// Ce qu'a donné « Enregistrer et mettre à la une » : `ok`, `brouillon`
 		// ou `pleine`.
 		une: url.searchParams.get('une')
@@ -46,7 +47,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 };
 
 /** Enregistre la publication ; renvoie `null`, ou l'échec à afficher. */
-async function enregistrer({ request, params, locals }: RequestEvent<{ id: string }>, decision: 'save' | 'approve' = 'save') {
+async function enregistrer({ request, params, locals }: RequestEvent<{ id: string }>, decision: 'save' | 'approve' | 'publish' = 'save') {
 	const admin = locals.admin!;
 	const publication = charger(params.id);
 	const form = await request.formData();
@@ -69,15 +70,18 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
         if (current.kind==='article' && Number(form.get('reviewRevision'))!==getReview(current.id).revision) throw new ReviewError('Le texte a changé. Rechargez la fiche avant de l’enregistrer.');
         if (soumettre && (saisie.kind !== 'article' || (saisie.authorAdminId ?? current.author_id) !== admin.id)) throw new ReviewError('Seul l’auteur peut soumettre son article à validation.');
         if (decision==='approve' && !articleReviewPermissions(current.id,admin.id).canReview) throw new ReviewError('Vous ne pouvez pas valider cet article.');
+        if (decision==='publish' && !articleReviewPermissions(current.id,admin.id).canPublish) throw new ReviewError('Seul l’auteur peut publier une version validée.');
         const base=db();
         base.exec('begin immediate');
         try {
             updatePublication(current.id, saisie, { reslug: form.get('regenererUrl') === '1' });
             if (soumettre) reviewAction(current.id,admin.id,'author',getReview(current.id).revision,'',0,0,false);
             if (decision==='approve') reviewAction(current.id,admin.id,'approve',getReview(current.id).revision,'',0,0,false);
+            if (decision==='publish' && canPublishArticle(current.id)) publishReviewedArticle(current.id,admin.id,getReview(current.id).revision,false);
             base.exec('commit');
         } catch(e) {base.exec('rollback');throw e;}
 		audit(admin, 'publication.modification', saisie.title, saisie.status, locals.ipHash);
+		if (decision === 'publish' && charger(params.id).status === 'published') audit(admin, 'publication.publication', params.id, '', locals.ipHash);
 		return null;
 	} catch (err) {
 		if (err instanceof ErreurFormulaire || err instanceof ReviewError) {
@@ -88,6 +92,12 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
 }
 
 export const actions: Actions = {
+ enregistrerEtPublier: async (event) => {
+ const echec=await enregistrer(event,'publish');
+ if(echec) return echec;
+ const relecture=charger(event.params.id).status==='draft';
+ redirect(303,`/admin/publications/${event.params.id}?enregistre=1${relecture?'&relecture=1':''}`);
+ },
  publier: async ({params,locals,request}) => {
  const f=await request.formData();
  try {publishReviewedArticle(Number(params.id),locals.admin!.id,Number(f.get('revision')));}

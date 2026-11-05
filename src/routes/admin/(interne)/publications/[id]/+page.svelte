@@ -32,6 +32,9 @@
 </header>
 
 {#if data.enregistre && !form}
+	{#if data.relecture}
+		<p class="alerte mb-6">Vos modifications sont enregistrées. Le texte a changé depuis sa validation : une nouvelle relecture est nécessaire avant publication, sans nouvelle soumission.</p>
+	{/if}
 	<!-- Le résultat de « Enregistrer et mettre à la une ». Le texte est
 	     toujours enregistré ; seule la une a pu refuser la fiche. -->
 	{#if data.une === 'ok'}

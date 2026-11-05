@@ -71,6 +71,28 @@ try {
  });
  assert.equal((await request('/admin/verifications')).status, 303);
  passed('Administration requires a valid session');
+ const creationView=(await request('/admin/publications/nouvelle',1)).html;
+ assert.ok(creationView.includes('Enregistrer et soumettre'));
+ assert.ok(creationView.includes('Enregistrer le brouillon'));
+ assert.doesNotMatch(creationView,/<select[^>]*name="status"/);
+ const draftFields={kind:'article',title:'One-step submission',summary:'Summary',body:'Ready to review',status:'draft',authorAdminId:'1',articleAction:'submit',commentsOpen:'1'};
+ const countBeforeCreation=base.prepare('select count(*) as n from publications').get().n;
+ for (const overrides of [{authorAdminId:'2'},{title:''}]) {
+ assert.equal((await request('/admin/publications/nouvelle?/creer',1,{...draftFields,...overrides})).status,400);
+ assert.equal(base.prepare('select count(*) as n from publications').get().n,countBeforeCreation);
+ }
+ const created=await request('/admin/publications/nouvelle?/creer',1,draftFields);
+ assert.equal(created.status,303);
+ assert.equal(created.location,'/admin/verifications?onglet=mes-articles&soumis=1');
+ const submittedId=base.prepare('select id from publications where title=?').get(draftFields.title).id;
+ assert.equal(getById(submittedId).status,'draft');
+ assert.equal(getReview(submittedId).author_approved_by,1);
+ assert.ok((await request(created.location,1)).html.includes('Article enregistré et soumis à la relecture'));
+ assert.ok((await request('/admin/verifications?onglet=a-verifier',2)).html.includes(draftFields.title));
+ assert.equal((await decide(submittedId,2,'approve')).status,303);
+ assert.equal((await request(`/admin/publications/${submittedId}?/enregistrerEtPublier`,1,fields(submittedId))).status,303);
+ assert.equal(getById(submittedId).status,'published');
+ passed('Creation saves and submits in one step, while invalid submissions leave no orphan drafts');
  for (const action of ['creer', 'creerEtUne']) {
  const count = base.prepare('select count(*) as n from publications').get().n;
  const direct = await request(`/admin/publications/nouvelle?/${action}`, 1, {
@@ -87,14 +109,18 @@ try {
  await submit(id);
  const authorView = (await request(`/admin/publications/${id}`, 1)).html;
  assert.ok(authorView.includes('Votre article attend une relecture'));
- assert.ok(!authorView.includes('id="publication-edit"'));
+ assert.ok(authorView.includes('id="publication-edit"'));
  assert.ok(!/<button[^>]*>Valider cet article<\/button>/.test(authorView));
- assert.equal((await request(`/admin/publications/${id}?/enregistrer`, 1, fields(id, { body: 'Unauthorized edit' }))).status, 400);
- assert.equal(getById(id).body, 'Original text');
+ const staleFields=fields(id,{body:'Stale reviewer changes'});
+ assert.equal((await request(`/admin/publications/${id}?/enregistrer`, 1, fields(id, { body: 'Author update during review' }))).status, 303);
+ assert.equal(getById(id).body, 'Author update during review');
+ assert.equal(getReview(id).author_approved_by,1);
+ assert.equal((await request(`/admin/publications/${id}?/enregistrer`,2,staleFields)).status,400);
+ assert.equal(getById(id).body,'Author update during review');
  assert.equal((await decide(id, 1, 'approve')).status, 400);
- passed('Submitted authors can consult but cannot edit or approve their own article');
+ passed('Author editing remains available during review while stale saves and self-approval are rejected');
  assert.equal((await decide(id, 2, 'comment', 'Useful comment')).status, 303);
- assert.equal(getById(id).body, 'Original text');
+ assert.equal(getById(id).body, 'Author update during review');
  assert.equal(getReview(id).reviewer_id, null);
  assert.ok((await request(`/admin/publications/${id}`, 1)).html.includes('Useful comment'));
  assert.equal(countArticlesAwaitingReview(1), 0);
@@ -105,7 +131,7 @@ try {
  assert.ok(reviewerView.includes('id="publication-edit"'));
  const revision = getReview(id).revision;
  assert.equal((await request(`/admin/publications/${id}?/enregistrerEtValider`, 2, fields(id, { title: '', body: 'Invalid revision' }))).status, 400);
- assert.equal(getById(id).body, 'Original text');
+ assert.equal(getById(id).body, 'Author update during review');
  assert.equal((await request(`/admin/publications/${id}?/enregistrerEtValider`, 2, fields(id, { body: 'Corrected and approved text' }))).status, 303);
  assert.equal(getById(id).body, 'Corrected and approved text');
  assert.equal(getReview(id).reviewer_id, 2);
@@ -126,10 +152,20 @@ try {
  assert.equal((await request(`/admin/publications/${id}?/publier`, 2, { revision: String(getReview(id).revision) })).status, 400);
  assert.equal((await request(`/admin/publications/${id}?/publier`, 1, { revision: String(revision) })).status, 400);
  assert.ok((await request(`/admin/publications/${id}`, 1)).html.includes('>Publier</button>'));
- assert.equal((await request(`/admin/publications/${id}?/publier`, 1, { revision: String(getReview(id).revision) })).status, 303);
+ assert.equal((await request(`/admin/publications/${id}?/enregistrerEtPublier`,2,fields(id))).status,400);
+ const editedPublication=await request(`/admin/publications/${id}?/enregistrerEtPublier`,1,fields(id,{body:'Final author changes'}));
+ assert.equal(editedPublication.status,303);
+ assert.ok(editedPublication.location.includes('relecture=1'));
+ assert.equal(getById(id).status,'draft');
+ assert.equal(getById(id).body,'Final author changes');
+ assert.equal(getReview(id).author_approved_by,1);
+ assert.equal(getReview(id).reviewer_id,null);
+ assert.equal((await request(`/articles/${getById(id).slug}`)).status,404);
+ assert.equal((await decide(id,2,'approve')).status,303);
+ assert.equal((await request(`/admin/publications/${id}?/enregistrerEtPublier`,1,fields(id))).status,303);
  assert.equal(getById(id).status, 'published');
  assert.equal((await request(`/articles/${getById(id).slug}`)).status, 200);
- passed('Only the author can publish the approved revision');
+ passed('Publication saves the form and requires renewed review for changes without another submission');
  const enhanced = await create('Enhanced form journey');
  await submit(enhanced);
  const ajax = await request(`/admin/publications/${enhanced}?/enregistrerEtValider`, 2, fields(enhanced, { body:'Saved through the enhanced multipart form' }), {accept:'application/json','x-sveltekit-action':'true'}, true);

@@ -32,8 +32,11 @@
 	}}
 >
 	<FormulairePublication
+		articleWorkflow={true}
+		canSubmitArticle={true}
+		currentAdminId={data.currentAdminId}
 		admins={data.admins}
-		valeurs={form ?? {}}
+		valeurs={form ?? { authorAdminId: String(data.currentAdminId) }}
 		erreur={form?.erreur ?? ''}
 		apercu={form?.apercu ?? ''}
 		libelleValider="Créer la publication"

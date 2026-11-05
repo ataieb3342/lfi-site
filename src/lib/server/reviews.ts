@@ -108,24 +108,24 @@ export function articleReviewPermissions(id: number, actorId: number) {
  const active = !!db().prepare('select id from admins where id=? and disabled_at is null').get(actorId);
  const canReview = active && !isAuthor && p.status === 'draft' && !!r.author_approved_by && (!r.reviewer_id || r.reviewer_id===actorId) && (!r.requested_id || r.requested_id === actorId);
  const canSubmit = active && isAuthor && p.status === 'draft' && !r.author_approved_by;
- return {isAuthor,canEdit:active && (p.status === 'published' || canSubmit || canReview),canSubmit,canReview,
+ return {isAuthor,canEdit:active && (p.status === 'published' || (isAuthor && p.status === 'draft') || canReview),canSubmit,canReview,
  canAskAdvice:canSubmit,canReplyAdvice:active && !isAuthor && r.advice_requested_id === actorId && !r.author_approved_by,
  canComment:active && (p.status==='published' || isAuthor || canReview || r.advice_requested_id === actorId || r.reviewer_id === actorId || r.requested_by === actorId),
  canPublish:active && isAuthor && p.status === 'draft' && canPublishArticle(id)};
 }
 
 export function assertArticleEditable(id: number, actorId: number) {
- if (!articleReviewPermissions(id,actorId).canEdit) throw new ReviewError('Cet article est en cours de relecture. Vous pouvez consulter le texte et les commentaires.');
+ if (!articleReviewPermissions(id,actorId).canEdit) throw new ReviewError('Vous pouvez consulter cet article. Les modifications sont réservées à l’auteur et à la personne chargée de la relecture.');
 }
 
-export function publishReviewedArticle(id:number, actorId:number, revision:number) {
+export function publishReviewedArticle(id:number, actorId:number, revision:number, transaction = true) {
  const base=db();
- base.exec('begin immediate');
+ if (transaction) base.exec('begin immediate');
  try {
  if (getReview(id).revision!==revision || !articleReviewPermissions(id,actorId).canPublish) throw new ReviewError('Seul l’auteur peut publier la version validée de cet article.');
  base.prepare("update publications set status='published',published_at=coalesce(published_at,?),updated_at=? where id=?").run(now(),now(),id);
- base.exec('commit');
- } catch(e) {base.exec('rollback');throw e;}
+ if (transaction) base.exec('commit');
+ } catch(e) {if (transaction) base.exec('rollback');throw e;}
 }
 
 export function articleReviewWorkspace(actorId:number) {
