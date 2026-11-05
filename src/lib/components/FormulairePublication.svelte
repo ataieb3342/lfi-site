@@ -394,7 +394,7 @@
 
         {#if articleWorkflow && typeSelectionne === 'article'}
         {#if canSubmitArticle}<button class="bouton w-full justify-center" type="submit" name="articleAction" value="submit">Enregistrer et soumettre</button>{/if}
-        {#if canReviewArticle}<button class="bouton w-full justify-center" type="submit" formaction="?/enregistrerEtValider">Enregistrer et valider</button>{/if}
+        {#if canReviewArticle}<button class="bouton w-full justify-center" type="submit" formaction="?/enregistrerEtValider">{articleValidated ? 'Enregistrer et confirmer les corrections' : 'Valider cet article'}</button><p class="aide">Enregistre vos corrections et autorise l’auteur à publier.</p>{/if}
         <button class="bouton-secondaire w-full justify-center" type="submit">Enregistrer</button>
         {:else}
         <button class="bouton w-full justify-center" type="submit">{libelleValider}</button>

@@ -117,13 +117,15 @@ Ces restrictions sont aussi contrôlées côté serveur. Une demande explicite d
 corrections lui rend la rédaction ; un commentaire seul conserve l'état.
 
 Un autre administrateur ouvre l'article, le corrige si besoin et choisit
-« Enregistrer et valider ». Les corrections et la validation sont enregistrées
+« Valider cet article », disponible en haut et à la fin du formulaire. Les
+corrections et la validation sont enregistrées
 ensemble, sans redemander l'accord initial de l'auteur. Les décisions sur une
 ancienne version du texte sont refusées. L'auteur peut ensuite utiliser le
 bouton « Publier » sur la version validée. La validation ne publie pas
 automatiquement et un auteur ne peut jamais assurer sa propre relecture.
 
-Le bloc de suivi se trouve au-dessus du texte. Il affiche l'action attendue ;
+Le bloc de suivi se trouve au-dessus du texte. Après validation, il confirme
+que l'auteur peut publier. Il affiche l'action attendue ;
 les commentaires récents sont visibles directement. Les autres actions
 s'ouvrent au clic : commenter, demander des corrections ou demander un autre
 avis. Les dates, versions et priorités restent dans l'historique.

@@ -7,17 +7,23 @@
  history:ReturnType<typeof reviewHistory>;status:string;error?:string;
  }=$props();
  const targetName=$derived(admins.find(a=>a.id===(review.requested_id ?? review.advice_requested_id))?.name ?? 'la personne sollicitée');
- const message=$derived(status==='published'?'Cet article est publié.':permissions.canPublish?'Votre article est validé. Vous pouvez le publier.':review.requested_id?`En attente de l’avis de ${targetName}.`:permissions.canReplyAdvice?'Votre avis est demandé sur ce brouillon.':permissions.isAuthor&&review.author_approved_by?'Votre article attend une relecture.':permissions.canReview?'Cet article attend votre relecture.':permissions.canSubmit?'Votre article est en rédaction.':'Vous pouvez consulter cet article.');
+ const message=$derived(status==='published'?'Cet article est publié.':permissions.canPublish?'Votre article est validé. Vous pouvez le publier.':review.reviewer_id?(review.reviewer_id===actorId?'Vous avez validé cet article. Son auteur peut maintenant le publier.':'Cet article est validé. Son auteur peut le publier.'):review.requested_id?`En attente de l’avis de ${targetName}.`:permissions.canReplyAdvice?'Votre avis est demandé sur ce brouillon.':permissions.isAuthor&&review.author_approved_by?'Votre article attend une relecture.':permissions.canReview?'Cet article attend votre relecture.':permissions.canSubmit?'Votre article est en rédaction.':'Vous pouvez consulter cet article.');
  const remarks=$derived(history.filter(h=>['comment','corrections','advice_reply'].includes(h.action)).slice(0,3));
  const labels:Record<string,string>={author:'Soumission',approve:'Validation',comment:'Commentaire',corrections:'Corrections demandées',advice:'Avis demandé',advice_reply:'Avis reçu',request:'Autre avis demandé',priority:'Priorité modifiée'};
 </script>
-<section class="mb-6 rounded-lg border border-line p-5" aria-label="Suivi de l'article">
+<section class="mb-6 rounded-lg border p-5 {permissions.canReview && !review.reviewer_id ? 'border-brand bg-brand-soft' : 'border-line'}" aria-label="Suivi de l'article">
  <h2 class="font-bold">{message}</h2>
  {#if error}<p class="alerte mt-3" role="alert">{error}</p>{/if}
  {#if review.request_note}<p class="mt-2 text-sm text-ink-soft">{review.request_note}</p>{/if}
  {#if review.advice_note}<p class="mt-2 text-sm text-ink-soft">Question : {review.advice_note}</p>{/if}
  {#if permissions.canPublish}<form method="POST" action="?/publier" class="mt-4"><input type="hidden" name="revision" value={review.revision}/><button class="bouton" type="submit">Publier</button></form>{/if}
- {#if permissions.canReview}<a class="bouton mt-4" href="#texte-article">Lire et corriger</a>{/if}
+ {#if permissions.canReview}
+ <div class="mt-4 flex flex-wrap items-center gap-3">
+ {#if !review.reviewer_id}<button class="bouton review-primary" type="submit" form="publication-edit" formaction="?/enregistrerEtValider" aria-describedby="validation-help">Valider cet article</button>{/if}
+ <a class="bouton-secondaire" href="#texte-article">Lire et corriger le texte</a>
+ </div>
+ {#if !review.reviewer_id}<p class="mt-2 text-sm text-ink-soft" id="validation-help">Enregistre vos corrections et autorise l'auteur à publier.</p>{/if}
+ {/if}
  {#if permissions.canSubmit}<p class="mt-2 text-sm text-ink-soft">Enregistrez votre texte, puis choisissez « Enregistrer et soumettre » quand il est prêt.</p>{/if}
  {#if remarks.length}<div class="mt-4 space-y-2">{#each remarks as h}<p class="rounded bg-surface-alt p-3 text-sm"><span class="font-semibold">{h.name}</span> : {h.note}</p>{/each}</div>{/if}
  {#if permissions.canReplyAdvice}<form method="POST" action="?/verifier" class="mt-4 space-y-3"><input type="hidden" name="revision" value={review.revision}/><label class="block text-sm">Votre avis<textarea class="champ mt-1" name="note" maxlength="2000" required></textarea></label><button class="bouton" name="decision" value="advice_reply">Donner mon avis</button></form>{/if}
@@ -31,3 +37,8 @@
  {#each history as h}<p class="mt-2 text-xs text-ink-soft">{formatDateTime(h.created_at)} · {h.name} · {labels[h.action] ?? h.action} · Version {h.revision}{h.note?` : ${h.note}`:''}</p>{/each}
  </details>
 </section>
+
+<style>
+ .review-primary { padding:0.85rem 1.4rem; font-size:1rem; font-weight:800; }
+ @media(max-width:520px) { .review-primary { width:100%; justify-content:center; } }
+</style>

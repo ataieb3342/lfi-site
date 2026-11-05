@@ -64,6 +64,7 @@
 {#if data.permissions.canEdit}
 
 <form
+    id="publication-edit"
 	method="POST"
 	action="?/enregistrer"
 	enctype="multipart/form-data"
