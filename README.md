@@ -185,3 +185,14 @@ node --test src/lib/jeux/mythology-rts/tests/*.test.js
 Les jeux sont des applications JavaScript autonomes, exclues du contrôle
 TypeScript/Svelte du site. Le jeu de stratégie possède donc sa propre suite de
 tests, exécutée par la troisième commande.
+
+Pour vérifier le parcours éditorial sur le serveur compilé, après `npm run build` :
+
+```bash
+node --experimental-strip-types tests/integration/article-workflow-http.mjs
+```
+
+Ce contrôle utilise des comptes fictifs, une base temporaire et un serveur local
+sur le port 5191 (`TEST_PORT` permet de le changer). Il vérifie aussi les
+formulaires avec JavaScript, les refus d'accès et le fonctionnement habituel
+des événements, formations et apéros. Le serveur de test est arrêté à la fin.
