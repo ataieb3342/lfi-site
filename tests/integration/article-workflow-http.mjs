@@ -71,6 +71,16 @@ try {
  });
  assert.equal((await request('/admin/verifications')).status, 303);
  passed('Administration requires a valid session');
+ for (const action of ['creer', 'creerEtUne']) {
+ const count = base.prepare('select count(*) as n from publications').get().n;
+ const direct = await request(`/admin/publications/nouvelle?/${action}`, 1, {
+ kind: 'article', title: 'Direct publication attempt', summary: 'Must remain unpublished',
+ body: 'Unreviewed text', status: 'published', authorAdminId: '1', commentsOpen: '1'
+ });
+ assert.equal(direct.status, 400);
+ assert.equal(base.prepare('select count(*) as n from publications').get().n, count);
+ }
+ passed('Article creation rejects direct publication, including the front-page shortcut');
  const id = await create('HTTP review journey');
  assert.equal((await request(`/articles/${getById(id).slug}`)).status, 404);
  assert.ok((await request(`/admin/publications/${id}`, 1)).html.includes('Enregistrer et soumettre'));
@@ -104,6 +114,15 @@ try {
  assert.equal(countArticlesAwaitingReview(2), 0);
  assert.ok((await request(`/admin/publications/${id}`, 2)).html.includes('Vous avez validé cet article'));
  passed('Main approval action saves corrections atomically and confirms success');
+ const approved = getById(id);
+ for (const actor of [1, 2]) {
+ for (const action of ['enregistrer', 'enregistrerEtUne', ...(actor === 2 ? ['enregistrerEtValider'] : [])]) {
+ const direct = await request(`/admin/publications/${id}?/${action}`, actor, fields(id, { status: 'published' }));
+ assert.equal(direct.status, 400, `Direct publication through ${action} by admin ${actor}`);
+ assert.deepEqual(getById(id), approved);
+ }
+ }
+ passed('Saving or pinning a reviewed draft cannot bypass the author publication action');
  assert.equal((await request(`/admin/publications/${id}?/publier`, 2, { revision: String(getReview(id).revision) })).status, 400);
  assert.equal((await request(`/admin/publications/${id}?/publier`, 1, { revision: String(revision) })).status, 400);
  assert.ok((await request(`/admin/publications/${id}`, 1)).html.includes('>Publier</button>'));

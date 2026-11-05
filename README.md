@@ -41,13 +41,12 @@ scripts/           sauvegarde et restauration
 
 | Je veux… | Où |
 | --- | --- |
-| Écrire un article ou une actualité | Administration → Publications → Nouvelle publication |
-| Raconter une action terminée | Choisir « Retour d’action », puis collage, porte-à-porte ou tractage |
+| Écrire un article ou un compte rendu | Administration → Publications → Nouvelle publication → Article |
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
-| Mettre temporairement une publication à la une | Cocher « Épingler à la une » ; l’épinglage expire automatiquement après 15 jours |
+| Mettre une publication à la une | Sur une publication en ligne, choisir « Enregistrer et mettre à la une » ; gérer l’ordre et le retrait dans Administration → À la une |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
 | Retrouver mes articles en cours | Administration → Vérifications → Mes articles |
-| Vérifier un article avant publication | Administration → Vérifications |
+| Vérifier un article avant publication | Administration → Vérifications → À vérifier |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
@@ -85,12 +84,6 @@ la taille du texte et les marges intérieures pour cet élément seulement.
 en respectant leur ordre dans le Markdown.
 Les anciens articles restent compatibles. Le HTML brut n'est pas interprété.
 
-Un retour d’action ne peut porter que sur une action terminée. Le titre et le
-chapô sont préparés à partir du type d’action et de sa date, puis restent
-modifiables. Aucun horaire, lieu, responsable, carte ou lien d’inscription
-n’est enregistré. Une invitation vers Action populaire termine automatiquement
-la fiche.
-
 Les événements, formations et apéros peuvent partager une même date : chaque
 fiche reste distincte dans les rubriques et dans l’agenda. Ils disposent de
 leurs propres horaires, lieu, adresse, point de rendez-vous, responsables et
@@ -102,13 +95,19 @@ servent que de valeurs de repli.
 
 Le circuit concerne uniquement le type « Article ». Les événements, formations
 et apéros conservent leur publication habituelle dans Publications.
+Tout nouvel article est créé en brouillon : l’option « Publié » est désactivée
+à la création. Le serveur refuse aussi une tentative de publication directe,
+y compris par le raccourci de mise à la une. Après validation, seule l’action
+« Publier » de l’auteur met l’article en ligne ; enregistrer ou mettre à la une
+ne permet pas de contourner cette étape.
 
 Administration → Vérifications comporte deux onglets. « Mes articles » rassemble
 les textes non publiés dont le compte connecté est l'auteur responsable.
 « À vérifier » contient uniquement les articles des autres sur lesquels ce
 compte peut intervenir : une relecture après soumission, ou un avis demandé
 personnellement sur un brouillon. Le compteur du menu correspond à cet onglet.
-Un brouillon non soumis ne rejoint pas la liste des autres administrateurs.
+Un brouillon non soumis apparaît dans « À vérifier » uniquement chez la
+personne à laquelle l’auteur a demandé un avis.
 
 L'auteur rédige et enregistre son article, puis choisit « Enregistrer et
 soumettre » quand il est prêt. Pendant la relecture, il consulte le texte et
@@ -118,15 +117,15 @@ corrections lui rend la rédaction ; un commentaire seul conserve l'état.
 
 Un autre administrateur ouvre l'article, le corrige si besoin et choisit
 « Valider cet article », disponible en haut et à la fin du formulaire. Les
-corrections et la validation sont enregistrées
-ensemble, sans redemander l'accord initial de l'auteur. Les décisions sur une
+corrections et la validation sont enregistrées ensemble, sans redemander
+l'accord initial de l'auteur. Les décisions sur une
 ancienne version du texte sont refusées. L'auteur peut ensuite utiliser le
 bouton « Publier » sur la version validée. La validation ne publie pas
 automatiquement et un auteur ne peut jamais assurer sa propre relecture.
 
 Le bloc de suivi se trouve au-dessus du texte. Après validation, il confirme
-que l'auteur peut publier. Il affiche l'action attendue ;
-les commentaires récents sont visibles directement. Les autres actions
+que l'auteur peut publier. Il affiche l'action attendue ; les commentaires
+récents sont visibles directement. Les autres actions
 s'ouvrent au clic : commenter, demander des corrections ou demander un autre
 avis. Les dates, versions et priorités restent dans l'historique.
 
@@ -146,16 +145,10 @@ prévisualisation utilisent une base séparée de la production.
 
 ## Navigation et agenda
 
-La navigation publique est regroupée en deux ensembles :
-
-- **Actualités** : vue d’ensemble, agenda, retours d’action, événements et formations ;
-- **Ressources** : bibliothèque, revue de presse, boîte à outils et jeux.
-
-Un clic sur le nom d’un ensemble ouvre sa page principale ; la flèche affiche
-ses sous-rubriques.
-
-L’agenda rassemble les rendez-vous à venir. Les retours d’action restent dans
-les actualités et n’annoncent jamais une action à l’avance.
+La navigation publique donne directement accès à l’agenda et aux articles.
+Le menu « Ressources » ouvre la bibliothèque ; sa flèche donne aussi accès à
+la boîte à outils, aux jeux et aux médias. L’agenda rassemble les événements,
+formations et apéros, avec une navigation par mois et des filtres par catégorie.
 
 ## Site de démonstration
 
@@ -184,7 +177,7 @@ node --test src/lib/jeux/mythology-rts/tests/*.test.js
 
 Les jeux sont des applications JavaScript autonomes, exclues du contrôle
 TypeScript/Svelte du site. Le jeu de stratégie possède donc sa propre suite de
-tests, exécutée par la troisième commande.
+tests, exécutée par la quatrième commande.
 
 Pour vérifier le parcours éditorial sur le serveur compilé, après `npm run build` :
 
@@ -194,5 +187,6 @@ node --experimental-strip-types tests/integration/article-workflow-http.mjs
 
 Ce contrôle utilise des comptes fictifs, une base temporaire et un serveur local
 sur le port 5191 (`TEST_PORT` permet de le changer). Il vérifie aussi les
-formulaires avec JavaScript, les refus d'accès et le fonctionnement habituel
+requêtes de formulaires avec et sans amélioration JavaScript, les refus d'accès,
+les tentatives de publication directe et le fonctionnement habituel
 des événements, formations et apéros. Le serveur de test est arrêté à la fin.

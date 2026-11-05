@@ -64,6 +64,7 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
         const soumettre = form.get('soumettreValidation') === '1' || form.get('articleAction') === 'submit';
         const current=charger(params.id);
         assertArticleEditable(current.id,admin.id);
+        if (current.kind==='article' && saisie.kind==='article' && current.status==='draft' && saisie.status==='published') throw new ReviewError('Seul l’auteur peut publier la version validée avec le bouton « Publier ».');
         if (current.kind==='article' && getReview(current.id).author_approved_by && (saisie.kind!=='article' || (saisie.authorAdminId ?? current.author_id)!==(current.byline_admin_id ?? current.author_id))) throw new ReviewError('Le type et l’auteur restent fixes pendant la relecture.');
         if (current.kind==='article' && Number(form.get('reviewRevision'))!==getReview(current.id).revision) throw new ReviewError('Le texte a changé. Rechargez la fiche avant de l’enregistrer.');
         if (soumettre && (saisie.kind !== 'article' || (saisie.authorAdminId ?? current.author_id) !== admin.id)) throw new ReviewError('Seul l’auteur peut soumettre son article à validation.');
