@@ -6,7 +6,7 @@ import { join } from 'node:path';
 process.env.DATABASE_PATH = join(mkdtempSync(join(tmpdir(), 'lfi-review-')), 'test.db');
 const { db } = await import('../src/lib/server/db.ts');
 const { createPublication, updatePublication, getById, getPublishedBySlug } = await import('../src/lib/server/content.ts');
-const { reviewAction, getReview, canPublishArticle, reviewHistory, listArticlesForReview, countArticlesAwaitingReview } = await import('../src/lib/server/reviews.ts');
+const { reviewAction, getReview, canPublishArticle, reviewHistory, listArticlesForReview, countArticlesAwaitingReview, articleReviewPermissions, assertArticleEditable, articleReviewWorkspace, publishReviewedArticle } = await import('../src/lib/server/reviews.ts');
 const base = db();
 for (let i = 1; i <= 4; i++) {
  base.prepare("insert into admins(username,display_name,password_hash,role,created_at) values(?,?,?,'admin',?)")
@@ -120,7 +120,7 @@ test('invalid operations roll back completely and corrections block publishing',
  assert.throws(() => act(id, 3, action, note, 0, priority));
  assert.deepEqual(getReview(id), review);
  }
- act(id, 3, 'corrections', 'Incorrect source');
+ act(id, 2, 'corrections', 'Incorrect source');
  assert.equal(canPublishArticle(id), false);
  assert.throws(() => publish(id));
 });
@@ -168,7 +168,7 @@ test('drafts enter the verification queue only after their author submits them',
  const id = create();
  assert.equal(listArticlesForReview().some(p => p.id === id), false);
  assert.equal(listArticlesForReview(false).some(p => p.id === id), true);
- act(id, 2, 'comment', 'Drafting suggestion');
+ act(id, 1, 'comment', 'Drafting suggestion');
  assert.equal(listArticlesForReview().some(p => p.id === id), false);
  assert.throws(() => act(id, 2, 'author'));
  act(id, 1, 'author');
@@ -219,4 +219,54 @@ test('review counter counts pending submitted articles and third opinions only',
  assert.equal(countArticlesAwaitingReview(), initial + 1);
  act(id, 2, 'corrections', 'More drafting needed');
  assert.equal(countArticlesAwaitingReview(), initial);
+});
+
+
+test('personal queues exclude own articles and only count actionable work', () => {
+ const id=create();
+ for(const actor of [1,2,3,4]) assert.equal(countArticlesAwaitingReview(actor),articleReviewWorkspace(actor).toReview.length);
+ assert.equal(articleReviewWorkspace(1).mine.some(p=>p.id===id),true);
+ assert.equal(articleReviewWorkspace(1).toReview.some(p=>p.id===id),false);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),false);
+ act(id,1,'advice','Could you read this?',2);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),true);
+ assert.equal(articleReviewWorkspace(3).toReview.some(p=>p.id===id),false);
+ act(id,1,'author');
+ assert.equal(articleReviewWorkspace(1).toReview.some(p=>p.id===id),false);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),true);
+ act(id,2,'request','Third opinion needed',3);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),false);
+ assert.equal(articleReviewWorkspace(3).toReview.some(p=>p.id===id),true);
+ assert.equal(articleReviewWorkspace(4).toReview.some(p=>p.id===id),false);
+ for(const actor of [1,2,3,4]) assert.equal(countArticlesAwaitingReview(actor),articleReviewWorkspace(actor).toReview.length);
+ act(id,3,'approve');
+ assert.equal(articleReviewWorkspace(3).toReview.some(p=>p.id===id),false);
+ assert.equal(articleReviewWorkspace(1).mine.find(p=>p.id===id)!.label,'Prêt à publier');
+});
+
+test('author can consult and comment during review, then publish the approved version', () => {
+ const id=create();
+ assertArticleEditable(id,1);
+ act(id,1,'author');
+ assert.throws(()=>assertArticleEditable(id,1));
+ assert.equal(articleReviewPermissions(id,1).canReview,false);
+ assert.equal(articleReviewPermissions(id,1).canComment,true);
+ assert.throws(()=>act(id,1,'approve'));
+ assert.throws(()=>act(id,1,'corrections','Let me edit'));
+ assert.throws(()=>publishReviewedArticle(id,1,getReview(id).revision));
+ act(id,1,'comment','Thank you for reviewing');
+ assertArticleEditable(id,2);
+ act(id,2,'request','Please check this',3);
+ assert.throws(()=>assertArticleEditable(id,2));
+ assertArticleEditable(id,3);
+ act(id,3,'corrections','Complete the source');
+ assertArticleEditable(id,1);
+ act(id,1,'author');
+ act(id,2,'approve');
+ assert.equal(articleReviewPermissions(id,1).canPublish,true);
+ assert.throws(()=>publishReviewedArticle(id,2,getReview(id).revision));
+ assert.throws(()=>publishReviewedArticle(id,1,getReview(id).revision-1));
+ publishReviewedArticle(id,1,getReview(id).revision);
+ assert.equal(getById(id)!.status,'published');
+ assert.equal(articleReviewWorkspace(1).mine.some(p=>p.id===id),false);
 });

@@ -46,7 +46,7 @@ scripts/           sauvegarde et restauration
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
 | Mettre temporairement une publication à la une | Cocher « Épingler à la une » ; l’épinglage expire automatiquement après 15 jours |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
-| Retrouver un article en cours | Administration → Rédaction |
+| Retrouver mes articles en cours | Administration → Vérifications → Mes articles |
 | Vérifier un article avant publication | Administration → Vérifications |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
@@ -101,50 +101,46 @@ servent que de valeurs de repli.
 ## Validation des articles
 
 Le circuit concerne uniquement le type « Article ». Les événements, formations
-et apéros conservent leur publication habituelle.
+et apéros conservent leur publication habituelle dans Publications.
 
-L'auteur rédige son article dans Administration → Rédaction. Quand le texte est
-prêt, il coche « Soumettre à validation » puis enregistre. Cette action vaut
-accord de l'auteur et fait apparaître l'article dans Vérifications. Un autre
-administrateur peut alors le relire et cliquer sur « Valider
-l'article ». Cette validation autorise la publication ; elle ne publie pas
-automatiquement. L'auteur peut ensuite choisir « Publié » et enregistrer.
-Le contrôle est aussi effectué côté serveur.
+Administration → Vérifications comporte deux onglets. « Mes articles » rassemble
+les textes non publiés dont le compte connecté est l'auteur responsable.
+« À vérifier » contient uniquement les articles des autres sur lesquels ce
+compte peut intervenir : une relecture après soumission, ou un avis demandé
+personnellement sur un brouillon. Le compteur du menu correspond à cet onglet.
+Un brouillon non soumis ne rejoint pas la liste des autres administrateurs.
 
-Les brouillons non soumis restent dans Rédaction et n'apparaissent pas dans
-Vérifications. Dans Vérifications, les articles soumis non publiés sont classés
-par urgence puis par ancienneté : à valider (orange), troisième avis demandé,
-ou validé (vert). Le compteur de Vérifications indique les articles soumis
-qui attendent encore une validation, y compris un troisième avis ; les brouillons
-non soumis et les articles déjà validés ne sont pas comptés. La priorité
-est distincte de l'état : normale, prioritaire ou urgente.
+L'auteur rédige et enregistre son article, puis choisit « Enregistrer et
+soumettre » quand il est prêt. Pendant la relecture, il consulte le texte et
+les commentaires et peut répondre, sans modifier le texte ni le valider.
+Ces restrictions sont aussi contrôlées côté serveur. Une demande explicite de
+corrections lui rend la rédaction ; un commentaire seul conserve l'état.
 
-Le relecteur peut corriger le texte, enregistrer, puis valider directement la
-version corrigée. L'accord initial de l'auteur reste acquis. Une modification
-du contenu annule la validation du relecteur et remet l'article en brouillon ;
-une nouvelle validation suffit. Un changement d'auteur nécessite l'accord du
-nouvel auteur. Les décisions sur une ancienne version du texte sont refusées.
+Un autre administrateur ouvre l'article, le corrige si besoin et choisit
+« Enregistrer et valider ». Les corrections et la validation sont enregistrées
+ensemble, sans redemander l'accord initial de l'auteur. Les décisions sur une
+ancienne version du texte sont refusées. L'auteur peut ensuite utiliser le
+bouton « Publier » sur la version validée. La validation ne publie pas
+automatiquement et un auteur ne peut jamais assurer sa propre relecture.
 
-Pendant la rédaction, « Demander un avis à quelqu'un » permet de choisir un
-autre administrateur et de lui poser une question. La personne sollicitée peut
-cliquer sur « Donner mon avis ». L'article reste dans Rédaction : cette demande
-et sa réponse ne valent ni soumission ni validation. L'auteur peut soumettre
-son texte dès qu'il le juge prêt, sans attendre la réponse à cette demande.
+Le bloc de suivi se trouve au-dessus du texte. Il affiche l'action attendue ;
+les commentaires récents sont visibles directement. Les autres actions
+s'ouvrent au clic : commenter, demander des corrections ou demander un autre
+avis. Les dates, versions et priorités restent dans l'historique.
 
-« Ajouter un commentaire » conserve le texte et l'état actuels. Les commentaires
-sont internes à l'administration et restent dans l'historique. « Demander des
-corrections » exige un commentaire et remet les accords à zéro.
+Pendant la rédaction, l'auteur peut demander un avis à une personne désignée.
+Celle-ci retrouve la demande dans « À vérifier » et peut donner son avis,
+sans valider ni modifier ce brouillon. L'auteur peut soumettre son article
+sans attendre la réponse. Cette soumission clôt la demande informelle.
 
-En cas de doute, le relecteur peut demander un troisième avis en choisissant une
-personne différente de lui et de l'auteur, avec un commentaire obligatoire.
-La publication reste bloquée jusqu'à validation par la personne sollicitée.
-Le bouton de demande disparaît tant qu'un troisième avis est en cours.
-Le bloc de vérification se trouve au-dessus du texte de l'article.
-Une correction du texte conserve cette demande en cours.
+Lors d'une relecture, demander un autre avis bloque la validation jusqu'à
+l'intervention de la personne sollicitée, différente de l'auteur et du demandeur.
+La demande quitte la liste des interventions du demandeur et apparaît chez la
+personne sollicitée. Le suivi reste visible sur la fiche de l'article.
 
 Les articles déjà publiés restent en ligne lors de la mise à jour du logiciel.
-La base est migrée automatiquement au démarrage. Les exemples de la prévisualisation
-utilisent une base séparée et ne sont pas transférés en production.
+La base est migrée automatiquement au démarrage. Les exemples de la
+prévisualisation utilisent une base séparée de la production.
 
 ## Navigation et agenda
 

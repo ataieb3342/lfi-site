@@ -25,7 +25,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 			role: locals.admin.role,
 			totpEnabled: locals.admin.totpEnabled
 		},
-		verificationsEnAttente: countArticlesAwaitingReview(),
+		verificationsEnAttente: countArticlesAwaitingReview(locals.admin.id),
 		commentairesEnAttente: countPendingComments(),
 		sourcesEnAttente: countPendingSources()
 	};

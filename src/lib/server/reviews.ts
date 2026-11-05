@@ -1,4 +1,5 @@
 import { db, now } from './db.ts';
+import type { Publication } from './content.ts';
 
 export class ReviewError extends Error {}
 export type Review = {
@@ -25,9 +26,9 @@ export function canPublishArticle(id: number) {
 export function reviewHistory(id:number) {
  return db().prepare(`select h.*, a.display_name as name from article_review_history h join admins a on a.id=h.admin_id where publication_id=? order by h.id desc`).all(id) as {id:number;revision:number;name:string;action:string;note:string;created_at:string}[];
 }
-export function reviewAction(id:number, actor:number, action:string, revision:number, note:string, target:number, priority:number) {
+export function reviewAction(id:number, actor:number, action:string, revision:number, note:string, target:number, priority:number, transaction = true) {
  const base=db();
- base.exec('begin immediate');
+ if (transaction) base.exec('begin immediate');
  try {
  const p=base.prepare('select kind,status,coalesce(byline_admin_id,author_id) as author from publications where id=?').get(id) as {kind:string;status:string;author:number|null}|undefined;
  if (!p || p.kind!=='article') throw new ReviewError('Article introuvable.');
@@ -36,6 +37,12 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  const r=getReview(id);
  if (r.revision!==revision) throw new ReviewError('Le texte a changé. Relisez la nouvelle version avant de valider.');
  if (note.length>2000) throw new ReviewError('Le commentaire est trop long.');
+ const permissions = articleReviewPermissions(id, actor);
+ if (action==='author' && !permissions.canSubmit) throw new ReviewError('Cet article ne peut pas être soumis par ce compte.');
+ if (['approve','request','corrections'].includes(action) && !permissions.canReview) throw new ReviewError('Cette relecture est réservée à un autre administrateur ou à la personne sollicitée.');
+ if (action==='advice' && !permissions.canAskAdvice) throw new ReviewError('Seul l’auteur peut demander un avis sur son brouillon.');
+ if (action==='comment' && !permissions.canComment) throw new ReviewError('Vous ne participez pas à cette relecture.');
+ if (action==='priority' && !permissions.canEdit) throw new ReviewError('Cet article est en consultation seule pour votre compte.');
  if (action==='author') {
  if (p.author!==actor) throw new ReviewError("Seul l'auteur peut valider son texte. Choisissez son compte dans le formulaire.");
  base.prepare("update article_reviews set author_approved_by=?,author_approved_at=?,advice_requested_id=null,advice_requested_by=null,advice_note='',advice_requested_at=null where publication_id=?").run(actor,now(),id);
@@ -66,8 +73,8 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  base.prepare('update article_reviews set priority=? where publication_id=?').run(priority,id);
  } else throw new ReviewError('Action inconnue.');
  base.prepare('insert into article_review_history(publication_id,revision,admin_id,action,note,created_at) values(?,?,?,?,?,?)').run(id,r.revision,actor,action,note,now());
- base.exec('commit');
- } catch(e) {base.exec('rollback');throw e;}
+ if (transaction) base.exec('commit');
+ } catch(e) {if (transaction) base.exec('rollback');throw e;}
 }
 
 export function listArticlesForReview(submitted = true) {
@@ -79,9 +86,59 @@ export function listArticlesForReview(submitted = true) {
  return rows.map(p => ({...p,review:getReview(p.id),label:reviewLabel(getReview(p.id))}));
 }
 
-export function countArticlesAwaitingReview(): number {
+export function countArticlesAwaitingReview(actorId?: number): number {
+ if (actorId !== undefined) return Number((db().prepare(`select count(*) as n from publications p
+ join article_reviews r on r.publication_id=p.id
+ where p.kind='article' and p.status='draft'
+ and coalesce(p.byline_admin_id,p.author_id) is not ?
+ and exists(select 1 from admins where id=? and disabled_at is null)
+ and ((r.author_approved_by is not null and r.reviewer_id is null and (r.requested_id is null or r.requested_id=?))
+ or (r.author_approved_by is null and r.advice_requested_id=?))`).get(actorId,actorId,actorId,actorId) as {n:number}).n);
  return Number((db().prepare(`select count(*) as n from publications p
  join article_reviews r on r.publication_id=p.id
  where p.kind='article' and p.status='draft' and r.author_approved_by is not null
  and (r.reviewer_id is null or r.requested_id is not null)`).get() as {n:number}).n);
+}
+
+export function articleReviewPermissions(id: number, actorId: number) {
+ const p = db().prepare('select * from publications where id=?').get(id) as Publication | undefined;
+ if (!p || p.kind !== 'article') return {isAuthor:false,canEdit:true,canSubmit:false,canReview:false,canAskAdvice:false,canReplyAdvice:false,canComment:false,canPublish:false};
+ const r = getReview(id);
+ const isAuthor = (p.byline_admin_id ?? p.author_id) === actorId;
+ const active = !!db().prepare('select id from admins where id=? and disabled_at is null').get(actorId);
+ const canReview = active && !isAuthor && p.status === 'draft' && !!r.author_approved_by && (!r.reviewer_id || r.reviewer_id===actorId) && (!r.requested_id || r.requested_id === actorId);
+ const canSubmit = active && isAuthor && p.status === 'draft' && !r.author_approved_by;
+ return {isAuthor,canEdit:active && (p.status === 'published' || canSubmit || canReview),canSubmit,canReview,
+ canAskAdvice:canSubmit,canReplyAdvice:active && !isAuthor && r.advice_requested_id === actorId && !r.author_approved_by,
+ canComment:active && (p.status==='published' || isAuthor || canReview || r.advice_requested_id === actorId || r.reviewer_id === actorId || r.requested_by === actorId),
+ canPublish:active && isAuthor && p.status === 'draft' && canPublishArticle(id)};
+}
+
+export function assertArticleEditable(id: number, actorId: number) {
+ if (!articleReviewPermissions(id,actorId).canEdit) throw new ReviewError('Cet article est en cours de relecture. Vous pouvez consulter le texte et les commentaires.');
+}
+
+export function publishReviewedArticle(id:number, actorId:number, revision:number) {
+ const base=db();
+ base.exec('begin immediate');
+ try {
+ if (getReview(id).revision!==revision || !articleReviewPermissions(id,actorId).canPublish) throw new ReviewError('Seul l’auteur peut publier la version validée de cet article.');
+ base.prepare("update publications set status='published',published_at=coalesce(published_at,?),updated_at=? where id=?").run(now(),now(),id);
+ base.exec('commit');
+ } catch(e) {base.exec('rollback');throw e;}
+}
+
+export function articleReviewWorkspace(actorId:number) {
+ const rows=db().prepare(`select p.id,p.title,p.author_name,p.status,p.updated_at,
+ coalesce(p.byline_admin_id,p.author_id) as owner from publications p
+ where p.kind='article' and p.status='draft' order by p.updated_at desc,p.id desc`).all() as {id:number;title:string;author_name:string;status:string;updated_at:string;owner:number|null}[];
+ const articles=rows.map(p=>{
+ const review=getReview(p.id);
+ const history=reviewHistory(p.id);
+ const lastRemark=history.find(h=>['comment','corrections','advice_reply'].includes(h.action));
+ const needsCorrections=!review.author_approved_by && history.find(h=>['author','corrections'].includes(h.action))?.action==='corrections';
+ return {...p,review,permissions:articleReviewPermissions(p.id,actorId),lastRemark:lastRemark?.note ?? '',
+ label:needsCorrections ? 'Corrections demandées' : review.reviewer_id ? 'Prêt à publier' : review.requested_id ? 'Avis en cours' : review.author_approved_by ? 'En attente de relecture' : 'En rédaction'};
+ });
+ return {mine:articles.filter(p=>p.owner===actorId),toReview:articles.filter(p=>p.owner!==actorId && ((p.permissions.canReview && !p.review.reviewer_id) || p.permissions.canReplyAdvice)).sort((a,b)=>b.review.priority-a.review.priority || (a.review.author_approved_at ?? a.updated_at).localeCompare(b.review.author_approved_at ?? b.updated_at))};
 }

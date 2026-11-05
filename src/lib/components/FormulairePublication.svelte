@@ -30,6 +30,8 @@
 		publication = null,
 		articleValidated = false,
 		canSubmitArticle = false,
+        articleWorkflow = false,
+        canReviewArticle = false,
 		valeurs = {},
 		erreur = '',
 		libelleValider = 'Enregistrer',
@@ -41,6 +43,8 @@
 		publication?: PublicationVue | null;
 		articleValidated?: boolean;
 		canSubmitArticle?: boolean;
+        articleWorkflow?: boolean;
+        canReviewArticle?: boolean;
 		valeurs?: Champs;
 		erreur?: string;
 		libelleValider?: string;
@@ -231,6 +235,9 @@
 				<input type="hidden" name="layoutStyle" value="standard" />
 			{/if}
 
+            {#if articleWorkflow && typeSelectionne === 'article'}
+            <input type="hidden" name="status" value={v.status} />
+            {:else}
 			<div>
 				<label class="etiquette" for="status">État</label>
 				<select id="status" name="status" class="champ">
@@ -239,6 +246,7 @@
 				</select>
 				<p class="aide">Un brouillon n'est visible que par les administrateurs connectés.</p>
 			</div>
+            {/if}
 
 
 			{#if !estRendezVous}
@@ -347,7 +355,7 @@
 						</a>
 					</p>
 				{:else}
-					<button type="submit" formaction={actionUne} class="bouton-secondaire">
+					<button type="submit" formaction={actionUne} class="bouton-secondaire" hidden={articleWorkflow && typeSelectionne === 'article'}>
 						Enregistrer et mettre à la une
 					</button>
 					<p class="aide">
@@ -384,9 +392,12 @@
 			</div>
 		</div>
 
-        {#if typeSelectionne === 'article' && canSubmitArticle}
-        <label class="carte flex items-start gap-2 text-sm"><input type="checkbox" name="soumettreValidation" value="1" class="mt-1" /><span>Soumettre à validation<span class="mt-1 block text-xs text-ink-soft">Je valide mon texte. Il apparaîtra dans Vérifications après l'enregistrement.</span></span></label>
+        {#if articleWorkflow && typeSelectionne === 'article'}
+        {#if canSubmitArticle}<button class="bouton w-full justify-center" type="submit" name="articleAction" value="submit">Enregistrer et soumettre</button>{/if}
+        {#if canReviewArticle}<button class="bouton w-full justify-center" type="submit" formaction="?/enregistrerEtValider">Enregistrer et valider</button>{/if}
+        <button class="bouton-secondaire w-full justify-center" type="submit">Enregistrer</button>
+        {:else}
+        <button class="bouton w-full justify-center" type="submit">{libelleValider}</button>
         {/if}
-		<button class="bouton w-full justify-center" type="submit">{libelleValider}</button>
 	</aside>
 </div>
