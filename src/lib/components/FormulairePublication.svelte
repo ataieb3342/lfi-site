@@ -29,6 +29,7 @@
 	let {
 		publication = null,
 		articleValidated = false,
+		canSubmitArticle = false,
 		valeurs = {},
 		erreur = '',
 		libelleValider = 'Enregistrer',
@@ -39,6 +40,7 @@
 	}: {
 		publication?: PublicationVue | null;
 		articleValidated?: boolean;
+		canSubmitArticle?: boolean;
 		valeurs?: Champs;
 		erreur?: string;
 		libelleValider?: string;
@@ -382,6 +384,9 @@
 			</div>
 		</div>
 
+        {#if typeSelectionne === 'article' && canSubmitArticle}
+        <label class="carte flex items-start gap-2 text-sm"><input type="checkbox" name="soumettreValidation" value="1" class="mt-1" /><span>Soumettre à validation<span class="mt-1 block text-xs text-ink-soft">Je valide mon texte. Il apparaîtra dans Vérifications après l'enregistrement.</span></span></label>
+        {/if}
 		<button class="bouton w-full justify-center" type="submit">{libelleValider}</button>
 	</aside>
 </div>

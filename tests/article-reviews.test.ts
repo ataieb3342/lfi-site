@@ -6,7 +6,7 @@ import { join } from 'node:path';
 process.env.DATABASE_PATH = join(mkdtempSync(join(tmpdir(), 'lfi-review-')), 'test.db');
 const { db } = await import('../src/lib/server/db.ts');
 const { createPublication, updatePublication, getById, getPublishedBySlug } = await import('../src/lib/server/content.ts');
-const { reviewAction, getReview, canPublishArticle, reviewHistory } = await import('../src/lib/server/reviews.ts');
+const { reviewAction, getReview, canPublishArticle, reviewHistory, listArticlesForReview } = await import('../src/lib/server/reviews.ts');
 const base = db();
 for (let i = 1; i <= 4; i++) {
  base.prepare("insert into admins(username,display_name,password_hash,role,created_at) values(?,?,?,'admin',?)")
@@ -161,4 +161,43 @@ test('migration preserves articles already published before reviews existed', as
  assert.equal(migrated.prepare('select author_approved_by from article_reviews where publication_id=?').get(id)!.author_approved_by, null);
  assert.deepEqual(migrated.prepare('pragma foreign_key_check').all(), []);
  migrated.close();
+});
+
+
+test('drafts enter the verification queue only after their author submits them', () => {
+ const id = create();
+ assert.equal(listArticlesForReview().some(p => p.id === id), false);
+ assert.equal(listArticlesForReview(false).some(p => p.id === id), true);
+ act(id, 2, 'comment', 'Drafting suggestion');
+ assert.equal(listArticlesForReview().some(p => p.id === id), false);
+ assert.throws(() => act(id, 2, 'author'));
+ act(id, 1, 'author');
+ assert.equal(listArticlesForReview().some(p => p.id === id), true);
+ assert.equal(listArticlesForReview(false).some(p => p.id === id), false);
+ act(id, 2, 'corrections', 'Please complete the introduction');
+ assert.equal(listArticlesForReview().some(p => p.id === id), false);
+ assert.equal(listArticlesForReview(false).some(p => p.id === id), true);
+});
+
+test('informal advice and its reply never submit or approve an article', () => {
+ const id = create();
+ const before = getById(id);
+ assert.throws(() => act(id, 1, 'advice', '', 2));
+ assert.throws(() => act(id, 1, 'advice', 'Question', 1));
+ act(id, 1, 'advice', 'Could you read the introduction?', 2);
+ assert.equal(getReview(id).advice_requested_id, 2);
+ assert.equal(getReview(id).requested_id, null);
+ assert.equal(getReview(id).author_approved_by, null);
+ assert.equal(listArticlesForReview().some(p => p.id === id), false);
+ assert.deepEqual(getById(id), before);
+ assert.throws(() => act(id, 3, 'advice_reply', 'My opinion'));
+ act(id, 2, 'advice_reply', 'The introduction is clear');
+ assert.equal(getReview(id).advice_requested_id, null);
+ assert.equal(canPublishArticle(id), false);
+ assert.equal(listArticlesForReview(false).some(p => p.id === id), true);
+ act(id, 1, 'advice', 'One more question', 3);
+ act(id, 1, 'author'); // The author can submit without waiting for informal advice.
+ assert.equal(getReview(id).advice_requested_id, null);
+ assert.equal(listArticlesForReview().some(p => p.id === id), true);
+ assert.throws(() => act(id, 2, 'advice', 'Question', 3));
 });

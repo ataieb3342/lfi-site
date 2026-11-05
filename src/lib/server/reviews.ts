@@ -5,11 +5,12 @@ export type Review = {
  publication_id: number; revision: number; author_approved_by: number | null;
  author_approved_at: string | null; reviewer_id: number | null; reviewed_at: string | null;
  requested_by: number | null; requested_id: number | null; request_note: string; priority: number;
+ advice_requested_id: number | null; advice_requested_by: number | null; advice_note: string; advice_requested_at: string | null;
 };
 export function getReview(id: number): Review {
  return db().prepare('select * from article_reviews where publication_id=?').get(id) as Review ?? {
  publication_id:id,revision:1,author_approved_by:null,author_approved_at:null,reviewer_id:null,
- reviewed_at:null,requested_by:null,requested_id:null,request_note:'',priority:0
+ reviewed_at:null,requested_by:null,requested_id:null,request_note:'',priority:0,advice_requested_id:null,advice_requested_by:null,advice_note:'',advice_requested_at:null
  };
 }
 export function reviewLabel(r: Review) {
@@ -28,7 +29,7 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  const base=db();
  base.exec('begin immediate');
  try {
- const p=base.prepare('select kind,coalesce(byline_admin_id,author_id) as author from publications where id=?').get(id) as {kind:string;author:number|null}|undefined;
+ const p=base.prepare('select kind,status,coalesce(byline_admin_id,author_id) as author from publications where id=?').get(id) as {kind:string;status:string;author:number|null}|undefined;
  if (!p || p.kind!=='article') throw new ReviewError('Article introuvable.');
  if (!base.prepare('select id from admins where id=? and disabled_at is null').get(actor)) throw new ReviewError('Compte indisponible.');
  base.prepare('insert or ignore into article_reviews(publication_id) values (?)').run(id);
@@ -37,7 +38,15 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  if (note.length>2000) throw new ReviewError('Le commentaire est trop long.');
  if (action==='author') {
  if (p.author!==actor) throw new ReviewError("Seul l'auteur peut valider son texte. Choisissez son compte dans le formulaire.");
- base.prepare('update article_reviews set author_approved_by=?,author_approved_at=? where publication_id=?').run(actor,now(),id);
+ base.prepare("update article_reviews set author_approved_by=?,author_approved_at=?,advice_requested_id=null,advice_requested_by=null,advice_note='',advice_requested_at=null where publication_id=?").run(actor,now(),id);
+ } else if (action==='advice') {
+ if (p.status!=='draft' || r.author_approved_by) throw new ReviewError('Cette demande est réservée aux brouillons non soumis.');
+ if (!note.trim() || target===actor || !base.prepare('select id from admins where id=? and disabled_at is null').get(target)) throw new ReviewError('Choisissez une autre personne et précisez votre question.');
+ if (r.advice_requested_id) throw new ReviewError('Une demande d’avis est déjà en cours.');
+ base.prepare('update article_reviews set advice_requested_id=?,advice_requested_by=?,advice_note=?,advice_requested_at=? where publication_id=?').run(target,actor,note,now(),id);
+ } else if (action==='advice_reply') {
+ if (r.advice_requested_id!==actor || !note.trim()) throw new ReviewError('La personne sollicitée doit écrire son avis.');
+ base.prepare("update article_reviews set advice_requested_id=null,advice_requested_by=null,advice_note='',advice_requested_at=null where publication_id=?").run(id);
  } else if (action==='approve') {
  if (!r.author_approved_by || actor===p.author || (r.requested_id && actor!==r.requested_id)) throw new ReviewError('La validation doit être donnée par un autre administrateur ou la personne sollicitée.');
  base.prepare('update article_reviews set reviewer_id=?,reviewed_at=?,requested_id=null,requested_by=null,request_note=\'\' where publication_id=?').run(actor,now(),id);
@@ -59,4 +68,13 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  base.prepare('insert into article_review_history(publication_id,revision,admin_id,action,note,created_at) values(?,?,?,?,?,?)').run(id,r.revision,actor,action,note,now());
  base.exec('commit');
  } catch(e) {base.exec('rollback');throw e;}
+}
+
+export function listArticlesForReview(submitted = true) {
+ const rows = db().prepare(`select p.id,p.title,p.author_name,p.created_at,p.status
+ from publications p join article_reviews r on r.publication_id=p.id
+ where p.kind='article' and p.status='draft'
+ and (r.author_approved_by is not null) = ?
+ order by r.priority desc,coalesce(r.author_approved_at,p.created_at),p.id`).all(submitted ? 1 : 0) as {id:number;title:string;author_name:string;created_at:string;status:string}[];
+ return rows.map(p => ({...p,review:getReview(p.id),label:reviewLabel(getReview(p.id))}));
 }

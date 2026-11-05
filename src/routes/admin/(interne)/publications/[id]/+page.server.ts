@@ -56,7 +56,12 @@ async function enregistrer({ request, params, locals }: RequestEvent<{ id: strin
 		);
 		// L'URL n'est régénérée que si on le demande : les liens déjà partagés
 		// sur les réseaux sociaux continuent de fonctionner.
+        const soumettre = form.get('soumettreValidation') === '1';
+        if (soumettre && (saisie.kind !== 'article' || (saisie.authorAdminId ?? publication.author_id) !== admin.id)) {
+            throw new ReviewError('Seul l’auteur peut soumettre son article à validation.');
+        }
 		updatePublication(publication.id, saisie, { reslug: form.get('regenererUrl') === '1' });
+        if (soumettre) reviewAction(publication.id,admin.id,'author',getReview(publication.id).revision,'',0,0);
 		audit(admin, 'publication.modification', saisie.title, saisie.status, locals.ipHash);
 		return null;
 	} catch (err) {

@@ -46,6 +46,7 @@ scripts/           sauvegarde et restauration
 | Ajouter un rendez-vous | Choisir directement « Événement », « Formation » ou « Apéro thématique » |
 | Mettre temporairement une publication à la une | Cocher « Épingler à la une » ; l’épinglage expire automatiquement après 15 jours |
 | Consulter les rendez-vous | Agenda : navigation par mois et filtres par catégorie |
+| Retrouver un article en cours | Administration → Rédaction |
 | Vérifier un article avant publication | Administration → Vérifications |
 | Relire les commentaires reçus | Administration → Commentaires |
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
@@ -99,15 +100,18 @@ servent que de valeurs de repli.
 Le circuit concerne uniquement le type « Article ». Les événements, formations
 et apéros conservent leur publication habituelle.
 
-L'auteur enregistre son article en brouillon, puis clique sur « Je valide mon
-texte ». Un autre administrateur peut alors le relire et cliquer sur « Valider
+L'auteur rédige son article dans Administration → Rédaction. Quand le texte est
+prêt, il coche « Soumettre à validation » puis enregistre. Cette action vaut
+accord de l'auteur et fait apparaître l'article dans Vérifications. Un autre
+administrateur peut alors le relire et cliquer sur « Valider
 l'article ». Cette validation autorise la publication ; elle ne publie pas
 automatiquement. L'auteur peut ensuite choisir « Publié » et enregistrer.
 Le contrôle est aussi effectué côté serveur.
 
-Dans Administration → Vérifications, les articles non publiés sont classés par
-urgence puis par ancienneté. Un filtre permet de choisir leur état : brouillon
-(gris), à valider après accord de l'auteur (orange), ou validé (vert). La priorité
+Les brouillons non soumis restent dans Rédaction et n'apparaissent pas dans
+Vérifications. Dans Vérifications, les articles soumis non publiés sont classés
+par urgence puis par ancienneté : à valider (orange), troisième avis demandé,
+ou validé (vert). La priorité
 est distincte de l'état : normale, prioritaire ou urgente.
 
 Le relecteur peut corriger le texte, enregistrer, puis valider directement la
@@ -115,6 +119,12 @@ version corrigée. L'accord initial de l'auteur reste acquis. Une modification
 du contenu annule la validation du relecteur et remet l'article en brouillon ;
 une nouvelle validation suffit. Un changement d'auteur nécessite l'accord du
 nouvel auteur. Les décisions sur une ancienne version du texte sont refusées.
+
+Pendant la rédaction, « Demander un avis à quelqu'un » permet de choisir un
+autre administrateur et de lui poser une question. La personne sollicitée peut
+cliquer sur « Donner mon avis ». L'article reste dans Rédaction : cette demande
+et sa réponse ne valent ni soumission ni validation. L'auteur peut soumettre
+son texte dès qu'il le juge prêt, sans attendre la réponse à cette demande.
 
 « Ajouter un commentaire » conserve le texte et l'état actuels. Les commentaires
 sont internes à l'administration et restent dans l'historique. « Demander des

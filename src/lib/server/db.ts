@@ -583,6 +583,12 @@ const MIGRATIONS: string[] = [
  end;
  `
 
+, `
+ alter table article_reviews add column advice_requested_id integer references admins(id);
+ alter table article_reviews add column advice_requested_by integer references admins(id);
+ alter table article_reviews add column advice_note text not null default '';
+ alter table article_reviews add column advice_requested_at text;
+ `
 ];
 
 function migrer(base: DatabaseSync) {
