@@ -15,3 +15,9 @@ incidents
 *.md
 .vscode
 .claude
+
+# Aperçus et fichiers de travail locaux
+output
+tmp
+.codex-build
+.codex-finalizer

@@ -108,6 +108,11 @@ export function deleteMedia(id: number) {
 	if (!media) return;
 	db().prepare('delete from media where id = ?').run(id);
 	try {
+		unlinkSync(join(UPLOADS_DIR, '.thumbnails', `${media.filename}.webp`));
+	} catch {
+		// No thumbnail has been generated yet.
+	}
+	try {
 		unlinkSync(join(UPLOADS_DIR, media.filename));
 	} catch {
 		// Fichier déjà absent : l'entrée en base est supprimée, c'est l'essentiel.

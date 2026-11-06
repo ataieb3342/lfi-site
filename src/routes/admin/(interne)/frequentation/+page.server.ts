@@ -9,6 +9,7 @@ import { JEUX, urlJeu } from '$lib/jeux';
 const PAGES_FIXES: Record<string, string> = {
 	'/': 'Accueil',
 	'/articles': 'Articles',
+	'/dessins': 'Dessins et caricatures',
 	'/agenda': 'Agenda',
 	'/aperos': 'Apéros',
 	'/bibliotheque': 'Bibliothèque',

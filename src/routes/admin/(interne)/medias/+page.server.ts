@@ -16,6 +16,7 @@ export const load: PageServerLoad = async () => {
 			utilisations:
 				(db().prepare('select count(*) as n from publications where cover_media_id = ?').get(m.id) as { n: number }).n +
 				(db().prepare('select count(*) as n from admins where profile_media_id = ?').get(m.id) as { n: number }).n +
+				(db().prepare('select count(*) as n from drawings where media_id = ?').get(m.id) as { n: number }).n +
 				(db().prepare('select count(*) as n from medias_recommandes where logo_media_id = ?').get(m.id) as { n: number }).n
 		}))
 	};
@@ -48,6 +49,7 @@ export const actions: Actions = {
 		const utilisations =
 			(db().prepare('select count(*) as n from publications where cover_media_id = ?').get(id) as { n: number }).n +
 			(db().prepare('select count(*) as n from admins where profile_media_id = ?').get(id) as { n: number }).n +
+			(db().prepare('select count(*) as n from drawings where media_id = ?').get(id) as { n: number }).n +
 			(db().prepare('select count(*) as n from medias_recommandes where logo_media_id = ?').get(id) as { n: number }).n;
 		if (utilisations > 0) return fail(400, { erreur: 'Cette image est encore utilisée sur le site.' });
 

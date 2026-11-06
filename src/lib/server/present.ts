@@ -122,3 +122,20 @@ export function presentMediaRecommande(row: MediaRecommande): MediaRecommandeVue
 		accueil: !!row.accueil
 	};
 }
+
+/** Public drawing fields only; uploaded files retain their original content. */
+export function presentDrawing(row: import('./drawings.ts').Drawing) {
+ const media = getMedia(row.media_id);
+ return {
+  id: row.id, title: row.title, author: row.author, caption: row.caption,
+  alt: row.alt, rights: row.rights, published: !!row.published,
+  image: media ? `/media/${media.filename}` : null,
+  thumbnail: media ? `/media/${media.filename}/vignette` : null
+ };
+}
+
+export function presentDrawingSubmission(row: import('./drawing-submissions.ts').DrawingSubmission) {
+ return { id: row.id, title: row.title, author: row.author, caption: row.caption,
+  alt: row.alt, rights: row.rights, createdAt: row.created_at,
+  image: `/admin/dessins/propositions/${row.id}/image` };
+}

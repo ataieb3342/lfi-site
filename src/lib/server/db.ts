@@ -588,6 +588,29 @@ const MIGRATIONS: string[] = [
  alter table article_reviews add column advice_requested_by integer references admins(id);
  alter table article_reviews add column advice_note text not null default '';
  alter table article_reviews add column advice_requested_at text;
+ `,
+ `
+ create table drawings (
+  id integer primary key autoincrement,
+  title text not null,
+  author text not null,
+  caption text not null default '',
+  alt text not null,
+  rights text not null default '',
+  media_id integer not null references media(id) on delete restrict,
+  published integer not null default 0 check (published in (0, 1)),
+  created_at text not null,
+  updated_at text not null
+ );
+ create index drawings_public on drawings(published, created_at desc);
+ `,
+ `
+ create table drawing_submissions (
+  id integer primary key autoincrement,
+  title text not null, author text not null, caption text not null default '',
+  alt text not null, rights text not null, filename text not null unique,
+  mime text not null, bytes integer not null, created_at text not null
+ );
  `
 ];
 

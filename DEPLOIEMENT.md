@@ -207,3 +207,21 @@ ssh lfi 'docker stats --no-stream'
 **Trois habitudes qui comptent plus que le reste :** un mot de passe unique et
 long par personne, la 2FA active partout, et une sauvegarde vérifiée ailleurs
 qu'sur le serveur.
+
+## Galerie de dessins et mises à jour
+
+La galerie collaborative utilise Sharp pour produire les vignettes. `npm ci`
+installe ses binaires précompilés dans l'image Node 24 Alpine ; aucune commande
+de conversion ni service d'image externe n'est nécessaire. Reconstruisez
+l'image Docker lors de cette mise à jour, comme pour toute modification de
+`package-lock.json`.
+
+Les nouvelles tables SQLite sont ajoutées automatiquement à la première
+requête. Le volume `data/` contient aussi les fichiers privés des propositions
+(`uploads/.drawing-submissions/`) et le cache des vignettes
+(`uploads/.thumbnails/`). Le script de sauvegarde archive tout `uploads`,
+fichiers cachés compris. Ne servez jamais ce dossier directement avec Caddy :
+les routes du site contrôlent l'accès aux images en attente.
+
+Les données et illustrations d'exemple de l'aperçu local ne sont pas envoyées
+par Git ni incluses dans le contexte de compilation Docker.

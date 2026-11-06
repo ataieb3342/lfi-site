@@ -15,8 +15,7 @@ RUN npm run build && npm prune --omit=dev
 FROM node:24-alpine
 
 # `node:sqlite` (base de données) et `crypto.scrypt` (mots de passe) font partie
-# de Node : aucune bibliothèque native à compiler, donc aucune mise à jour de
-# Node ne peut casser l'installation.
+# de Node. Sharp fournit les vignettes via ses binaires précompilés pour Alpine.
 
 WORKDIR /app
 ENV NODE_ENV=production

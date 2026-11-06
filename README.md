@@ -1,8 +1,8 @@
 # Site du groupe d'action LFI Dijon Centre
 
 Site d'information : articles, actualités classées par catégorie, agenda
-interactif, commentaires anonymes modérés et administration protégée par
-double authentification.
+interactif, galerie collaborative de dessins, commentaires anonymes modérés
+et administration protégée par double authentification.
 
 - **Hébergement** : VPS français (OVH ou Scaleway), Docker + Caddy.
 - **Données** : un fichier SQLite, les images et les PDF de la bibliothèque.
@@ -12,8 +12,10 @@ double authentification.
 
 ## Démarrer en local
 
+Node.js 24 minimum.
+
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -51,6 +53,8 @@ scripts/           sauvegarde et restauration
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
 | Ajouter un jeu | Déposer son dossier dans `src/lib/jeux/` et l'ajouter à `src/lib/jeux.ts` |
+| Proposer un dessin sans compte | Dessins → Proposer un dessin |
+| Vérifier les dessins reçus | Administration → Dessins → Propositions à vérifier |
 | Ajouter une image | Administration → Images |
 | Ajouter un média recommandé, choisir ceux de l'accueil | Administration → Médias recommandés |
 | Changer le nom du site, l'adresse de contact | Administration → Réglages |
@@ -154,9 +158,49 @@ Les articles déjà publiés restent en ligne lors de la mise à jour du logicie
 La base est migrée automatiquement au démarrage. Les exemples de la
 prévisualisation utilisent une base séparée de la production.
 
+## Galerie collaborative de dessins
+
+La page `/dessins` réunit les dessins et caricatures acceptés. Chacun peut
+proposer une image depuis `/dessins/proposer`, sans compte ni adresse e-mail.
+Le formulaire demande un titre, un nom ou pseudonyme, une description
+accessible, les conditions de partage et une confirmation de l'autorisation
+de publication et de téléchargement. Une légende peut être ajoutée.
+Les fichiers JPEG, PNG, WebP, GIF et AVIF sont acceptés, jusqu'à 5 Mo.
+
+Chaque proposition attend une vérification. Son fichier est conservé dans
+`data/uploads/.drawing-submissions/`, sans adresse publique. Seuls les
+administrateurs connectés avec la double authentification activée peuvent
+le consulter. Le menu Dessins de l'administration indique le nombre de
+propositions en attente. L'équipe peut corriger la fiche, puis choisir
+« Accepter et publier » ou confirmer son refus. Un refus supprime la
+proposition et son fichier privé ; les décisions sont inscrites dans le
+journal d'administration. Aucun accusé de décision n'est envoyé par e-mail.
+
+Après acceptation, le dessin rejoint la galerie avec sa signature et ses
+conditions de partage. L'original devient téléchargeable. La galerie utilise
+des vignettes WebP de 640 pixels maximum, sans recadrage, créées par Sharp
+et mises en cache dans `data/uploads/.thumbnails/`. Un clic ouvre un lecteur
+avec zoom, navigation précédent/suivant et fermeture par Échap.
+
+Les administrateurs peuvent aussi ajouter directement un dessin, modifier une
+fiche publiée ou la remettre en brouillon. Ce brouillon masque la fiche de la
+galerie, mais ne rend pas privé un fichier déjà publié dans la médiathèque.
+Supprimer une fiche conserve son image dans Administration → Images.
+
+Les envois publics utilisent les mêmes protections anti-spam que les autres
+contributions : champ-piège, preuve de travail locale et quotas par empreinte
+d'IP. Aucun service extérieur n'est contacté. La file est limitée à 100
+propositions. En fonctionnement normal, un visiteur peut envoyer jusqu'à cinq
+propositions par jour ; sans preuve de travail valide, un envoi par jour est
+accepté. Les images sont vérifiées par leurs octets et décodées avant stockage.
+
+Le dossier `data/` doit être sauvegardé avec les fichiers cachés des envois en
+attente. Le script `scripts/sauvegarde.sh` les inclut. Les dessins d'exemple de
+l'aperçu local sont dans des données ignorées par Git et ne sont pas déployés.
+
 ## Navigation et agenda
 
-La navigation publique donne directement accès à l’agenda et aux articles.
+La navigation publique donne directement accès à l’agenda, aux articles et aux dessins.
 Le menu « Ressources » ouvre la bibliothèque ; sa flèche donne aussi accès à
 la boîte à outils, aux jeux et aux médias. L’agenda rassemble les événements,
 formations et apéros, avec une navigation par mois et des filtres par catégorie.
@@ -201,3 +245,16 @@ sur le port 5191 (`TEST_PORT` permet de le changer). Il vérifie aussi les
 requêtes de formulaires avec et sans amélioration JavaScript, les refus d'accès,
 les tentatives de publication directe et le fonctionnement habituel
 des événements, formations et apéros. Le serveur de test est arrêté à la fin.
+
+Pour vérifier les dessins et les contributions publiques, après compilation :
+
+```bash
+node tests/integration/drawings-http.mjs
+node tests/integration/drawing-submissions-http.mjs
+```
+
+Ces contrôles utilisent des bases temporaires, des images et comptes fictifs,
+et des serveurs locaux sur les ports 5193 et 5194. Ils couvrent les vignettes,
+le téléchargement original, les brouillons, les autorisations, les fichiers
+privés avant acceptation, la publication après modération, le refus et
+l'anti-spam. Les serveurs sont arrêtés à la fin.

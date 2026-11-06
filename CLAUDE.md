@@ -63,7 +63,8 @@ native.
 | `src/lib/fichiers-embarques.ts` | Sert les fichiers des jeux et des modules, avec leur CSP |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
-Les dépendances runtime se comptent sur une main : `markdown-it` et `qrcode`.
+Les dépendances runtime sont `markdown-it`, `qrcode`, `turndown` et `sharp`
+(vignettes des dessins).
 **Ne pas en ajouter sans nécessité** : chaque dépendance est une porte d'entrée
 possible et une mise à jour à suivre.
 
@@ -1163,6 +1164,37 @@ dérivées du violet et du rouge du logo, et ont été vérifiées pour rester
 distinctes aux yeux des daltoniens, dans les deux thèmes : les changer demande
 de refaire cette vérification. Chaque graphique se parcourt au clavier et a son
 tableau de chiffres dépliable.
+
+## Dessins et caricatures
+
+La rubrique `/dessins` affiche les dessins publiés ; chaque fiche `/dessins/ID`
+conserve une adresse stable, son aperçu de partage et le téléchargement de
+l'image originale. Les images ne sont jamais recadrées. La galerie utilise des vignettes WebP de
+640 pixels maximum, créées à la demande par Sharp et conservées dans
+`data/uploads/.thumbnails/`. Le téléchargement conserve l'original. Le lecteur
+en grand propose un zoom, Échap pour fermer et les dessins précédent/suivant
+parmi les seules fiches publiées.
+
+Le formulaire public `/dessins/proposer` est accessible sans compte. Chaque
+proposition reste dans `drawing_submissions`, avec son fichier privé sous
+`data/uploads/.drawing-submissions/`, jusqu'à la décision de l'équipe.
+Le fichier n'entre dans `media` qu'après acceptation. Son aperçu privé exige
+une session administrateur avec la double authentification activée. Les envois
+sont limités par empreinte d'IP, avec preuve de travail et champ-piège ; les
+images sont vérifiées par leurs octets et décodées avant stockage.
+Un refus supprime la proposition et son fichier. Les décisions sont auditées.
+
+Administration → Dessins permet l'ajout, la modification, la mise en brouillon
+et la suppression d'une fiche. Le nom de l'auteur, une description accessible,
+les conditions de partage et l'autorisation de publication sont obligatoires.
+Les brouillons restent hors de la galerie et du plan du site. Comme les autres
+images de la médiathèque, leurs fichiers ne sont pas confidentiels.
+Une image liée à un dessin ne peut pas être supprimée dans Administration →
+Images. Supprimer une fiche conserve son image dans la médiathèque.
+
+Vérification du parcours sur une base temporaire, après compilation :
+`node tests/integration/drawings-http.mjs` et
+`node tests/integration/drawing-submissions-http.mjs`.
 
 ## Ajouter une page fixe
 

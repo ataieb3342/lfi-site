@@ -16,7 +16,8 @@
 	// événement est sous /actualites, celle d'un apéro sous /aperos.
 	const liensPrincipaux = [
 		{ href: '/agenda', label: 'Agenda', sections: ['/agenda', '/actualites', '/aperos'] },
-		{ href: '/articles', label: 'Articles', sections: ['/articles'] }
+		{ href: '/articles', label: 'Articles', sections: ['/articles'] },
+		{ href: '/dessins', label: 'Dessins', sections: ['/dessins'] }
 	];
 
 	const groupesNavigation = [
@@ -84,6 +85,7 @@
 			titre: 'Ressources',
 			liens: [
 				{ href: '/articles', label: 'Articles' },
+				{ href: '/dessins', label: 'Dessins et caricatures' },
 				{ href: '/bibliotheque', label: 'Bibliothèque' },
 				{ href: '/boite-a-outils', label: 'Boîte à outils' },
 				{ href: '/jeux', label: 'Jeux' },

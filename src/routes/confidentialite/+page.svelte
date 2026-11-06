@@ -61,7 +61,10 @@
 		des tiers.
 	</p>
 
-	<h2>Journaux techniques</h2>
+	<h2>Quand vous proposez un dessin</h2>
+ <p>Le fichier, le titre, votre nom ou pseudonyme, la description et les conditions de partage sont transmis à l’équipe de modération. Aucun compte ni adresse e-mail n’est demandé. Le fichier reste privé jusqu’à son acceptation. Après validation, votre pseudonyme et votre dessin deviennent publics ; l’image originale peut être téléchargée. Une proposition refusée et son fichier sont supprimés. Les compteurs anti-spam utilisent une empreinte de votre adresse IP, sans conserver l’adresse en clair.</p>
+ <p>Pour demander le retrait d’un dessin, utilisez l’adresse de contact du site en précisant son titre ou son adresse.</p>
+ <h2>Journaux techniques</h2>
 	<p>
 		L'hébergeur conserve des journaux de connexion, comme l'impose la réglementation française. Le
 		site lui-même ne conserve pas d'adresse IP en clair.
