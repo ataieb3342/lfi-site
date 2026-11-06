@@ -63,8 +63,8 @@ native.
 | `src/lib/fichiers-embarques.ts` | Sert les fichiers des jeux et des modules, avec leur CSP |
 | `src/routes/admin/(interne)/` | Pages d'administration (session obligatoire) |
 
-Les dépendances runtime sont `markdown-it`, `qrcode`, `turndown` et `sharp`
-(vignettes des dessins).
+Les dépendances runtime sont `markdown-it`, `qrcode`, `turndown`, `sharp`
+(vignettes des dessins), `mammoth` et `yauzl` (import Word privé).
 **Ne pas en ajouter sans nécessité** : chaque dépendance est une porte d'entrée
 possible et une mise à jour à suivre.
 
@@ -1164,6 +1164,31 @@ dérivées du violet et du rouge du logo, et ont été vérifiées pour rester
 distinctes aux yeux des daltoniens, dans les deux thèmes : les changer demande
 de refaire cette vérification. Chaque graphique se parcourt au clavier et a son
 tableau de chiffres dépliable.
+
+## Comptes rendus internes
+
+Les routes `/admin/comptes-rendus` et leurs téléchargements exigent une
+session avec double authentification activée, vérifiée explicitement dans
+les chargements, actions et endpoints. Les fichiers originaux restent dans
+`data/uploads/.meeting-reports/`, sans entrée dans la médiathèque publique.
+Les données sont dans `meeting_reports` et passent par les fonctions de
+présentation avant d'être envoyées au navigateur.
+
+`meeting-reports.ts` vérifie les limites des archives DOCX avec Yauzl avant
+conversion par Mammoth, sans accès aux fichiers externes, puis convertit le
+texte en Markdown. Le rendu privé utilise `html: false` et ne charge pas les
+images. Les originaux sont servis en pièce jointe avec `private, no-store`.
+Les tâches Markdown sont rendues comme des cases natives. L'action `task`
+valide la ligne avec les tokens du parseur, sauvegarde `[ ]` ou `[x]` avec
+contrôle de version et journalise `meeting-report.task`. Aucun HTML fourni
+par le document n'est exécuté. Le module partagé `meeting-markdown.ts` garantit le même rendu privé dans
+la lecture et l’aperçu de `MeetingReportEditor.svelte`. Cet éditeur reprend
+les classes et boutons des publications, avec un modèle facultatif sur texte
+vide. Ne pas y importer le module serveur ni le moteur des articles publics.
+`POST /admin/comptes-rendus/import` convertit un fichier pour remplir l’éditeur,
+sans le sauvegarder. L’accès exige la session et la 2FA. À la création, le texte
+corrigé est enregistré avec les octets du fichier original, revalidé côté serveur.
+Ne jamais ajouter ces comptes rendus aux publications, au RSS ou au sitemap.
 
 ## Dessins et caricatures
 

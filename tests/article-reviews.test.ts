@@ -149,7 +149,7 @@ test('migration preserves articles already published before reviews existed', as
  base.exec(`vacuum into '${legacyPath.replaceAll("'", "''")}'`);
  const legacy = new DatabaseSync(legacyPath);
  for (const name of ['article_review_create', 'article_review_convert', 'article_review_reset']) legacy.exec(`drop trigger ${name}`);
- legacy.exec('drop table drawing_submissions; drop table drawings; drop table article_review_history; drop table article_reviews; pragma user_version=21');
+ legacy.exec('drop table meeting_reports; drop table drawing_submissions; drop table drawings; drop table article_review_history; drop table article_reviews; pragma user_version=21');
  const id = Number(legacy.prepare("insert into publications(kind,slug,title,summary,body,status,created_at,updated_at,author_id,author_name,pinned,pinned_order) values('article','legacy-published','Legacy title','Legacy summary','Legacy body','published',?, ?,1,'Admin 1',1,1)").run(new Date().toISOString(), new Date().toISOString()).lastInsertRowid);
  legacy.close();
  const result = spawnSync(process.execPath, ['--experimental-strip-types', '--input-type=module', '-e', "const {db}=await import('./src/lib/server/db.ts'); db().close();"], { env: { ...process.env, DATABASE_PATH: legacyPath }, encoding: 'utf8' });

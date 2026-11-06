@@ -8,6 +8,7 @@
 	const liens = $derived([
 		{ href: '/admin', label: 'Tableau de bord', exact: true },
 		{ href: '/admin/publications', label: 'Publications' },
+		{ href: '/admin/comptes-rendus', label: 'Comptes rendus de réunions' },
 		{ href: '/admin/verifications', label: 'Vérifications', badge: data.verificationsEnAttente },
 		{ href: '/admin/a-la-une', label: 'À la une' },
 		{ href: '/admin/commentaires', label: 'Commentaires', badge: data.commentairesEnAttente },
@@ -22,7 +23,7 @@
 	]);
 
 	function actif(lien: { href: string; exact?: boolean }): boolean {
-		return lien.exact ? page.url.pathname === lien.href : page.url.pathname.startsWith(lien.href);
+		return lien.exact ? page.url.pathname === lien.href : page.url.pathname === lien.href || page.url.pathname.startsWith(`${lien.href}/`);
 	}
 </script>
 

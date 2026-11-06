@@ -611,6 +611,16 @@ const MIGRATIONS: string[] = [
   alt text not null, rights text not null, filename text not null unique,
   mime text not null, bytes integer not null, created_at text not null
  );
+ `,
+ `
+ create table meeting_reports (
+  id integer primary key autoincrement, title text not null,
+  meeting_date text not null, body text not null,
+  filename text, original_name text not null default '', mime text not null default '',
+  created_at text not null, updated_at text not null,
+  created_by integer references admins(id) on delete set null
+ );
+ create index meeting_reports_date on meeting_reports(meeting_date desc);
  `
 ];
 

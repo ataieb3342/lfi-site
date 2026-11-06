@@ -218,10 +218,11 @@ l'image Docker lors de cette mise à jour, comme pour toute modification de
 
 Les nouvelles tables SQLite sont ajoutées automatiquement à la première
 requête. Le volume `data/` contient aussi les fichiers privés des propositions
-(`uploads/.drawing-submissions/`) et le cache des vignettes
+(`uploads/.drawing-submissions/`), les originaux privés des comptes rendus
+(`uploads/.meeting-reports/`) et le cache des vignettes
 (`uploads/.thumbnails/`). Le script de sauvegarde archive tout `uploads`,
 fichiers cachés compris. Ne servez jamais ce dossier directement avec Caddy :
-les routes du site contrôlent l'accès aux images en attente.
+les routes du site contrôlent l'accès aux images en attente et aux comptes rendus.
 
 Les données et illustrations d'exemple de l'aperçu local ne sont pas envoyées
 par Git ni incluses dans le contexte de compilation Docker.

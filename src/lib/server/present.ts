@@ -139,3 +139,13 @@ export function presentDrawingSubmission(row: import('./drawing-submissions.ts')
   alt: row.alt, rights: row.rights, createdAt: row.created_at,
   image: `/admin/dessins/propositions/${row.id}/image` };
 }
+
+export function presentMeetingReport(row: import('./meeting-reports.ts').MeetingReport) {
+ return { id: row.id, title: row.title, meetingDate: row.meeting_date, body: row.body,
+  updatedAt: row.updated_at, originalName: row.original_name,
+  originalUrl: row.filename ? `/admin/comptes-rendus/${row.id}/original` : null };
+}
+
+export function presentMeetingSummary(row: Pick<import('./meeting-reports.ts').MeetingReport, 'id'|'title'|'meeting_date'|'updated_at'>) {
+ return {id:row.id,title:row.title,meetingDate:row.meeting_date,updatedAt:row.updated_at};
+}

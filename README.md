@@ -53,6 +53,7 @@ scripts/           sauvegarde et restauration
 | Relire les sources proposées pour un apéro | Administration → Sources des apéros |
 | Consulter les ressources validées | Bibliothèque |
 | Ajouter un jeu | Déposer son dossier dans `src/lib/jeux/` et l'ajouter à `src/lib/jeux.ts` |
+| Ajouter ou importer un compte rendu de réunion interne | Administration → Comptes rendus de réunions |
 | Proposer un dessin sans compte | Dessins → Proposer un dessin |
 | Vérifier les dessins reçus | Administration → Dessins → Propositions à vérifier |
 | Ajouter une image | Administration → Images |
@@ -158,6 +159,44 @@ Les articles déjà publiés restent en ligne lors de la mise à jour du logicie
 La base est migrée automatiquement au démarrage. Les exemples de la
 prévisualisation utilisent une base séparée de la production.
 
+## Comptes rendus de réunions internes
+
+Administration → Comptes rendus de réunions est réservée aux administrateurs
+connectés avec la double authentification activée. Un titre et une date
+permettent de classer les comptes rendus et de les retrouver par recherche.
+
+Importez un fichier `.docx` (10 Mo maximum) ou `.md` (1 Mo maximum).
+Les anciens fichiers Word `.doc` ne sont pas pris en charge.
+La sélection d’un fichier remplit directement l’éditeur et remplace le modèle.
+Le texte peut être corrigé et prévisualisé avant l’enregistrement ; le fichier
+original est conservé à l’identique. La lecture préalable ne crée aucun compte rendu.
+Il est aussi possible d’écrire directement en Markdown. Les titres,
+liens et listes peuvent être insérés avec les mêmes boutons que dans les
+publications. « Case à cocher » ajoute une tâche et « Aperçu » affiche le
+rendu avant enregistrement. Le bouton « Utiliser le modèle », disponible
+quand le texte est vide, propose les rubriques participants, points discutés,
+décisions et actions à mener. L'import d'un fichier reste facultatif.
+
+Les tâches `- [ ]` et `- [x]`
+deviennent des cases cliquables : chaque changement est enregistré dans le
+texte du compte rendu, sans modifier l'original. Si une autre personne a
+modifié le document entre-temps, rechargez-le avant de recommencer.
+
+Le texte importé est consultable et modifiable dans cette rubrique. La mise
+en page Word est simplifiée ; les images et pièces jointes restent dans
+l'original. Les images mentionnées dans le Markdown ne sont pas chargées.
+L'original peut être téléchargé uniquement après connexion ; modifier le
+texte du compte rendu ne modifie pas ce fichier initial.
+
+Les documents sont conservés dans `data/uploads/.meeting-reports/`, inclus
+dans les sauvegardes de `uploads`. Ils ne passent jamais par la médiathèque
+publique et ne figurent ni dans les articles, ni dans le RSS ou le plan du
+site. Les pages et les téléchargements sont privés et ne sont pas mis en
+cache. La suppression d'un compte rendu supprime également son original.
+Les créations, modifications et suppressions sont inscrites dans le journal
+d'administration. Les modifications simultanées sont détectées pour éviter
+d'écraser le travail d'une autre personne.
+
 ## Galerie collaborative de dessins
 
 La page `/dessins` réunit les dessins et caricatures acceptés. Chacun peut
@@ -258,3 +297,16 @@ et des serveurs locaux sur les ports 5193 et 5194. Ils couvrent les vignettes,
 le téléchargement original, les brouillons, les autorisations, les fichiers
 privés avant acceptation, la publication après modération, le refus et
 l'anti-spam. Les serveurs sont arrêtés à la fin.
+
+Vérification du stockage et des imports des comptes rendus internes :
+
+```bash
+node tests/integration/meeting-reports-http.mjs
+```
+
+Ce test utilise une base temporaire et le port 5196. Il vérifie les imports
+Word et Markdown, les cases à cocher et leur sauvegarde, les corrections,
+les conflits de version, la recherche, le téléchargement original et la
+suppression. Il contrôle aussi le refus des accès sans session ou sans double
+authentification, des modifications depuis un autre site et l'absence de
+comptes rendus dans les pages publiques, le RSS et le plan du site.
