@@ -5,13 +5,11 @@
  import type { PageData } from './$types';
  let { data }: { data: PageData } = $props();
 </script>
-<Metadonnees titre="Dessins et caricatures - {data.settings.siteName}" description="Nos dessins et caricatures à découvrir et à partager, avec la signature de leurs auteurs." donnees={filAriane(page.url.origin, [{ nom: 'Accueil', chemin: '/' }, { nom: 'Dessins et caricatures', chemin: '/dessins' }])} />
+<Metadonnees titre="Dessins et caricatures - {data.settings.siteName}" description="Dessins et caricatures proposés sur le site. Vous pouvez envoyer un dessin sans créer de compte." donnees={filAriane(page.url.origin, [{ nom: 'Accueil', chemin: '/' }, { nom: 'Dessins et caricatures', chemin: '/dessins' }])} />
 <header class="border-b border-line pb-4">
- <p class="text-xs font-bold tracking-[0.2em] text-brand uppercase">Un autre regard</p>
- <h1 class="titre-affiche mt-2 text-3xl text-ink sm:text-4xl">Dessins et caricatures</h1>
- <p class="mt-3 max-w-2xl text-lg text-ink-soft">L’actualité et la vie locale en quelques coups de crayon. Des dessins à regarder et à faire circuler.</p>
+ <h1 class="titre-affiche text-3xl text-ink sm:text-4xl">Dessins et caricatures</h1>
+ <p class="mt-3 max-w-2xl text-lg text-ink-soft">Vous pouvez proposer un dessin sans créer de compte. Il sera vérifié avant d’être publié.</p>
  <a class="bouton mt-5" href="/dessins/proposer">Proposer un dessin</a>
- <p class="mt-3 text-sm text-ink-soft">Ouvert à toutes et tous, sans compte. Chaque proposition est vérifiée avant publication.</p>
 </header>
 {#if data.drawings.length}
  <ul class="mt-6 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -28,8 +26,7 @@
  </ul>
 {:else}
  <div class="mt-8 rounded-xl border border-line bg-carte p-6">
-  <h2 class="text-xl font-bold text-ink">Les premiers dessins arrivent bientôt.</h2>
-  <p class="mt-3 text-ink-soft">Ils seront réunis ici avec le nom de leur auteur et leurs conditions de partage.</p>
+  <p class="text-ink-soft">Aucun dessin publié pour le moment.</p>
   {#if data.admin}<a class="bouton mt-5" href="/admin/dessins">Ajouter un dessin</a>{/if}
  </div>
 {/if}
