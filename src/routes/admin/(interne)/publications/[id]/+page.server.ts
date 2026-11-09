@@ -39,7 +39,6 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
  reviewAuthor: publication.byline_admin_id ?? publication.author_id,
 		positionUne: positionALaUne(publication.id),
 		enregistre: url.searchParams.has('enregistre'),
-		relecture: url.searchParams.get('relecture') === '1',
 		// Ce qu'a donné « Enregistrer et mettre à la une » : `ok`, `brouillon`
 		// ou `pleine`.
 		une: url.searchParams.get('une')
@@ -95,8 +94,7 @@ export const actions: Actions = {
  enregistrerEtPublier: async (event) => {
  const echec=await enregistrer(event,'publish');
  if(echec) return echec;
- const relecture=charger(event.params.id).status==='draft';
- redirect(303,`/admin/publications/${event.params.id}?enregistre=1${relecture?'&relecture=1':''}`);
+ redirect(303,`/admin/publications/${event.params.id}?enregistre=1`);
  },
  publier: async ({params,locals,request}) => {
  const f=await request.formData();

@@ -84,16 +84,16 @@ test('third opinion blocks publication until the designated person approves', ()
  assert.equal(getReview(id).requested_id, null);
 });
 
-test('edits invalidate reviewer approval, prevent stale decisions and remove front-page pinning', () => {
+test('edits preserve approval and publication while preventing stale decisions', () => {
  const id = create();
  approve(id);
  publish(id);
  base.prepare('update publications set pinned=1,pinned_order=1,pinned_at=? where id=?').run(new Date().toISOString(), id);
  updatePublication(id, { ...input, status: 'published', body: 'Version two' }, { reslug: false });
- assert.equal(getById(id)!.status, 'draft');
- assert.equal(getById(id)!.pinned, 0);
+ assert.equal(getById(id)!.status, 'published');
+ assert.equal(getById(id)!.pinned, 1);
  assert.equal(getReview(id).author_approved_by, 1);
- assert.equal(getReview(id).reviewer_id, null);
+ assert.equal(getReview(id).reviewer_id, 2);
  assert.throws(() => reviewAction(id, 2, 'approve', 1, '', 0, 0));
  const initial = create();
  updatePublication(initial, { ...input, title: 'Changed before first agreement' }, { reslug: false });
@@ -216,8 +216,8 @@ test('review counter counts pending submitted articles and third opinions only',
  act(id, 3, 'approve');
  assert.equal(countArticlesAwaitingReview(), initial);
  updatePublication(id, {...input,body:'Changed after approval'}, {reslug:false});
- assert.equal(countArticlesAwaitingReview(), initial + 1);
- act(id, 2, 'corrections', 'More drafting needed');
+ assert.equal(countArticlesAwaitingReview(), initial);
+ act(id, 3, 'corrections', 'More drafting needed');
  assert.equal(countArticlesAwaitingReview(), initial);
 });
 
@@ -272,26 +272,94 @@ test('author can edit and comment during review, then publish the approved versi
  assert.equal(articleReviewWorkspace(1).mine.some(p=>p.id===id),false);
 });
 
-test('author and reviewer remain editable until publication and changes require review without resubmission', () => {
+test('corrections preserve approvals throughout the initial workflow', () => {
  const id=create();
  approve(id);
- for (const actor of [1,2]) assertArticleEditable(id,actor);
- assert.throws(()=>assertArticleEditable(id,3));
  const previous=getReview(id).revision;
  updatePublication(id,{...input,body:'Author revision after approval'},{reslug:false});
  assert.equal(getReview(id).author_approved_by,1);
- assert.equal(getReview(id).reviewer_id,null);
- assert.equal(articleReviewPermissions(id,1).canSubmit,false);
- assert.equal(articleReviewPermissions(id,2).canReview,true);
- assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),true);
+ assert.equal(getReview(id).reviewer_id,2);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),false);
  assert.throws(()=>reviewAction(id,2,'approve',previous,'',0,0));
- assert.throws(()=>publishReviewedArticle(id,1,getReview(id).revision));
- act(id,2,'approve');
  assertArticleEditable(id,2);
  updatePublication(id,{...input,body:'Reviewer revision after approval'},{reslug:false});
- assert.equal(canPublishArticle(id),false);
- assert.equal(getReview(id).author_approved_by,1);
- act(id,2,'approve');
+ assert.equal(canPublishArticle(id),true);
  publishReviewedArticle(id,1,getReview(id).revision);
  assert.equal(getById(id)!.body,'Reviewer revision after approval');
+});
+
+test('voluntary rereview keeps published articles online and appears in personal queues', () => {
+ const id=create();
+ approve(id);
+ publish(id);
+ const publishedAt=getById(id)!.published_at;
+ base.prepare('update publications set pinned=1,pinned_order=1,pinned_at=? where id=?').run(new Date().toISOString(),id);
+ const old=getReview(id).revision;
+ assert.throws(()=>act(id,1,'reopen',''));
+ act(id,1,'reopen','Please check the added source');
+ assert.equal(getById(id)!.status,'published');
+ assert.equal(getById(id)!.pinned,1);
+ assert.equal(getReview(id).author_approved_by,1);
+ assert.equal(getReview(id).reviewer_id,null);
+ assert.equal(articleReviewPermissions(id,1).canReview,false);
+ assert.equal(articleReviewPermissions(id,2).canReview,true);
+ assert.equal(articleReviewWorkspace(1).mine.some(p=>p.id===id),true);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),true);
+ for(const actor of [1,2,3,4]) assert.equal(countArticlesAwaitingReview(actor),articleReviewWorkspace(actor).toReview.length);
+ assert.throws(()=>reviewAction(id,2,'approve',old,'',0,0));
+ assert.throws(()=>act(id,1,'approve'));
+ updatePublication(id,{...input,status:'published',body:'Corrected while online'},{reslug:false});
+ act(id,2,'request','Please check the source',3);
+ assert.equal(getById(id)!.status,'published');
+ assert.equal(articleReviewPermissions(id,2).canReview,false);
+ act(id,3,'corrections','Please clarify the source');
+ assert.equal(getById(id)!.status,'published');
+ assert.equal(getReview(id).author_approved_by,1);
+ act(id,2,'approve');
+ assert.equal(getById(id)!.published_at,publishedAt);
+ assert.equal(getById(id)!.pinned,1);
+ assert.equal(articleReviewWorkspace(2).toReview.some(p=>p.id===id),false);
+});
+
+test('voluntary rereview on a validated draft needs another independent approval', () => {
+ const id=create();
+ approve(id);
+ assert.throws(()=>act(id,3,'reopen','Unauthorized reset'));
+ act(id,1,'reopen','Check the source');
+ assert.equal(articleReviewPermissions(id,1).canSubmit,false);
+ assert.throws(()=>publishReviewedArticle(id,1,getReview(id).revision));
+ act(id,2,'approve');
+ publishReviewedArticle(id,1,getReview(id).revision);
+ assert.equal(getById(id)!.status,'published');
+});
+
+test('migration from the deployed schema keeps existing approvals, publication and pinning', async () => {
+ const {DatabaseSync}=await import('node:sqlite');
+ const {spawnSync}=await import('node:child_process');
+ const id=create();
+ approve(id);
+ publish(id);
+ base.prepare('update publications set pinned=1,pinned_order=1 where id=?').run(id);
+ const path=join(mkdtempSync(join(tmpdir(),'lfi-review-upgrade-')),'deployed.db');
+ base.exec(`vacuum into '${path.replaceAll("'","''")}'`);
+ const previous=new DatabaseSync(path);
+ previous.exec(`drop trigger article_review_reset;
+ create trigger article_review_reset after update of body on publications begin
+ update article_reviews set reviewer_id=null,reviewed_at=null where publication_id=new.id;
+ update publications set status='draft',pinned=0 where id=new.id;
+ end; pragma user_version=28;`);
+ previous.close();
+ const result=spawnSync(process.execPath,['--experimental-strip-types','--input-type=module','-e',`const {db}=await import('./src/lib/server/db.ts'); const base=db(); base.prepare('update publications set body=? where id=?').run('Correction after upgrade',${id}); base.close();`],{env:{...process.env,DATABASE_PATH:path},encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ const upgraded=new DatabaseSync(path);
+ assert.equal(upgraded.prepare('pragma user_version').get()!.user_version,29);
+ const publication=upgraded.prepare('select * from publications where id=?').get(id)!;
+ assert.equal(publication.status,'published');
+ assert.equal(publication.pinned,1);
+ assert.equal(publication.body,'Correction after upgrade');
+ const review=upgraded.prepare('select * from article_reviews where publication_id=?').get(id)!;
+ assert.equal(review.author_approved_by,1);
+ assert.equal(review.reviewer_id,2);
+ assert.deepEqual(upgraded.prepare('pragma foreign_key_check').all(),[]);
+ upgraded.close();
 });

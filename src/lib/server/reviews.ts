@@ -38,6 +38,7 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  if (r.revision!==revision) throw new ReviewError('Le texte a changé. Relisez la nouvelle version avant de valider.');
  if (note.length>2000) throw new ReviewError('Le commentaire est trop long.');
  const permissions = articleReviewPermissions(id, actor);
+ if (action==='reopen' && !permissions.canRequestReview) throw new ReviewError('Vous ne pouvez pas demander une nouvelle relecture.');
  if (action==='author' && !permissions.canSubmit) throw new ReviewError('Cet article ne peut pas être soumis par ce compte.');
  if (['approve','request','corrections'].includes(action) && !permissions.canReview) throw new ReviewError('Cette relecture est réservée à un autre administrateur ou à la personne sollicitée.');
  if (action==='advice' && !permissions.canAskAdvice) throw new ReviewError('Seul l’auteur peut demander un avis sur son brouillon.');
@@ -46,6 +47,9 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  if (action==='author') {
  if (p.author!==actor) throw new ReviewError("Seul l'auteur peut valider son texte. Choisissez son compte dans le formulaire.");
  base.prepare("update article_reviews set author_approved_by=?,author_approved_at=?,advice_requested_id=null,advice_requested_by=null,advice_note='',advice_requested_at=null where publication_id=?").run(actor,now(),id);
+ } else if (action==='reopen') {
+ if (!note.trim()) throw new ReviewError('Précisez ce qui doit être relu.');
+ base.prepare("update article_reviews set revision=revision+1,author_approved_by=?,author_approved_at=coalesce(author_approved_at,?),reviewer_id=null,reviewed_at=null,requested_id=null,requested_by=null,request_note='' where publication_id=?").run(p.author,now(),id);
  } else if (action==='advice') {
  if (p.status!=='draft' || r.author_approved_by) throw new ReviewError('Cette demande est réservée aux brouillons non soumis.');
  if (!note.trim() || target===actor || !base.prepare('select id from admins where id=? and disabled_at is null').get(target)) throw new ReviewError('Choisissez une autre personne et précisez votre question.');
@@ -61,11 +65,15 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
  if (!r.author_approved_by || actor===p.author || r.requested_id) throw new ReviewError('Cette demande nécessite une première validation de l’auteur, sans autre demande en cours.');
  if (!note.trim() || target===actor || target===p.author || !base.prepare('select id from admins where id=? and disabled_at is null').get(target)) throw new ReviewError('Choisissez une troisième personne et précisez votre doute.');
  base.prepare('update article_reviews set requested_by=?,requested_id=?,request_note=?,reviewer_id=null,reviewed_at=null where publication_id=?').run(actor,target,note,id);
- base.prepare("update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=?").run(id);
+
  } else if (action==='corrections') {
  if (!note.trim()) throw new ReviewError('Précisez les corrections demandées.');
+ if (p.status==='published') {
+ base.prepare("update article_reviews set revision=revision+1,reviewer_id=null,reviewed_at=null,requested_id=null,requested_by=null,request_note='' where publication_id=?").run(id);
+ } else {
  base.prepare('update article_reviews set revision=revision+1,author_approved_by=null,author_approved_at=null,reviewer_id=null,reviewed_at=null,requested_id=null,requested_by=null,request_note=\'\' where publication_id=?').run(id);
- base.prepare("update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=?").run(id);
+ base.prepare("update publications set status='draft',pinned=0,pinned_order=null,pinned_at=null where id=? and status='draft'").run(id);
+ }
  } else if (action==='comment') {
  if (!note.trim()) throw new ReviewError('Écrivez un commentaire.');
  } else if (action==='priority') {
@@ -80,7 +88,7 @@ export function reviewAction(id:number, actor:number, action:string, revision:nu
 export function listArticlesForReview(submitted = true) {
  const rows = db().prepare(`select p.id,p.title,p.author_name,p.created_at,p.status
  from publications p join article_reviews r on r.publication_id=p.id
- where p.kind='article' and p.status='draft'
+ where p.kind='article' and (p.status='draft' or (p.status='published' and r.author_approved_by is not null and r.reviewer_id is null))
  and (r.author_approved_by is not null) = ?
  order by r.priority desc,coalesce(r.author_approved_at,p.created_at),p.id`).all(submitted ? 1 : 0) as {id:number;title:string;author_name:string;created_at:string;status:string}[];
  return rows.map(p => ({...p,review:getReview(p.id),label:reviewLabel(getReview(p.id))}));
@@ -89,28 +97,29 @@ export function listArticlesForReview(submitted = true) {
 export function countArticlesAwaitingReview(actorId?: number): number {
  if (actorId !== undefined) return Number((db().prepare(`select count(*) as n from publications p
  join article_reviews r on r.publication_id=p.id
- where p.kind='article' and p.status='draft'
+ where p.kind='article' and (p.status='draft' or (p.status='published' and r.author_approved_by is not null and r.reviewer_id is null))
  and coalesce(p.byline_admin_id,p.author_id) is not ?
  and exists(select 1 from admins where id=? and disabled_at is null)
  and ((r.author_approved_by is not null and r.reviewer_id is null and (r.requested_id is null or r.requested_id=?))
  or (r.author_approved_by is null and r.advice_requested_id=?))`).get(actorId,actorId,actorId,actorId) as {n:number}).n);
  return Number((db().prepare(`select count(*) as n from publications p
  join article_reviews r on r.publication_id=p.id
- where p.kind='article' and p.status='draft' and r.author_approved_by is not null
+ where p.kind='article' and (p.status='draft' or (p.status='published' and r.author_approved_by is not null and r.reviewer_id is null)) and r.author_approved_by is not null
  and (r.reviewer_id is null or r.requested_id is not null)`).get() as {n:number}).n);
 }
 
 export function articleReviewPermissions(id: number, actorId: number) {
  const p = db().prepare('select * from publications where id=?').get(id) as Publication | undefined;
- if (!p || p.kind !== 'article') return {isAuthor:false,canEdit:true,canSubmit:false,canReview:false,canAskAdvice:false,canReplyAdvice:false,canComment:false,canPublish:false};
+ if (!p || p.kind !== 'article') return {isAuthor:false,canEdit:true,canSubmit:false,canReview:false,canAskAdvice:false,canReplyAdvice:false,canComment:false,canPublish:false,canRequestReview:false};
  const r = getReview(id);
  const isAuthor = (p.byline_admin_id ?? p.author_id) === actorId;
  const active = !!db().prepare('select id from admins where id=? and disabled_at is null').get(actorId);
- const canReview = active && !isAuthor && p.status === 'draft' && !!r.author_approved_by && (!r.reviewer_id || r.reviewer_id===actorId) && (!r.requested_id || r.requested_id === actorId);
+ const canReview = active && !isAuthor && (p.status === 'draft' || (p.status === 'published' && !r.reviewer_id)) && !!r.author_approved_by && (!r.reviewer_id || r.reviewer_id===actorId) && (!r.requested_id || r.requested_id === actorId);
  const canSubmit = active && isAuthor && p.status === 'draft' && !r.author_approved_by;
  return {isAuthor,canEdit:active && (p.status === 'published' || (isAuthor && p.status === 'draft') || canReview),canSubmit,canReview,
  canAskAdvice:canSubmit,canReplyAdvice:active && !isAuthor && r.advice_requested_id === actorId && !r.author_approved_by,
  canComment:active && (p.status==='published' || isAuthor || canReview || r.advice_requested_id === actorId || r.reviewer_id === actorId || r.requested_by === actorId),
+ canRequestReview:active && !!(p.byline_admin_id ?? p.author_id) && !!db().prepare('select id from admins where id=? and disabled_at is null').get(p.byline_admin_id ?? p.author_id) && (p.status==='published' || ((isAuthor || r.reviewer_id===actorId) && !!r.reviewer_id)) && !(r.author_approved_by && !r.reviewer_id),
  canPublish:active && isAuthor && p.status === 'draft' && canPublishArticle(id)};
 }
 
@@ -130,15 +139,15 @@ export function publishReviewedArticle(id:number, actorId:number, revision:numbe
 
 export function articleReviewWorkspace(actorId:number) {
  const rows=db().prepare(`select p.id,p.title,p.author_name,p.status,p.updated_at,
- coalesce(p.byline_admin_id,p.author_id) as owner from publications p
- where p.kind='article' and p.status='draft' order by p.updated_at desc,p.id desc`).all() as {id:number;title:string;author_name:string;status:string;updated_at:string;owner:number|null}[];
+ coalesce(p.byline_admin_id,p.author_id) as owner from publications p left join article_reviews r on r.publication_id=p.id
+ where p.kind='article' and (p.status='draft' or (p.status='published' and r.author_approved_by is not null and r.reviewer_id is null)) order by p.updated_at desc,p.id desc`).all() as {id:number;title:string;author_name:string;status:string;updated_at:string;owner:number|null}[];
  const articles=rows.map(p=>{
  const review=getReview(p.id);
  const history=reviewHistory(p.id);
  const lastRemark=history.find(h=>['comment','corrections','advice_reply'].includes(h.action));
  const needsCorrections=!review.author_approved_by && history.find(h=>['author','corrections'].includes(h.action))?.action==='corrections';
  return {...p,review,permissions:articleReviewPermissions(p.id,actorId),lastRemark:lastRemark?.note ?? '',
- label:needsCorrections ? 'Corrections demandées' : review.reviewer_id ? 'Prêt à publier' : review.requested_id ? 'Avis en cours' : review.author_approved_by ? 'En attente de relecture' : 'En rédaction'};
+ label:p.status==='published' ? 'En ligne · Relecture demandée' : needsCorrections ? 'Corrections demandées' : review.reviewer_id ? 'Prêt à publier' : review.requested_id ? 'Avis en cours' : review.author_approved_by ? 'En attente de relecture' : 'En rédaction'};
  });
  return {mine:articles.filter(p=>p.owner===actorId),toReview:articles.filter(p=>p.owner!==actorId && ((p.permissions.canReview && !p.review.reviewer_id) || p.permissions.canReplyAdvice)).sort((a,b)=>b.review.priority-a.review.priority || (a.review.author_approved_at ?? a.updated_at).localeCompare(b.review.author_approved_at ?? b.updated_at))};
 }

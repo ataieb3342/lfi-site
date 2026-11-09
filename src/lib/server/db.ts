@@ -621,6 +621,21 @@ const MIGRATIONS: string[] = [
   created_by integer references admins(id) on delete set null
  );
  create index meeting_reports_date on meeting_reports(meeting_date desc);
+ `,
+ `
+ drop trigger article_review_reset;
+ create trigger article_review_reset after update of title,summary,body,cover_media_id,byline_admin_id,author_name,layout_style,kind on publications
+ when old.title is not new.title or old.summary is not new.summary or old.body is not new.body
+ or old.cover_media_id is not new.cover_media_id or old.byline_admin_id is not new.byline_admin_id
+ or old.author_name is not new.author_name or old.layout_style is not new.layout_style or old.kind is not new.kind
+ begin
+ update article_reviews set revision=revision+1,
+ author_approved_by=case when old.byline_admin_id is not new.byline_admin_id or old.kind is not new.kind then null else author_approved_by end,
+ author_approved_at=case when old.byline_admin_id is not new.byline_admin_id or old.kind is not new.kind then null else author_approved_at end,
+ reviewer_id=case when old.byline_admin_id is not new.byline_admin_id or old.kind is not new.kind then null else reviewer_id end,
+ reviewed_at=case when old.byline_admin_id is not new.byline_admin_id or old.kind is not new.kind then null else reviewed_at end
+ where publication_id=new.id;
+ end;
  `
 ];
 

@@ -112,32 +112,32 @@ y compris par le raccourci de mise à la une. Après validation, seule l’actio
 ne permet pas de contourner cette étape.
 
 Administration → Vérifications comporte deux onglets. « Mes articles » rassemble
-les textes non publiés dont le compte connecté est l'auteur responsable.
+les textes non publiés dont le compte connecté est l’auteur responsable, ainsi
+que ses articles en ligne pour lesquels une nouvelle relecture est demandée.
 « À vérifier » contient uniquement les articles des autres sur lesquels ce
 compte peut intervenir : une relecture après soumission, ou un avis demandé
 personnellement sur un brouillon. Le compteur du menu correspond à cet onglet.
 Un brouillon non soumis apparaît dans « À vérifier » uniquement chez la
 personne à laquelle l’auteur a demandé un avis.
 
-L’auteur et le relecteur peuvent modifier le texte jusqu’à sa publication,
-y compris après une première validation. Les modifications du texte retirent
-la validation du relecteur, sans retirer la soumission de l’auteur : la
-relecture continue sans nouvelle soumission. Un enregistrement fondé sur une
-ancienne version est refusé pour ne pas écraser les corrections de l’autre.
-L’auteur ne peut pas valider sa propre relecture. Une demande explicite de
-corrections remet le texte en rédaction ; un commentaire seul conserve l’état.
+L’auteur et le relecteur peuvent corriger le texte sans effacer les validations
+ni recommencer la soumission. Un article publié reste en ligne lorsqu’il est
+modifié ; sa date de publication et sa place à la une sont conservées.
+Le bouton « Publier » enregistre les dernières corrections et met l’article
+en ligne dès que la validation initiale de deux administrateurs distincts
+est acquise. L’auteur ne peut pas valider sa propre relecture.
 
-Un autre administrateur ouvre l'article, le corrige si besoin et choisit
-« Valider cet article », disponible en haut et à la fin du formulaire. Les
-corrections et la validation sont enregistrées ensemble, sans redemander
-l'accord initial de l'auteur. Les décisions sur une
-ancienne version du texte sont refusées. L'auteur peut ensuite utiliser le
-bouton « Publier » sur la version validée. La validation ne publie pas
-automatiquement et un auteur ne peut jamais assurer sa propre relecture.
-Le bouton « Publier » enregistre aussi les champs du formulaire : si le texte
-a changé depuis sa validation, les modifications sont conservées et l’article
-reste à relire. S’il n’a pas changé, il est mis en ligne. Aucun texte modifié
-ne peut ainsi être publié avec une ancienne validation.
+Une nouvelle relecture se demande volontairement sur la fiche, en précisant
+ce qui doit être relu. La soumission de l’auteur est conservée et la validation
+du relecteur est rouverte. Pour un article déjà publié, cette demande apparaît
+dans Vérifications sans retirer l’article du site. Pour un brouillon validé,
+elle suspend la première publication jusqu’à la nouvelle validation.
+
+Les versions continuent d’être suivies : un formulaire ancien ne peut pas
+écraser les corrections récentes de quelqu’un d’autre. Le changement de compte
+auteur ou de catégorie réinitialise les accords liés à cette identité ; les
+corrections du titre, du texte, de l’image, de la signature affichée et de la
+mise en page ne les réinitialisent pas.
 
 Le bloc de suivi se trouve au-dessus du texte. Après validation, il confirme
 que l'auteur peut publier. Il affiche l'action attendue ; les commentaires
