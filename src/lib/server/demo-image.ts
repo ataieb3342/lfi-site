@@ -3,9 +3,9 @@
  *
  * Elle est encodée ici en base64 plutôt que déposée dans `data/uploads/` :
  * ce dossier est le stockage du site en fonctionnement, il est dans
- * `.gitignore` et n'existe pas au démarrage d'un conteneur neuf. Sur Render, la
- * démo repart d'une base vide à chaque déploiement - sans cette copie dans le
- * code, l'article à la une y serait sans illustration.
+ * `.gitignore` et n'existe pas sur une copie neuve du dépôt : une démo qui
+ * part d'une base vide n'aurait pas d'illustration pour l'article à la une
+ * sans cette copie dans le code.
  *
  * Même raisonnement que pour les jeux et les outils (`fichiers-embarques.ts`) :
  * ce qui doit survivre au déploiement vit dans le dépôt, pas dans les données.

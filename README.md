@@ -157,10 +157,16 @@ apéros, en liste ou en calendrier du mois, avec des filtres par type. La page
 Articles se filtre par format (actus, articles, séries) et mène aux pages des
 séries.
 
-## Site de démonstration
+## Essayer le site avec des contenus fictifs
 
-Pour faire tester le site gratuitement avec des contenus fictifs, voir
-**[DEMO.md](DEMO.md)**.
+Sur son ordinateur, sans toucher aux vraies données :
+
+```bash
+MODE_DEMO=1 DATABASE_PATH=data/demo/site.db npm run dev
+```
+
+Une base vide est remplie de contenus fictifs, et la page de connexion de
+l'administration affiche les identifiants d'un compte de test.
 
 ## Mise en production
 
