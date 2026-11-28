@@ -1,12 +1,7 @@
 #!/bin/sh
 # Point d'entrée du conteneur.
 #
-# ORIGIN est l'adresse publique du site, indispensable à SvelteKit pour
-# accepter les formulaires. En production elle vient de .env. Sur Render (site
-# de démonstration), elle n'est pas connue à l'avance : Render la fournit dans
-# RENDER_EXTERNAL_URL, on la reprend si ORIGIN est vide.
-if [ -z "$ORIGIN" ] && [ -n "$RENDER_EXTERNAL_URL" ]; then
-	export ORIGIN="$RENDER_EXTERNAL_URL"
-fi
-
+# ORIGIN, l'adresse publique du site indispensable à SvelteKit pour accepter
+# les formulaires, vient de .env. (Le site de démonstration sur Render, qui la
+# lisait dans RENDER_EXTERNAL_URL, a été retiré en novembre 2026.)
 exec node build/index.js

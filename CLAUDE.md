@@ -1481,17 +1481,20 @@ Fréquentation l'affiche par son nom plutôt que par son adresse.
 `src/lib/server/demo.ts`, activé par `MODE_DEMO=1`. Sur une base vide, il crée
 des contenus fictifs et un compte `demo` avec la 2FA déjà activée, puis la page
 de connexion affiche les identifiants et le code du moment. L'administration
-est donc ouverte à tout le monde : ce mode est réservé au site de test sur
-Render (`render.yaml`, `DEMO.md`) et ne doit jamais être activé en production.
+est donc ouverte à tout le monde : ce mode sert à essayer le site sur son
+ordinateur (configuration « demo » de `.claude/launch.json`) et ne doit jamais
+être activé en production. Il a aussi fait tourner un site de test sur Render,
+retiré le 28 novembre 2026 avec `render.yaml` et `DEMO.md` : le vrai site en
+ligne le remplace.
 Les contenus fictifs sont dans le tableau `FICHES` de ce fichier ; les dates
 des rendez-vous sont relatives au jour du démarrage.
 
 La fiche portant `illustree: true` reçoit une **image de couverture**, encodée
 en base64 dans `demo-image.ts`. Elle est dans le code et non dans
 `data/uploads/` parce que ce dossier est le stockage du site en fonctionnement :
-il est dans `.gitignore` et n'existe pas au démarrage d'un conteneur neuf. Sur
-Render, la démo repart d'une base vide à chaque déploiement - sans cette copie,
-l'article à la une y serait sans illustration. Même raisonnement que pour les
+il est dans `.gitignore` et n'existe pas sur une copie neuve du dépôt : une démo
+qui part d'une base vide n'aurait pas d'illustration pour l'article à la une.
+Même raisonnement que pour les
 jeux et les outils : ce qui doit survivre au déploiement vit dans le dépôt, pas
 dans les données. **Le vrai site n'a rien à faire ici** : il reçoit ses images
 par Administration → Médias.

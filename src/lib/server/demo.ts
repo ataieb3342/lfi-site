@@ -9,9 +9,11 @@ import { currentTotp, generateTotpSecret } from './totp.ts';
 /**
  * Mode démonstration.
  *
- * Sert à mettre le site en ligne sur un hébergement gratuit (Render) pour le
- * faire tester, avant la vraie mise en production. Il s'active avec la variable
- * d'environnement MODE_DEMO=1 et fait trois choses :
+ * Sert à essayer le site sur son ordinateur avec des contenus fictifs
+ * (`npm run dev` avec MODE_DEMO=1, configuration « demo » de
+ * `.claude/launch.json`). Il a aussi servi au site de test sur Render, retiré en
+ * novembre 2026. Il s'active avec la variable d'environnement MODE_DEMO=1 et
+ * fait trois choses :
  *
  *   1. si la base est vide, elle est remplie d'articles, d'actualités, d'apéros
  *      et de commentaires FICTIFS, et un compte administrateur de test est créé avec
@@ -22,8 +24,7 @@ import { currentTotp, generateTotpSecret } from './totp.ts';
  *
  * Le point 3 rend l'administration ouverte à quiconque connaît l'adresse.
  * C'est voulu pour une démo, et c'est pour cela que MODE_DEMO ne doit JAMAIS
- * être défini sur le vrai site. Sur Render, le disque est effacé à chaque
- * redémarrage : ce que les testeurs écrivent disparaît de lui-même.
+ * être défini sur le vrai site.
  */
 
 export function modeDemo(): boolean {
