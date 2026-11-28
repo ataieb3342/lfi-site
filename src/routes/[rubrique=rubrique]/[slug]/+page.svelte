@@ -67,7 +67,11 @@
 
 <!-- Toute la fiche partage la même colonne de lecture : en-tête, image,
      texte, dossier partagé et commentaires ont ainsi le même bord gauche. -->
-<div class="mx-auto max-w-2xl" class:article-aquarelle={p.layoutStyle === 'carnet-aquarelle'}>
+<div
+	class="mx-auto max-w-2xl"
+	class:article-aquarelle={p.layoutStyle === 'carnet-aquarelle'}
+	class:article-revue={p.layoutStyle !== 'carnet-aquarelle'}
+>
 
 {#if data.apercu}
 	<p class="mb-6 rounded border border-accent bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
@@ -114,7 +118,7 @@
 			</p>
 		{/if}
 		{#if p.summary}
-			<p class="mt-4 max-w-2xl whitespace-pre-line text-lg text-ink-soft">{p.summary}</p>
+			<p class="chapo mt-4 max-w-2xl whitespace-pre-line text-lg text-ink-soft">{p.summary}</p>
 		{/if}
 
 		{#if p.eventAt && p.kind === 'apero'}

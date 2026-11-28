@@ -868,6 +868,33 @@ et `html: false` s'applique aussi à l'aperçu. Le formulaire est envoyé sans
 rechargement (`use:enhance`, `reset: false`) pour que l'image choisie et le
 texte tapé restent en place.
 
+## La mise en page des publications (« Revue »)
+
+Depuis le 28 novembre 2026, toute fiche qui n'est pas en « Carnet aquarelle »
+porte `.article-revue` (`[rubrique=rubrique]/[slug]/+page.svelte`, styles
+dans `app.css`). Les articles mêlaient quatre polices - Stack Sans, Union
+Gothic en capitales serrées, Public Sans, Gowun Batang - et ressemblaient à
+un tract. La « Revue » n'en garde que deux : `--font-serif` (Iowan Old Style
+sur Mac et iPhone, Palatino ou Georgia ailleurs, rien à télécharger) pour le
+texte, le chapô et les citations, Stack Sans pour le titre et les
+intertitres, en casse normale avec un court filet rouge au-dessus. Les
+citations sortent en rouge entre deux filets ; une lettrine ouvre le texte ;
+un carré rouge le ferme.
+
+**La lettrine et le carré sont placés par le Markdown**, règle
+`lettrine_et_fin` de `markdown.ts`, et non par le CSS seul, qui ne sait pas si
+un paragraphe commence par un mot ou par un lien. Sur les vrais articles, la
+lettrine tombait sur le « h » de « https » ou sur une légende en italique, et
+le carré restait seul sous une image. Le premier paragraphe reçoit
+`lettrine` s'il commence par une lettre en texte simple et fait au moins 80
+caractères ; le dernier bloc reçoit `fin` si c'est un paragraphe qui se
+termine par du texte simple. Les classes sont fixes : rien de ce qu'écrit
+l'auteur n'entre dans l'attribut.
+
+Le « Carnet aquarelle » reste un choix du formulaire, pour la série des
+Amfis : ses personnages et leurs répliques sont écrits dans `markdown.ts`, il
+ne se généralise pas tel quel.
+
 ## L'en-tête
 
 **Ce que contiennent l'en-tête, le menu Ressources et le pied de page est

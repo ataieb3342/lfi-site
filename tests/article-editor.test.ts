@@ -39,7 +39,7 @@ test('keeps the image, opening bubble and paragraph in the same bounded group', 
 	assert.match(html, /article-element-parchment/);
 	assert.match(
 		html,
-		/<div class="article-flow-content">[\s\S]*Bonjour[\s\S]*La question du syndicalisme\.<\/p>\n<\/div><\/div><p>Un autre paragraphe\./
+		/<div class="article-flow-content">[\s\S]*Bonjour[\s\S]*La question du syndicalisme\.<\/p>\n<\/div><\/div><p[^>]*>Un autre paragraphe\./
 	);
 });
 
@@ -341,7 +341,7 @@ test('staggered dialogue contains both replies before the following paragraph', 
 	const source = [question, answer, 'Le texte reprend sur toute la largeur.'].join('\n\n');
 	const html = renderMarkdown(source);
 	assert.match(html, /article-flow-objects article-flow-staggered/);
-	assert.match(html, /Question \?[\s\S]*Réponse\.[\s\S]*<\/aside><\/div><p>Le texte/);
+	assert.match(html, /Question \?[\s\S]*Réponse\.[\s\S]*<\/aside><\/div><p[^>]*>Le texte/);
 	assert.equal(serializeEditorDocument(parseEditorDocument(source)), source);
 	assert.equal(
 		parseArticleElement('{"kind":"bubble","text":"test","dialogueLayout":"<script>"}')?.dialogueLayout,

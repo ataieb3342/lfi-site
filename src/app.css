@@ -404,6 +404,113 @@ h1, h2, h3, h4 {
 .contenu table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
 .contenu th, .contenu td { border: 1px solid var(--color-line); padding: 0.5rem 0.75rem; text-align: left; }
 
+/*
+ * Mise en page « Revue » des publications (maquette, novembre 2026).
+ *
+ * Les articles mêlaient quatre polices - Stack Sans pour le titre, Union Gothic
+ * en capitales serrées pour les intertitres, Public Sans pour le texte, Gowun
+ * Batang pour les citations - et aucune ne donnait le ton. Ici, deux familles
+ * seulement : une police à empattements pour lire (le texte, le chapô, les
+ * citations) et Stack Sans pour se repérer (titre, intertitres), en casse
+ * normale. Le texte est celui d'un mensuel qu'on lit, pas celui d'un tract.
+ *
+ * `--font-serif` est la police de lecture du système (Iowan Old Style sur Mac
+ * et iPhone, Palatino ou Georgia ailleurs) : rien à télécharger.
+ */
+.article-revue .titre-publication {
+	font-size: clamp(2rem, 1.4rem + 2.6vw, 2.85rem);
+	line-height: 1.08;
+	letter-spacing: -0.032em;
+}
+.article-revue .chapo {
+	font-family: var(--font-serif);
+	font-size: 1.2rem;
+	line-height: 1.5;
+	color: var(--color-ink);
+}
+/* 18 pixels sur téléphone : à 19, une ligne ne tenait plus que cinq ou six
+   mots et le texte s'étirait sur des écrans entiers. */
+.article-revue .contenu {
+	font-family: var(--font-serif);
+	font-size: 1.125rem;
+	line-height: 1.65;
+}
+@media (min-width: 40rem) {
+	.article-revue .contenu { font-size: 1.1875rem; line-height: 1.7; }
+	.article-revue .chapo { font-size: 1.3rem; }
+}
+.article-revue .contenu > * + * { margin-top: 1.05em; }
+
+/* La lettrine : la première lettre du premier paragraphe, en rouge, sur deux
+   lignes. Le paragraphe qui la reçoit est choisi dans `markdown.ts` (règle
+   `lettrine_et_fin`) : seulement s'il commence par un mot et fait au moins
+   deux lignes. `flow-root` garde la lettrine dans son paragraphe si l'écran
+   est large au point qu'il tienne sur une seule. */
+.article-revue .contenu p.lettrine { display: flow-root; }
+.article-revue .contenu p.lettrine::first-letter {
+	float: left;
+	margin: 0.06em 0.09em 0 0;
+	font-family: 'Stack Sans Headline', 'Public Sans', var(--font-sans);
+	font-size: 3.55em;
+	font-weight: 700;
+	line-height: 0.82;
+	color: var(--color-brand);
+}
+
+/* Les intertitres : en casse normale, avec un court filet rouge au-dessus
+   qui marque le changement de partie sans crier. */
+.article-revue .contenu h2 {
+	margin-top: 2.1em;
+	font-family: 'Stack Sans Headline', 'Public Sans', var(--font-sans);
+	font-size: 1.55rem;
+	font-stretch: normal;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: -0.022em;
+	text-transform: none;
+}
+.article-revue .contenu h2::before {
+	content: '';
+	display: block;
+	width: 2.25rem;
+	height: 3px;
+	margin-bottom: 0.7rem;
+	border-radius: 2px;
+	background: var(--color-brand);
+}
+.article-revue .contenu h3 {
+	font-size: 1.25rem;
+}
+/* Un article qui s'ouvre sur un intertitre : l'en-tête marque déjà l'écart. */
+.article-revue .contenu > h2:first-child { margin-top: 0; }
+.article-revue .contenu :is(h2, h3) + p { margin-top: 0.6em; }
+
+/* Les citations ressortent du texte, comme dans la presse : plus grandes, en
+   rouge, entre deux filets. Les articles en contiennent peu, et courtes. */
+.article-revue .contenu blockquote {
+	margin-block: 1.8em;
+	padding: 0.9em 0;
+	border-block: 1px solid var(--color-line-forte);
+	border-left: 0;
+	font-family: var(--font-serif);
+	font-size: 1.3em;
+	font-style: italic;
+	line-height: 1.4;
+	color: var(--color-brand);
+}
+
+/* Le carré de fin, qui dit au lecteur qu'il est arrivé au bout. Posé
+   seulement après une phrase (`fin`, voir `markdown.ts`) : seul sous une
+   image ou collé à une adresse web, il avait l'air d'une coquille. */
+.article-revue .contenu p.fin::after {
+	content: '';
+	display: inline-block;
+	width: 0.55em;
+	height: 0.55em;
+	margin-left: 0.4em;
+	background: var(--color-brand);
+}
+
 /* Styles éditoriaux insérés depuis la barre d'outils de l'administration. */
 .texte-police-public-sans { font-family: 'Public Sans', var(--font-sans); }
 .texte-police-gowun-batang { font-family: 'Gowun Batang', var(--font-serif); }

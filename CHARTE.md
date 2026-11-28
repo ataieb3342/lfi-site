@@ -105,6 +105,10 @@ Avant d'écrire une classe à la main, prendre celle qui existe.
   écrase le fond, ce qui donne du texte blanc sur fond blanc.
 - Les ressources sont en **liste** ; les outils, les jeux et les dessins en
   **cartes**.
+- Le texte d'une publication suit la mise en page **« Revue »**
+  (`.article-revue` d'`app.css`) : deux familles seulement, une police à
+  empattements pour lire, Stack Sans pour les titres, en casse normale. Pas de
+  capitales serrées dans un article.
 
 ## 5. Espacements
 
