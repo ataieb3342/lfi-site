@@ -242,6 +242,48 @@ md.core.ruler.push('bloc_video', (state) => {
 	}
 });
 
+/**
+ * La lettrine et le carré de fin de la mise en page « Revue » (app.css).
+ *
+ * Le CSS seul ne sait pas les placer : il ne distingue pas un paragraphe qui
+ * commence par un mot d'un paragraphe qui commence par un lien ou une légende
+ * en italique. Sur les vrais articles, la lettrine tombait sur le « h » de
+ * « https », sur une légende de tableau, ou débordait d'un paragraphe d'une
+ * ligne sur le suivant ; le carré de fin se retrouvait seul sous une image.
+ *
+ * On marque donc ici, d'une classe fixe (rien de ce qu'écrit l'auteur ne
+ * passe dans l'attribut) :
+ * - `lettrine` : le premier paragraphe, s'il commence par une lettre en texte
+ *   simple et fait au moins 80 caractères (deux lignes sur ordinateur) ;
+ * - `fin` : le dernier bloc, si c'est un paragraphe qui se termine par du
+ *   texte simple (pas un lien, une image ou du gras).
+ */
+const LONGUEUR_LETTRINE = 80;
+
+md.core.ruler.push('lettrine_et_fin', (state) => {
+	const jetons = state.tokens;
+	const blocs = jetons.filter((jeton) => jeton.level === 0 && jeton.nesting !== -1);
+
+	const premier = jetons.findIndex((jeton) => jeton.level === 0 && jeton.type === 'paragraph_open');
+	if (premier !== -1) {
+		const enfants = jetons[premier + 1]?.children ?? [];
+		const texte = enfants.map((enfant) => enfant.content).join('');
+		if (enfants[0]?.type === 'text' && /^\p{L}/u.test(enfants[0].content) && texte.length >= LONGUEUR_LETTRINE) {
+			jetons[premier].attrJoin('class', 'lettrine');
+		}
+	}
+
+	const dernier = blocs.at(-1);
+	if (dernier?.type === 'paragraph_open') {
+		const indice = jetons.indexOf(dernier);
+		const enfants = jetons[indice + 1]?.children ?? [];
+		const fin = enfants.at(-1);
+		if (fin?.type === 'text' && fin.content.trim() !== '') {
+			dernier.attrJoin('class', 'fin');
+		}
+	}
+});
+
 md.renderer.rules.bloc_video = (tokens, idx) => {
 	const { identifiant, titre } = tokens[idx].meta as { identifiant: string; titre: string };
 

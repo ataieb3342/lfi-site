@@ -9,7 +9,7 @@
 
 services:
   - type: web
-    name: lfi-dijon-demo
+    name: lachouetterouge-demo
     runtime: docker
     plan: free
     # Francfort est la seule région européenne proposée par Render.

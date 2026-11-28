@@ -40,7 +40,7 @@ https://github.com (compte gratuit), puis dans le dossier du projet :
 ```bash
 git init -b main
 git add .
-git commit -m "Site LFI Dijon"
+git commit -m "Site La chouette rouge"
 git remote add origin https://github.com/VOTRE-COMPTE/lachouetterouge.git
 git push -u origin main
 ```
@@ -54,11 +54,11 @@ aucun secret ni aucune donnée ne part sur GitHub.
    est la plus simple, aucune carte bancaire n'est demandée).
 2. Tableau de bord → **New** → **Blueprint**.
 3. Choisissez le dépôt `lachouetterouge`. Render lit `render.yaml` et propose un
-   service `lfi-dijon-demo` sur l'offre gratuite. Validez.
+   service `lachouetterouge-demo` sur l'offre gratuite. Validez.
 4. Le premier déploiement prend 3 à 5 minutes (construction de l'image Docker).
 
 À la fin, Render affiche l'adresse du site, du type
-`https://lfi-dijon-demo.onrender.com`. Si le nom est déjà pris, Render ajoute
+`https://lachouetterouge-demo.onrender.com`. Si le nom est déjà pris, Render ajoute
 un suffixe : ça ne change rien, l'adresse est lue automatiquement.
 
 ### 3. Vérifier
